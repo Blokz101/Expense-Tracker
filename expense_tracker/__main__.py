@@ -3,10 +3,8 @@
 from expense_tracker import cli, __app_name__
 
 
-
 def main() -> None:
-    cli.CLI.app(prog_name = __app_name__)
-
+    cli.CLI.app(prog_name=__app_name__)
 
 
 if __name__ == "__main__":
