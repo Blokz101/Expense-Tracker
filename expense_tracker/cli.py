@@ -20,7 +20,7 @@ class CLI:
         Callback for main command and version option.
         """
         if value:
-            typer.echo(f"{__app_name__} {__version__}")
+            print(f"{__app_name__} {__version__}")
             raise typer.Exit()
 
     @staticmethod
