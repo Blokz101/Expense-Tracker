@@ -21,13 +21,13 @@ class ConfigManager(ConfigParser):
         super().__init__()
 
         if not os.path.exists(GeneralConstants.SETTINGS_FILE_NAME):
-            self._create_database()
+            self._create_database(GeneralConstants.SETTINGS_FILE_DEAFULTS)
 
         self.read(GeneralConstants.SETTINGS_FILE_NAME)
 
         self._verify_database()
 
-    def _create_database(self) -> None:
+    def _create_database(self, deafults: list) -> None:
         """
         Create a new database with deafults defined in constants.py
         """
@@ -35,10 +35,10 @@ class ConfigManager(ConfigParser):
         for (
             section_name,
             section_deafults,
-        ) in GeneralConstants.SETTINGS_FILE_DEAFULTS:
+        ) in deafults:
             self[section_name] = section_deafults
 
-        self.write(open(GeneralConstants.SETTINGS_FILE_NAME, "w"))
+        self.write(open(deafults, "w"))
 
     def _verify_database(self) -> None:
         """
@@ -55,5 +55,5 @@ class ConfigManager(ConfigParser):
                 if not self.has_option(section_name, key):
 
                     raise SettingsFormatException(
-                        f'Settings file is missing section "{section_name}" option "{key}"'
+                        f'Settings file is missing section \'{section_name}\' option \'{key}\''
                     )

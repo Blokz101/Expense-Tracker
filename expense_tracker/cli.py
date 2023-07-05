@@ -3,11 +3,14 @@
 from typing import Optional
 from typing_extensions import Annotated
 
+from rich.console import Console
+
 import typer
 
 from expense_tracker import __app_name__, __version__
 from expense_tracker.model import Database
 from expense_tracker.config_manager import ConfigManager
+from expense_tracker.exceptions import *
 
 
 class CLI:
@@ -16,11 +19,16 @@ class CLI:
     """
 
     app: typer.Typer = typer.Typer()
+    console: Console = Console(highlight = False)
+
+    database: Database
+    configs: ConfigManager
 
     def _version_callback(value: bool) -> None:
         """
         Callback for main command and version option.
         """
+
         if value:
             print(f"{__app_name__} {__version__}")
             raise typer.Exit()
@@ -41,7 +49,13 @@ class CLI:
         Reconcile and track expenses using receipt photos and bank statements.
         """
 
-        Database(ConfigManager())
+        try:
+            CLI.configs = ConfigManager()
+            CLI.database = Database(CLI.configs)
+
+        except SettingsFormatException as e:
+            CLI.console.print(f"\n\t{e}\n", style="red")
+            raise typer.Exit()
 
     @staticmethod
     @app.command()
