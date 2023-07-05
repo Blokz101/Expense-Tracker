@@ -5,7 +5,6 @@ import os
 from configparser import ConfigParser
 
 from expense_tracker.constants import GeneralConstants
-from expense_tracker.exceptions import SettingsFormatException
 
 
 class ConfigManager(ConfigParser):
@@ -25,8 +24,6 @@ class ConfigManager(ConfigParser):
 
         self.read(GeneralConstants.SETTINGS_FILE_NAME)
 
-        self._verify_database()
-
     def _create_database(self, deafults: list) -> None:
         """
         Create a new database with deafults defined in constants.py
@@ -39,21 +36,3 @@ class ConfigManager(ConfigParser):
             self[section_name] = section_deafults
 
         self.write(open(deafults, "w"))
-
-    def _verify_database(self) -> None:
-        """
-        Verify that the settings file has all the sections and options that the application requires
-        """
-
-        for (
-            section_name,
-            section_deafults,
-        ) in GeneralConstants.SETTINGS_FILE_DEAFULTS:
-
-            for key in section_deafults.keys():
-
-                if not self.has_option(section_name, key):
-
-                    raise SettingsFormatException(
-                        f'Settings file is missing section \'{section_name}\' option \'{key}\''
-                    )

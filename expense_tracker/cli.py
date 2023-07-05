@@ -6,11 +6,11 @@ from typing_extensions import Annotated
 from rich.console import Console
 
 import typer
+import configparser
 
 from expense_tracker import __app_name__, __version__
 from expense_tracker.model import Database
 from expense_tracker.config_manager import ConfigManager
-from expense_tracker.exceptions import *
 
 
 class CLI:
@@ -18,11 +18,14 @@ class CLI:
     ViewController for the application. Deals with command line user interaction.
     """
 
-    app: typer.Typer = typer.Typer()
-    console: Console = Console(highlight = False)
 
-    database: Database
+    app: typer.Typer = typer.Typer()
+    
+    console: Console
     configs: ConfigManager
+    database: Database
+        
+
 
     def _version_callback(value: bool) -> None:
         """
@@ -48,14 +51,22 @@ class CLI:
         """
         Reconcile and track expenses using receipt photos and bank statements.
         """
-
+        
+        CLI.console = Console(highlight = False)
+        
+        
+        CLI.configs = ConfigManager()
+        
         try:
-            CLI.configs = ConfigManager()
             CLI.database = Database(CLI.configs)
-
-        except SettingsFormatException as e:
-            CLI.console.print(f"\n\t{e}\n", style="red")
+            
+        except configparser.NoOptionError as e:
+            CLI.console.print(
+                f"\n\t{e}\n", 
+                style = "red",
+            )
             raise typer.Exit()
+            
 
     @staticmethod
     @app.command()
