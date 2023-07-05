@@ -1,4 +1,6 @@
-# expense_tracker/model.py
+# expense_tracker/database.py
+
+from expense_tracker.config_manager import ConfigManager
 
 
 class Database:
@@ -6,9 +8,9 @@ class Database:
     Performs all work that requires interaction with the database
     """
 
-    def __init__(self, database_path: str) -> None:
+    def __init__(self, config: ConfigManager) -> None:
         """
         Constructor
         """
 
-        self.database_path: str = database_path
+        self.config: ConfigManager = config

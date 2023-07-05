@@ -6,6 +6,8 @@ from typing_extensions import Annotated
 import typer
 
 from expense_tracker import __app_name__, __version__
+from expense_tracker.model import Database
+from expense_tracker.config_manager import ConfigManager
 
 
 class CLI:
@@ -39,7 +41,7 @@ class CLI:
         Reconcile and track expenses using receipt photos and bank statements.
         """
 
-        pass
+        Database(ConfigManager())
 
     @staticmethod
     @app.command()
