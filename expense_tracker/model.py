@@ -26,7 +26,7 @@ class Database:
 
         with open(GeneralConstants.DATABASE_TEMPLATE_PATH, "r") as database_template:
 
-            database, cursor = Database._connect_to_database(path)
+            database, cursor = Database._connect_to_database(path, ignore_exist_error = True)
 
             sql_script: str = database_template.read()
             cursor.executescript(sql_script)
@@ -34,9 +34,10 @@ class Database:
             database.commit()
             database.close()
 
-    def _connect_to_database(path: Path) -> tuple[sqlite3.Connection, sqlite3.Cursor]:
+    @staticmethod
+    def _connect_to_database(path: Path, ignore_exist_error = False) -> tuple[sqlite3.Connection, sqlite3.Cursor]:
 
-        if not os.path.exists(path):
+        if not os.path.exists(path) and not ignore_exist_error:
             raise DatabaseNotFound(
                 f"Could not lcoate database at '{path}'\n\tCreate a new database with 'exptrack --init'"
             )
