@@ -1,6 +1,5 @@
 # expense_tracker/cil.py
 
-from typing import Optional
 from typing_extensions import Annotated
 
 from rich.console import Console
@@ -11,6 +10,7 @@ import configparser
 from expense_tracker import __app_name__, __version__
 from expense_tracker.model import Database
 from expense_tracker.config_manager import ConfigManager
+from expense_tracker.exceptions import DatabaseNotFound, DatabaseAlreadyExists
 
 
 class CLI:
@@ -18,22 +18,39 @@ class CLI:
     ViewController for the application. Deals with command line user interaction.
     """
 
-
     app: typer.Typer = typer.Typer()
-    
-    console: Console
-    configs: ConfigManager
-    database: Database
-        
 
+    console: Console = Console(highlight=False)
+    configs: ConfigManager = ConfigManager()
+
+    database: Database
 
     def _version_callback(value: bool) -> None:
         """
-        Callback for main command and version option.
+        Callback for version option.
         """
 
         if value:
             print(f"{__app_name__} {__version__}")
+            raise typer.Exit()
+
+    def _init_callback(value: bool) -> None:
+        """
+        Callback for init version option.
+        """
+
+        if value:
+
+            try:
+                Database.create_database(CLI.configs.get("files", "database_path"))
+
+                CLI.console.print(
+                    "\n\tSuccessfully created new database!\n", style="Green"
+                )
+
+            except DatabaseAlreadyExists as error:
+                CLI.print_exception(error)
+
             raise typer.Exit()
 
     @staticmethod
@@ -42,31 +59,31 @@ class CLI:
         version: Annotated[
             bool,
             typer.Option(
-                help="Display the version and exit.",
+                "--version",
+                help="Display the version.",
                 callback=_version_callback,
                 is_eager=True,
             ),
-        ] = False
+        ] = False,
+        init: Annotated[
+            bool,
+            typer.Option(
+                "--init",
+                help="Create a new database.",
+                callback=_init_callback,
+                is_eager=True,
+            ),
+        ] = False,
     ) -> None:
         """
         Reconcile and track expenses using receipt photos and bank statements.
         """
-        
-        CLI.console = Console(highlight = False)
-        
-        
-        CLI.configs = ConfigManager()
-        
+
         try:
-            CLI.database = Database(CLI.configs)
-            
-        except configparser.NoOptionError as e:
-            CLI.console.print(
-                f"\n\t{e}\n", 
-                style = "red",
-            )
-            raise typer.Exit()
-            
+            CLI.database = Database()
+
+        except (configparser.NoOptionError, DatabaseNotFound) as error:
+            CLI.print_exception(error)
 
     @staticmethod
     @app.command()
@@ -95,3 +112,11 @@ class CLI:
         """
 
         print("Reconcile")
+
+    @staticmethod
+    def print_exception(error: Exception) -> None:
+        """
+        Print an exception message and exit
+        """
+        CLI.console.print(f"\n\t{error}\n", style="red")
+        raise typer.Exit()

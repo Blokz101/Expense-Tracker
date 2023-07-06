@@ -2,6 +2,8 @@
 
 from dataclasses import dataclass
 
+from pathlib import Path
+
 
 @dataclass
 class GeneralConstants:
@@ -15,7 +17,11 @@ class GeneralConstants:
         (
             "files",
             {
-                "database_path": "database.db",
+                "database_path": str(Path().absolute() / "database.db"),
             },
         ),
+    )
+
+    DATABASE_TEMPLATE_PATH: Path = (
+        Path().absolute() / "expense_tracker" / "database_template.sql"
     )
