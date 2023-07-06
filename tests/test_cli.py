@@ -3,7 +3,7 @@
 from typer.testing import CliRunner
 
 from expense_tracker import __app_name__, __version__
-from expense_tracker.cli import CLI
+from expense_tracker.cli.cli import CLI
 
 
 runner: CliRunner = CliRunner()

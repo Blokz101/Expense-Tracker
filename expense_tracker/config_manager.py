@@ -12,9 +12,9 @@ class ConfigManager(ConfigParser):
     Handels setting and getting config settings from settings file
     """
 
-    def _create_database(self, deafults: list) -> None:
+    def _create_configs(self, deafults: list) -> None:
         """
-        Create a new database with deafults defined in constants.py
+        Create a new configs file with deafults defined in constants.py
         """
 
         for (
@@ -33,6 +33,6 @@ class ConfigManager(ConfigParser):
         super().__init__()
 
         if not os.path.exists(GeneralConstants.SETTINGS_FILE_NAME):
-            self._create_database(GeneralConstants.SETTINGS_FILE_DEAFULTS)
+            self._create_configs(GeneralConstants.SETTINGS_FILE_DEAFULTS)
 
         self.read(GeneralConstants.SETTINGS_FILE_NAME)

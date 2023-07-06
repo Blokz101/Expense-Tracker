@@ -1,16 +1,21 @@
-# expense_tracker/cil.py
+# expense_tracker/cli/cil.py
 
 from typing_extensions import Annotated
 
-from rich.console import Console
-
 import typer
-import configparser
+
+from configparser import NoOptionError
+
+from sqlite3 import OperationalError
 
 from expense_tracker import __app_name__, __version__
-from expense_tracker.model import Database
-from expense_tracker.config_manager import ConfigManager
-from expense_tracker.exceptions import DatabaseNotFound, DatabaseAlreadyExists
+from expense_tracker.cli import configs, console
+from expense_tracker.model.database import Database
+from expense_tracker.exceptions import DatabaseAlreadyExists, DatabaseNotFound
+from expense_tracker.cli.merchants import Merchants
+from expense_tracker.cli.tags import Tags
+from expense_tracker.cli.cli_utils import StatusPrint
+from expense_tracker.constants import StatusMessage as msg
 
 
 class CLI:
@@ -19,9 +24,8 @@ class CLI:
     """
 
     app: typer.Typer = typer.Typer()
-
-    console: Console = Console(highlight=False)
-    configs: ConfigManager = ConfigManager()
+    app.add_typer(Merchants.app, name="merchant")
+    app.add_typer(Tags.app, name="tag")
 
     database: Database
 
@@ -42,14 +46,21 @@ class CLI:
         if value:
 
             try:
-                Database.create_database(CLI.configs.get("files", "database_path"))
+                Database.create_database(configs.get("files", "database_path"))
 
-                CLI.console.print(
-                    "\n\tSuccessfully created new database!\n", style="Green"
-                )
-
+                StatusPrint.success(msg.DATABASE_CREATION_SUCCESS)
+                
             except DatabaseAlreadyExists as error:
-                CLI.print_exception(error)
+                StatusPrint.error(msg.DATABASE_ALREADY_ESISTS, error_message = error)
+                
+            except DatabaseNotFound as error:
+                StatusPrint.error(msg.DATABASE_NOT_FOUND, error_message = error)
+                
+            except NoOptionError as error:
+                StatusPrint.error(msg.SETTING_OPTION_NOT_FOUND, error_message = error)
+                
+            except OperationalError as error:
+                StatusPrint.error(msg.CANNOT_OPEN_DATABASE, error_message = error)
 
             raise typer.Exit()
 
@@ -79,22 +90,19 @@ class CLI:
         Reconcile and track expenses using receipt photos and bank statements.
         """
 
-        try:
-            CLI.database = Database()
-
-        except (configparser.NoOptionError, DatabaseNotFound) as error:
-            CLI.print_exception(error)
+        pass
 
     @staticmethod
     @app.command()
     def add(
         photo: Annotated[
-            bool, typer.Option(help="Create transactions based on photos.")
+            bool, typer.Option("--photo", help="Create transactions based on photos.")
         ] = True,
         auto: Annotated[
             bool,
             typer.Option(
-                help="Automatically create transactions based on photos and bank statement."
+                "--auto",
+                help="Automatically create transactions based on photos and bank statement.",
             ),
         ] = False,
     ) -> None:
@@ -102,7 +110,7 @@ class CLI:
         Create new transactions.
         """
 
-        print("Add")
+        console.print("Add")
 
     @staticmethod
     @app.command()
@@ -112,11 +120,3 @@ class CLI:
         """
 
         print("Reconcile")
-
-    @staticmethod
-    def print_exception(error: Exception) -> None:
-        """
-        Print an exception message and exit
-        """
-        CLI.console.print(f"\n\t{error}\n", style="red")
-        raise typer.Exit()

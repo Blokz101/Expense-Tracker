@@ -1,4 +1,4 @@
-# expense_tracker/database.py
+# expense_tracker/model/database.py
 
 from expense_tracker.config_manager import ConfigManager
 from expense_tracker.exceptions import DatabaseNotFound, DatabaseAlreadyExists
@@ -22,11 +22,13 @@ class Database:
         """
 
         if os.path.exists(path):
-            raise DatabaseAlreadyExists(f"Database at '{str(path)}' already exists.")
+            raise DatabaseAlreadyExists(f"File at '{str(path)}' already exists.")
 
         with open(GeneralConstants.DATABASE_TEMPLATE_PATH, "r") as database_template:
 
-            database, cursor = Database._connect_to_database(path, ignore_exist_error = True)
+            database, cursor = Database._connect_to_database(
+                path, ignore_exist_error=True
+            )
 
             sql_script: str = database_template.read()
             cursor.executescript(sql_script)
@@ -35,11 +37,13 @@ class Database:
             database.close()
 
     @staticmethod
-    def _connect_to_database(path: Path, ignore_exist_error = False) -> tuple[sqlite3.Connection, sqlite3.Cursor]:
+    def _connect_to_database(
+        path: Path, ignore_exist_error=False
+    ) -> tuple[sqlite3.Connection, sqlite3.Cursor]:
 
         if not os.path.exists(path) and not ignore_exist_error:
             raise DatabaseNotFound(
-                f"Could not lcoate database at '{path}'\n\tCreate a new database with 'exptrack --init'"
+                f"Could not lcoate database at \'{path}\'"
             )
 
         database_connection: sqlite3.connection = sqlite3.connect(path)
