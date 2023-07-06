@@ -10,7 +10,6 @@ runner: CliRunner = CliRunner()
 
 
 def test_version() -> None:
-
     result = runner.invoke(CLI.app, ["--version"])
 
     assert result.exit_code == 0

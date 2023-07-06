@@ -10,12 +10,11 @@ from sqlite3 import OperationalError
 
 from expense_tracker import __app_name__, __version__
 from expense_tracker.cli import configs, console
-from expense_tracker.model.database import Database
+from expense_tracker.model.database_utils import Database_Utils
 from expense_tracker.exceptions import DatabaseAlreadyExists, DatabaseNotFound
 from expense_tracker.cli.merchants import Merchants
 from expense_tracker.cli.tags import Tags
 from expense_tracker.cli.cli_utils import StatusPrint
-from expense_tracker.constants import StatusMessage as msg
 
 
 class CLI:
@@ -27,7 +26,7 @@ class CLI:
     app.add_typer(Merchants.app, name="merchant")
     app.add_typer(Tags.app, name="tag")
 
-    database: Database
+    database: Database_Utils
 
     def _version_callback(value: bool) -> None:
         """
@@ -44,23 +43,19 @@ class CLI:
         """
 
         if value:
-
             try:
-                Database.create_database(configs.get("files", "database_path"))
+                Database_Utils.create_database(configs.get("files", "database_path"))
 
-                StatusPrint.success(msg.DATABASE_CREATION_SUCCESS)
-                
+                StatusPrint.success("Created new database!")
+
             except DatabaseAlreadyExists as error:
-                StatusPrint.error(msg.DATABASE_ALREADY_ESISTS, error_message = error)
-                
+                StatusPrint.error(error)
+
             except DatabaseNotFound as error:
-                StatusPrint.error(msg.DATABASE_NOT_FOUND, error_message = error)
-                
-            except NoOptionError as error:
-                StatusPrint.error(msg.SETTING_OPTION_NOT_FOUND, error_message = error)
-                
-            except OperationalError as error:
-                StatusPrint.error(msg.CANNOT_OPEN_DATABASE, error_message = error)
+                StatusPrint.error(error)
+
+            except Exception as error:
+                StatusPrint.error("Could not create database.", error_message=error)
 
             raise typer.Exit()
 

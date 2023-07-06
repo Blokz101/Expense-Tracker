@@ -25,16 +25,3 @@ class GeneralConstants:
     DATABASE_TEMPLATE_PATH: Path = (
         Path().absolute() / "expense_tracker" / "model" / "database_template.sql"
     )
-    
-@dataclass
-class StatusMessage:
-    """
-    Provides status messages for the user
-    """
-    
-    DATABASE_CREATION_SUCCESS: str = "Database successfully created!"
-    SETTING_OPTION_NOT_FOUND: str = "Unable to locate setting option."
-    DATABASE_NOT_FOUND: str = "Could not locate the database\nCheck the path in settings.ini?"
-    DATABASE_ALREADY_ESISTS: str = "Database already exists."
-    CANNOT_OPEN_DATABASE: str = "Failed to open database\nCheck the path in settings.ini?"
-    

@@ -3,16 +3,37 @@
 
 import typer
 
-from rich.console import Console
+from expense_tracker.model.merchant_database import Merchant_Database
+from expense_tracker.cli import configs
+from expense_tracker.cli.cli_utils import StatusPrint
 
-from expense_tracker.cli import console, configs
+from typing_extensions import Annotated
 
 
 class Merchants:
-
     app: typer.Typer = typer.Typer()
 
     @app.command()
-    def create() -> None:
+    def create(
+        name: Annotated[str, typer.Option(prompt=True, help="Name of the merchant.")]
+    ) -> None:
+        """
+        Create a new merchant
+        """
 
-        console.print("CREATING MERCHANT")
+        try:
+            Merchant_Database.create_merchant(
+                configs.get("files", "database_path"),
+                name,
+            )
+
+            StatusPrint.success(f"Created '{name}' merchant.")
+
+        except Exception as error:
+            StatusPrint.error("Unable to create merchant.", error_message=error)
+
+    @app.callback()
+    def main() -> None:
+        """
+        Edits merchants, to add or remove locations from each merchant use "exptrack location".
+        """

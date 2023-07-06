@@ -11,7 +11,7 @@ class StatusPrint:
     """
     Utility printing functions
     """
-    
+
     @staticmethod
     def success(message: str) -> None:
         """
@@ -25,10 +25,10 @@ class StatusPrint:
         Print a message with error formating
         """
         console.print(f"\n\t{StatusPrint._indent_message(message)}\n", style="Red")
-        
+
         if error_message:
-            console.print(f"\tFailed with: {str(error_message)}\n", style = "Red")
-        
+            console.print(f"\tFailed with: {str(error_message)}\n", style="Red")
+
     @staticmethod
     def _indent_message(message: str) -> str:
         """
