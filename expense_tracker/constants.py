@@ -16,9 +16,7 @@ class GeneralConstants:
     SETTINGS_FILE_DEAFULTS: list = (
         (
             "files",
-            {
-                "database_path": str(Path().absolute() / "database.db"),
-            },
+            {"database_path": str(Path().absolute() / "database.db")},
         ),
     )
 

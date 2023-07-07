@@ -35,9 +35,13 @@ class Database_Utils:
             connection.close()
 
     @staticmethod
-    def _connect_to_database(
+    def connect_to_database(
         path: Path, ignore_exist_error=False
     ) -> tuple[sqlite3.Connection, sqlite3.Cursor]:
+        """
+        Return connection and cursor object after connecting to the database
+        """
+
         if not os.path.exists(path) and not ignore_exist_error:
             raise DatabaseNotFound(f"Could not lcoate database at '{path}'")
 

@@ -4,10 +4,6 @@ from typing_extensions import Annotated
 
 import typer
 
-from configparser import NoOptionError
-
-from sqlite3 import OperationalError
-
 from expense_tracker import __app_name__, __version__
 from expense_tracker.cli import configs, console
 from expense_tracker.model.database_utils import Database_Utils
@@ -61,7 +57,7 @@ class CLI:
 
     @staticmethod
     @app.callback()
-    def main(
+    def callback(
         version: Annotated[
             bool,
             typer.Option(
@@ -86,6 +82,11 @@ class CLI:
         """
 
         pass
+
+    @staticmethod
+    @app.command()
+    def main() -> None:
+        console.print("WORKING")
 
     @staticmethod
     @app.command()
