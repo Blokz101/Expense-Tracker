@@ -1,6 +1,5 @@
 # expense_tracker/cli/merchants.py
 
-
 import typer
 
 from typing import Optional
@@ -34,21 +33,26 @@ class Merchants:
         except Exception as error:
             StatusPrint.error("Unable to create merchant.", error_message=error)
 
-    # @app.command()
-    # def delete(
-    #     id: Annotated[int, typer.Option(prompt=True, help="Name of the merchant.")]
-    # ) -> None:
-    #     """
-    #     Attempt to delete an existing merchant.
-    #     """
+    @app.command()
+    def delete(id: Annotated[int, typer.Argument(help="ID of the merchant.")]) -> None:
+        """
+        Attempt to delete an existing merchant.
+        """
 
-    #     try:
-    #         Merchant_Database.delete_merchant(configs.get("files", "database_path"), id)
+        try:
+            console.print(
+                Merchant_Database.get_filterd_by_id(
+                    configs.get("files", "database_path"), id
+                )
+            )
 
-    #         StatusPrint.success("Deleted merchant.")
+            if typer.confirm("Are you sure that you want to delete this merchant?"):
+                Merchant_Database.delete(configs.get("files", "database_path"), id)
 
-    #     except Exception as error:
-    #         StatusPrint.error("Unable to delete merchant.", error_message=error)
+                StatusPrint.success("Deleted merchant.")
+
+        except Exception as error:
+            StatusPrint.error("Unable to delete merchant.", error_message=error)
 
     @app.command()
     def list(

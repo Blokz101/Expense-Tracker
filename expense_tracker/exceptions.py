@@ -3,11 +3,11 @@
 
 class DatabaseNotFound(Exception):
     """
-    Database was not found
+    Database was not found.
     """
 
 
 class DatabaseAlreadyExists(Exception):
     """
-    User ordered creation of database but it already exists
+    User ordered creation of database but it already exists.
     """

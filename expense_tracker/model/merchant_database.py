@@ -1,7 +1,7 @@
 # expense_tracker/model/merchant_database.py
 
 from expense_tracker.model.database_utils import Database_Utils
-from expense_tracker.model.querys import Execute_Query, Fetchall_Query
+from expense_tracker.model.query import Query
 
 from typing import Optional
 
@@ -17,7 +17,7 @@ class Merchant_Database:
         Create a new merchant.
         """
 
-        Execute_Query(
+        Query.execute(
             database_path,
             "INSERT INTO merchants (name) VALUES (?)",
             (name,),
@@ -29,18 +29,40 @@ class Merchant_Database:
         List all merchants in database
         """
 
-        return Fetchall_Query(
-            database_path, "SELECT id, name FROM merchants", ()
-        ).result
+        return Query.fetchall(database_path, "SELECT id, name FROM merchants", ())
 
     @staticmethod
     def get_filterd_by_name(database_path: str, filter: str) -> list:
         """
-        List all merchants in database
+        List merchants in database filtered by name
         """
 
-        return Fetchall_Query(
+        return Query.fetchall(
             database_path,
             "SELECT id, name FROM merchants WHERE name LIKE (?)",
             (f"%{filter}%",),
-        ).result
+        )
+
+    @staticmethod
+    def get_filterd_by_id(database_path: str, filter: str) -> list:
+        """
+        List merchants in database filtered by id.
+        """
+
+        return Query.fetchall(
+            database_path,
+            "SELECT id, name FROM merchants WHERE id = (?)",
+            (filter,),
+        )
+
+    @staticmethod
+    def delete(database_path: str, id: int) -> list:
+        """
+        Delete a merchant in database by id.
+        """
+
+        Query.execute(
+            database_path,
+            "DELETE FROM merchants WHERE id = (?)",
+            (id,),
+        )
