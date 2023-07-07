@@ -25,7 +25,7 @@ CREATE TABLE "tags"(
     "name" TEXT NOT NULL
 );
 
-CREATE TABLE "merchant_tag_branch"(
+CREATE TABLE "merchant_tag_defaults"(
     "id" INTEGER NOT NULL PRIMARY KEY,
     "merchant_id" BIGINT NOT NULL,
     "tag_id" BIGINT NOT NULL,
