@@ -5,6 +5,7 @@ import typer
 from typing import Optional
 
 from expense_tracker.model.merchant_database import Merchant_Database
+from expense_tracker.model.database import Database
 from expense_tracker.cli import configs, console
 from expense_tracker.cli.cli_utils import StatusPrint
 
@@ -22,9 +23,11 @@ class Merchants:
         Create a new merchant.
         """
 
+        database: Database = Database(configs.database_path())
+
         try:
             Merchant_Database.create(
-                configs.get("files", "database_path"),
+                database,
                 name,
             )
 
@@ -39,15 +42,13 @@ class Merchants:
         Attempt to delete an existing merchant.
         """
 
+        database: Database = Database(configs.database_path())
+
         try:
-            console.print(
-                Merchant_Database.get_filterd_by_id(
-                    configs.get("files", "database_path"), id
-                )
-            )
+            console.print(Merchant_Database.get_filterd_by_id(database, id))
 
             if typer.confirm("Are you sure that you want to delete this merchant?"):
-                Merchant_Database.delete(configs.get("files", "database_path"), id)
+                Merchant_Database.delete(database, id)
 
                 StatusPrint.success("Deleted merchant.")
 
@@ -65,15 +66,15 @@ class Merchants:
         List all merchants, filter by name if needed
         """
 
+        database: Database = Database(configs.database_path())
+
         result: tuple
 
         if filter:
-            result = Merchant_Database.get_filterd_by_name(
-                configs.get("files", "database_path"), filter
-            )
+            result = Merchant_Database.get_filterd_by_name(database, filter)
 
         else:
-            result = Merchant_Database.get_all(configs.get("files", "database_path"))
+            result = Merchant_Database.get_all(database)
 
         console.print(result)
 

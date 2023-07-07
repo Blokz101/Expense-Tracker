@@ -6,9 +6,13 @@ import typer
 
 from expense_tracker import __app_name__, __version__
 from expense_tracker.cli import configs, console
-from expense_tracker.model.database_utils import Database_Utils
-from expense_tracker.exceptions import DatabaseAlreadyExists, DatabaseNotFound
 from expense_tracker.cli.merchants import Merchants
+from expense_tracker.model.database import (
+    Database,
+    DatabaseAlreadyExists,
+    DatabaseNotFound,
+)
+from expense_tracker.constants import GeneralConstants
 from expense_tracker.cli.tags import Tags
 from expense_tracker.cli.cli_utils import StatusPrint
 
@@ -21,8 +25,6 @@ class CLI:
     app: typer.Typer = typer.Typer()
     app.add_typer(Merchants.app, name="merchant")
     app.add_typer(Tags.app, name="tag")
-
-    database: Database_Utils
 
     def _version_callback(value: bool) -> None:
         """
@@ -40,7 +42,11 @@ class CLI:
 
         if value:
             try:
-                Database_Utils.create_database(configs.get("files", "database_path"))
+                database: Database = Database(configs.database_path())
+
+                database.create_database(
+                    GeneralConstants.DATABASE_TEMPLATE_PATH,
+                )
 
                 StatusPrint.success("Created new database!")
 
@@ -49,9 +55,6 @@ class CLI:
 
             except DatabaseNotFound as error:
                 StatusPrint.error(error)
-
-            except Exception as error:
-                StatusPrint.error("Could not create database.", error_message=error)
 
             raise typer.Exit()
 
