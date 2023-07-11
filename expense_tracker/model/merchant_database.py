@@ -16,10 +16,10 @@ class Merchant_Database:
         Create a new merchant.
         """
 
-        database.execute_query(
-            "INSERT INTO merchants (name) VALUES (?)",
-            (name,),
-        )
+        # database.execute_query(
+        #     "INSERT INTO merchants (name) VALUES (?)",
+        #     (name,),
+        # )
 
     @staticmethod
     def get_all(database: Database) -> list:
@@ -27,7 +27,7 @@ class Merchant_Database:
         List all merchants in database
         """
 
-        return database.fetchall_query("SELECT id, name FROM merchants", ())
+        # return database.fetchall_query("SELECT id, name FROM merchants", ())
 
     @staticmethod
     def get_filterd_by_name(database: Database, filter: str) -> list:
@@ -35,10 +35,12 @@ class Merchant_Database:
         List merchants in database filtered by name
         """
 
-        return database.fetchall_query(
-            "SELECT id, name FROM merchants WHERE name LIKE (?)",
-            (f"%{filter}%",),
-        )
+        # TODO Impliment get_filtered_by_name
+
+        # return database.fetchall_query(
+        #     "SELECT id, name FROM merchants WHERE name LIKE (?)",
+        #     (f"%{filter}%",),
+        # )
 
     @staticmethod
     def get_filterd_by_id(database: Database, filter: str) -> list:
@@ -46,10 +48,12 @@ class Merchant_Database:
         List merchants in database filtered by id.
         """
 
-        return database.fetchall_query(
-            "SELECT id, name FROM merchants WHERE id = (?)",
-            (filter,),
-        )
+        # TODO Impliment get_filtered_by_id
+
+        # return database.fetchall_query(
+        #     "SELECT id, name FROM merchants WHERE id = (?)",
+        #     (filter,),
+        # )
 
     @staticmethod
     def delete(database: Database, id: int) -> list:
@@ -57,7 +61,9 @@ class Merchant_Database:
         Delete a merchant in database by id.
         """
 
-        database.execute_query(
-            "DELETE FROM merchants WHERE id = (?)",
-            (id,),
-        )
+        # TODO Impliment delete
+
+        # database.execute_query(
+        #     "DELETE FROM merchants WHERE id = (?)",
+        #     (id,),
+        # )

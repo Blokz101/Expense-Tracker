@@ -11,6 +11,8 @@ class GeneralConstants:
     General constants for the program
     """
 
+    DATABASE_URL: str = f"sqlite:////{Path().absolute()}/database.db"
+
     SETTINGS_FILE_NAME: str = "settings.ini"
 
     SETTINGS_FILE_DEAFULTS: list = (

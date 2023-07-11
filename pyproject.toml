@@ -16,6 +16,7 @@ rich = "^13.4.2"
 pysqlite3 = "^0.5.1"
 pyexiftool = "^0.5.5"
 configparser = "^5.3.0"
+sqlalchemy = "^2.0.18"
 
 
 [tool.poetry.group.dev.dependencies]

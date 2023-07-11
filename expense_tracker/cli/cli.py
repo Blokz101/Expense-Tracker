@@ -7,11 +7,12 @@ import typer
 from expense_tracker import __app_name__, __version__
 from expense_tracker.cli import configs, console
 from expense_tracker.cli.merchants import Merchants
-from expense_tracker.model.database import (
-    Database,
-    DatabaseAlreadyExists,
-    DatabaseNotFound,
-)
+
+# from expense_tracker.model.database import (
+#     Database,
+#     DatabaseAlreadyExists,
+#     DatabaseNotFound,
+# )
 from expense_tracker.constants import GeneralConstants
 from expense_tracker.cli.tags import Tags
 from expense_tracker.cli.cli_utils import StatusPrint
@@ -40,23 +41,25 @@ class CLI:
         Callback for init version option.
         """
 
-        if value:
-            try:
-                database: Database = Database(configs.database_path())
+        # TODO Impliment _init_callback
 
-                database.create_database(
-                    GeneralConstants.DATABASE_TEMPLATE_PATH,
-                )
+        # if value:
+        #     try:
+        #         database: Database = Database(configs.database_path())
 
-                StatusPrint.success("Created new database!")
+        #         database.create_database(
+        #             GeneralConstants.DATABASE_TEMPLATE_PATH,
+        #         )
 
-            except DatabaseAlreadyExists as error:
-                StatusPrint.error(error)
+        #         StatusPrint.success("Created new database!")
 
-            except DatabaseNotFound as error:
-                StatusPrint.error(error)
+        #     except DatabaseAlreadyExists as error:
+        #         StatusPrint.error(error)
 
-            raise typer.Exit()
+        #     except DatabaseNotFound as error:
+        #         StatusPrint.error(error)
+
+        #     raise typer.Exit()
 
     @staticmethod
     @app.callback()
