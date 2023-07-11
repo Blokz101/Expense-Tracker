@@ -10,10 +10,15 @@ from sqlalchemy.orm import relationship, mapped_column
 
 
 class Tag(Base):
-    """ """
+    """
+    SQLAlchemy tags table
+    
+    Stores tags that can be applied to different amounts.
+    """
 
     __tablename__ = "tags"
 
+    # Database columns
     id: Mapped[int] = mapped_column(
         primary_key=True,
         nullable=False,
@@ -23,8 +28,9 @@ class Tag(Base):
         nullable=False,
     )
 
-    transactions: Mapped[List["Transaction"]] = relationship(
-        secondary=Branch_Table.transaction_tag,
+    # ORM objects
+    amounts: Mapped[List["Amount"]] = relationship(
+        secondary=Branch_Table.amount_tag,
         back_populates="tags",
     )
     default_merchants: Mapped[List["Merchant"]] = relationship(

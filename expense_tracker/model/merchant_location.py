@@ -8,10 +8,15 @@ from sqlalchemy.orm import relationship, mapped_column
 
 
 class Merchant_Location(Base):
-    """ """
+    """
+    SQLAlchemy merchant_locations table
+    
+    Stores merchant locations that can be assigned to a merchant.
+    """
 
     __tablename__ = "merchant_locations"
 
+    # Database columns
     id: Mapped[int] = mapped_column(
         primary_key=True,
         nullable=False,
@@ -28,6 +33,7 @@ class Merchant_Location(Base):
         nullable=False,
     )
 
+    # ORM objects
     merchant: Mapped["Merchant"] = relationship(
         back_populates="merchant_locations",
     )

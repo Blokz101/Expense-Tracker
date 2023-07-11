@@ -2,10 +2,9 @@
 
 from datetime import datetime
 
-from typing import Optional, List
+from typing import List
 
 from expense_tracker.model import Base
-from expense_tracker.model.branch_table import Branch_Table
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped
@@ -13,10 +12,13 @@ from sqlalchemy.orm import relationship, mapped_column
 
 
 class Transaction(Base):
-    """ """
+    """
+    SQLAlchemy transactions table
+    """
 
     __tablename__ = "transactions"
 
+    # Database columns
     id: Mapped[int] = mapped_column(
         primary_key=True,
         nullable=False,
@@ -41,9 +43,6 @@ class Transaction(Base):
     date: Mapped[datetime] = mapped_column(
         nullable=False,
     )
-    amount: Mapped[float] = mapped_column(
-        nullable=False,
-    )
     reconciled_status: Mapped[bool] = mapped_column(
         nullable=False,
     )
@@ -62,16 +61,13 @@ class Transaction(Base):
         nullable=True,
     )
 
+    # ORM objects
     merchant: Mapped["Merchant"] = relationship(
         back_populates="transactions",
     )
-    tags: Mapped[List["Tag"]] = relationship(
-        secondary=Branch_Table.transaction_tag,
-        back_populates="transactions",
+    amounts: Mapped[List["Amount"]] = relationship(
+        back_populates="transaction",
     )
-    # transaction_tag_branches: Mapped[List["Transaction_Tag_Branch"]] = relationship(
-    #     back_populates="transaction",
-    # )
     account: Mapped["Account"] = relationship(
         back_populates="transactions",
         foreign_keys=[account_id],

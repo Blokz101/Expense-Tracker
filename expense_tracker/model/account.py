@@ -9,10 +9,15 @@ from sqlalchemy.orm import relationship, mapped_column
 
 
 class Account(Base):
-    """ """
+    """
+    SQLAlchemy accounts table
+    
+    Stores accounts that can be assigned to a transaction.
+    """
 
     __tablename__ = "accounts"
-
+    
+    # Database columns
     id: Mapped[int] = mapped_column(
         primary_key=True,
         nullable=False,
@@ -22,6 +27,7 @@ class Account(Base):
         nullable=False,
     )
 
+    # ORM objects
     transactions: Mapped[List["Transaction"]] = relationship(
         foreign_keys="Transaction.account_id",
         back_populates="account",

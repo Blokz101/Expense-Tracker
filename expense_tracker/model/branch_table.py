@@ -7,13 +7,13 @@ from sqlalchemy import Table, Column, ForeignKey
 
 class Branch_Table:
     """
-    Association tables for the various tables that require a many to many connection
+    SQLAlchemy association tables for the various tables that require a many to many connection.
     """
-
-    transaction_tag: Table = Table(
-        "transaction_tag_branches",
+    
+    amount_tag: Table = Table(
+        "amount_tag_branches",
         Base.metadata,
-        Column("transaction_id", ForeignKey("transactions.id")),
+        Column("amount_id", ForeignKey("amounts.id")),
         Column("tag_id", ForeignKey("tags.id")),
     )
 

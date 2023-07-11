@@ -10,10 +10,15 @@ from sqlalchemy.orm import relationship, mapped_column
 
 
 class Merchant(Base):
-    """ """
+    """
+    SQLAlchemy merchants table
+    
+    Stores merchants that can be assigned to transactions
+    """
 
     __tablename__ = "merchants"
 
+    # Database columns
     id: Mapped[int] = mapped_column(
         primary_key=True,
         nullable=False,
@@ -23,6 +28,7 @@ class Merchant(Base):
         nullable=False,
     )
 
+    # ORM objects
     transactions: Mapped[List["Transaction"]] = relationship(
         back_populates="merchant",
     )
