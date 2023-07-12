@@ -163,3 +163,4 @@ cython_debug/
 settings.ini
 *.db
 test.py
+.vscode

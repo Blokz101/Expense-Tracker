@@ -11,8 +11,6 @@ class GeneralConstants:
     General constants for the program
     """
 
-    DATABASE_URL: str = f"sqlite:////{Path().absolute()}/database.db"
-
     SETTINGS_FILE_NAME: str = "settings.ini"
 
     SETTINGS_FILE_DEAFULTS: list = (
@@ -20,8 +18,4 @@ class GeneralConstants:
             "files",
             {"database_path": str(Path().absolute() / "database.db")},
         ),
-    )
-
-    DATABASE_TEMPLATE_PATH: Path = (
-        Path().absolute() / "expense_tracker" / "model" / "database_template.sql"
     )

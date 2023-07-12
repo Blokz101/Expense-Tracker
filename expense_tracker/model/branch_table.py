@@ -9,7 +9,7 @@ class Branch_Table:
     """
     SQLAlchemy association tables for the various tables that require a many to many connection.
     """
-    
+
     amount_tag: Table = Table(
         "amount_tag_branches",
         Base.metadata,

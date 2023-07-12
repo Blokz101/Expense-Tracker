@@ -46,7 +46,7 @@ class ConfigManager(ConfigParser):
 
         self.write(open(GeneralConstants.SETTINGS_FILE_NAME, "w"))
 
-    def database_path(self) -> str:
+    def get_database_path(self) -> str:
         """
         Return section files option database_path.
         """

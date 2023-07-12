@@ -6,16 +6,10 @@ import typer
 
 from expense_tracker import __app_name__, __version__
 from expense_tracker.cli import configs, console
-from expense_tracker.cli.merchants import Merchants
-
-# from expense_tracker.model.database import (
-#     Database,
-#     DatabaseAlreadyExists,
-#     DatabaseNotFound,
-# )
+from expense_tracker.cli.cli_merchants import Merchants
 from expense_tracker.constants import GeneralConstants
-from expense_tracker.cli.tags import Tags
-from expense_tracker.cli.cli_utils import StatusPrint
+from expense_tracker.cli.cli_tags import Tags
+from expense_tracker.cli.cli_utils import Print_Utils
 
 
 class CLI:
@@ -36,31 +30,6 @@ class CLI:
             print(f"{__app_name__} {__version__}")
             raise typer.Exit()
 
-    def _init_callback(value: bool) -> None:
-        """
-        Callback for init version option.
-        """
-
-        # TODO Impliment _init_callback
-
-        # if value:
-        #     try:
-        #         database: Database = Database(configs.database_path())
-
-        #         database.create_database(
-        #             GeneralConstants.DATABASE_TEMPLATE_PATH,
-        #         )
-
-        #         StatusPrint.success("Created new database!")
-
-        #     except DatabaseAlreadyExists as error:
-        #         StatusPrint.error(error)
-
-        #     except DatabaseNotFound as error:
-        #         StatusPrint.error(error)
-
-        #     raise typer.Exit()
-
     @staticmethod
     @app.callback()
     def callback(
@@ -73,26 +42,12 @@ class CLI:
                 is_eager=True,
             ),
         ] = False,
-        init: Annotated[
-            bool,
-            typer.Option(
-                "--init",
-                help="Create a new database.",
-                callback=_init_callback,
-                is_eager=True,
-            ),
-        ] = False,
     ) -> None:
         """
         Reconcile and track expenses using receipt photos and bank statements.
         """
 
         pass
-
-    @staticmethod
-    @app.command()
-    def main() -> None:
-        console.print("WORKING")
 
     @staticmethod
     @app.command()
@@ -114,6 +69,8 @@ class CLI:
 
         console.print("Add")
 
+        # TODO Finish this method
+
     @staticmethod
     @app.command()
     def reconcile() -> None:
@@ -122,3 +79,5 @@ class CLI:
         """
 
         print("Reconcile")
+
+        # TODO Finish this method

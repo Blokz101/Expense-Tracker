@@ -12,7 +12,7 @@ from sqlalchemy.orm import relationship, mapped_column
 class Tag(Base):
     """
     SQLAlchemy tags table
-    
+
     Stores tags that can be applied to different amounts.
     """
 

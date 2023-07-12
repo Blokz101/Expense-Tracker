@@ -1,8 +1,16 @@
 # expense_tracker/model/merchant_database.py
 
-from expense_tracker.model.database import Database
+from typing import List
 
-from typing import Optional
+from sqlalchemy.orm import Session
+
+from expense_tracker.model import engine
+from expense_tracker.model.merchant import Merchant
+from expense_tracker.model.amount import Amount
+from expense_tracker.model.merchant_location import Merchant_Location
+from expense_tracker.model.transaction import Transaction
+from expense_tracker.model.tag import Tag
+from expense_tracker.model.account import Account
 
 
 class Merchant_Database:
@@ -11,59 +19,50 @@ class Merchant_Database:
     """
 
     @staticmethod
-    def create(database: Database, name: str) -> None:
+    def create(name: str) -> None:
         """
         Create a new merchant.
         """
 
-        # database.execute_query(
-        #     "INSERT INTO merchants (name) VALUES (?)",
-        #     (name,),
-        # )
+        with Session(engine) as session:
+            session.add(Merchant(name=name))
+            session.commit()
 
     @staticmethod
-    def get_all(database: Database) -> list:
+    def get_all() -> list:
         """
         List all merchants in database
         """
 
-        # return database.fetchall_query("SELECT id, name FROM merchants", ())
+        with Session(engine) as session:
+            return session.query(Merchant).all()
 
     @staticmethod
-    def get_filterd_by_name(database: Database, filter: str) -> list:
+    def get_filterd_by_name(filter: str) -> list:
         """
-        List merchants in database filtered by name
+        List merchants in database filtered by name.
         """
 
-        # TODO Impliment get_filtered_by_name
-
-        # return database.fetchall_query(
-        #     "SELECT id, name FROM merchants WHERE name LIKE (?)",
-        #     (f"%{filter}%",),
-        # )
+        with Session(engine) as session:
+            return (
+                session.query(Merchant).filter(Merchant.name.like(f"%{filter}%")).all()
+            )
 
     @staticmethod
-    def get_filterd_by_id(database: Database, filter: str) -> list:
+    def get_filterd_by_id(filter: int) -> list:
         """
-        List merchants in database filtered by id.
+        List merchants in database filtered by name.
         """
 
-        # TODO Impliment get_filtered_by_id
-
-        # return database.fetchall_query(
-        #     "SELECT id, name FROM merchants WHERE id = (?)",
-        #     (filter,),
-        # )
+        with Session(engine) as session:
+            return session.query(Merchant).filter(Merchant.id == filter).all()
 
     @staticmethod
-    def delete(database: Database, id: int) -> list:
+    def delete(merchant: Merchant) -> None:
         """
-        Delete a merchant in database by id.
+        Delete a merchant in database.
         """
 
-        # TODO Impliment delete
-
-        # database.execute_query(
-        #     "DELETE FROM merchants WHERE id = (?)",
-        #     (id,),
-        # )
+        with Session(engine) as session:
+            session.delete(merchant)
+            session.commit()

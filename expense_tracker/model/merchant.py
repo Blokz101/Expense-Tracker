@@ -12,7 +12,7 @@ from sqlalchemy.orm import relationship, mapped_column
 class Merchant(Base):
     """
     SQLAlchemy merchants table
-    
+
     Stores merchants that can be assigned to transactions
     """
 

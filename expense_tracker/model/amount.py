@@ -13,7 +13,7 @@ from sqlalchemy.orm import relationship, mapped_column
 class Amount(Base):
     """
     SQLAlchemy amounts table
-    
+
     Stores amounts, allows a transaction to be split into different amounts and each ammount tagged with its own tags.
     """
 
@@ -28,13 +28,11 @@ class Amount(Base):
         unique=True,
         nullable=True,
     )
-    transaction_id: Mapped[int] = mapped_column(
-        ForeignKey("transactions.id")
-    )
+    transaction_id: Mapped[int] = mapped_column(ForeignKey("transactions.id"))
     amount: Mapped[float] = mapped_column(
         nullable=False,
     )
-    
+
     # ORM objects
     transaction: Mapped["Transaction"] = relationship(
         back_populates="amounts",

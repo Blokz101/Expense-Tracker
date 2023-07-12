@@ -10,7 +10,7 @@ from sqlalchemy.orm import relationship, mapped_column
 class Merchant_Location(Base):
     """
     SQLAlchemy merchant_locations table
-    
+
     Stores merchant locations that can be assigned to a merchant.
     """
 
