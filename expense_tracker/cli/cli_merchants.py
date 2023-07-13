@@ -33,22 +33,19 @@ class Merchants:
 
     @app.command()
     def delete(
-        id: Annotated[int, typer.Argument(help="ID of merchant to be deleted")]
+        name: Annotated[str, typer.Argument(help="name of merchant to be deleted")]
     ) -> None:
         """
         Attempt to delete an existing merchant.
         """
+        
+        merchant_list: List[str] = Merchant_Database.get_all()
+        merchant_name_list: List[str] = [merchant.name for merchant in merchant_list]
 
-        target_merchant_list: List[Merchant] = Merchant_Database.get_filterd_by_id(id)
-
-        if len(target_merchant_list) == 0:
-            Print_Utils.error_message("No merchant found by that id.")
-            raise typer.Exit()
-
-        if not len(target_merchant_list) == 1:
-            raise LookupError(f"Database returned more then one result for id '{id}'")
-
-        target_merchant: Merchant = target_merchant_list[0]
+        target_index: int = Print_Utils.input_from_options(
+                    merchant_name_list, input=name
+        )
+        target_merchant: Merchant = merchant_list[target_index]
 
         try:
             Merchant_Database.delete(target_merchant)

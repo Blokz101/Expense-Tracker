@@ -19,3 +19,5 @@ class GeneralConstants:
             {"database_path": str(Path().absolute() / "database.db")},
         ),
     )
+
+    NUMBER_OF_DISPLAY_OPTIONS: int = 5
