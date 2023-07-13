@@ -40,14 +40,13 @@ class CLI_Merchants:
         """
         Attempt to delete an existing merchant.
         """
-        
-        merchant_list: List[str] = Merchant_Database.get_all()
-        merchant_name_list: List[str] = [merchant.name for merchant in merchant_list]
 
-        target_index: int = Print_Utils.input_from_options(
-                    merchant_name_list, input=name
-        )
-        target_merchant: Merchant = merchant_list[target_index]
+        merchant_list: List[str] = Merchant_Database.get_all()
+        target_merchant: Merchant = merchant_list[
+            Print_Utils.input_from_options(
+                [merchant.name for merchant in merchant_list], input=name
+            )
+        ]
 
         try:
             Merchant_Database.delete(target_merchant)
@@ -58,28 +57,29 @@ class CLI_Merchants:
                 f"Unable to delete merchant, likley because one or more transactions reference it.",
                 error_message=error,
             )
-            
+
     @app.command()
     def rename(
-        name: Annotated[str, typer.Argument(help="Current name of merchant to be renamed")]
+        name: Annotated[
+            str, typer.Argument(help="Current name of merchant to be renamed")
+        ]
     ) -> None:
         """
         Attempt to delete an existing merchant.
         """
-        
-        merchant_list: List[str] = Merchant_Database.get_all()
-        merchant_name_list: List[str] = [merchant.name for merchant in merchant_list]
 
-        target_index: int = Print_Utils.input_from_options(
-                    merchant_name_list, input=name
-        )
-        target_merchant: Merchant = merchant_list[target_index]
-        
+        merchant_list: List[str] = Merchant_Database.get_all()
+        target_merchant: Merchant = merchant_list[
+            Print_Utils.input_from_options(
+                [merchant.name for merchant in merchant_list], input=name
+            )
+        ]
+
         new_name: str = console.input("New merchant name >>> ")
 
         try:
             Merchant_Database.rename(target_merchant, new_name)
-            Print_Utils.success_message(f"Renamed merchant '{name}' to \'{new_name}\'")
+            Print_Utils.success_message(f"Renamed merchant '{name}' to '{new_name}'")
 
         except Exception as error:
             Print_Utils.error_message(

@@ -42,9 +42,7 @@ class Account_Database:
         """
 
         with Session(engine) as session:
-            return (
-                session.query(Account).filter(Account.name.like(f"%{filter}%")).all()
-            )
+            return session.query(Account).filter(Account.name.like(f"%{filter}%")).all()
 
     @staticmethod
     def delete(account: Account) -> None:
@@ -55,13 +53,13 @@ class Account_Database:
         with Session(engine) as session:
             session.delete(account)
             session.commit()
-            
+
     @staticmethod
     def rename(account: Account, new_name: str) -> None:
         """
         Renames a account in the database.
         """
-        
+
         with Session(engine) as session:
             session.add(account)
             account.name = new_name

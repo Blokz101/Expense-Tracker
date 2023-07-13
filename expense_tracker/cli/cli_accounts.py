@@ -40,14 +40,13 @@ class CLI_Accounts:
         """
         Attempt to delete an existing account.
         """
-        
-        account_list: List[str] = Account_Database.get_all()
-        account_name_list: List[str] = [account.name for account in account_list]
 
-        target_index: int = Print_Utils.input_from_options(
-                    account_name_list, input=name
-        )
-        target_account: Account = account_list[target_index]
+        account_list: List[str] = Account_Database.get_all()
+        target_account: Account = account_list[
+            Print_Utils.input_from_options(
+                [account.name for account in account_list], input=name
+            )
+        ]
 
         try:
             Account_Database.delete(target_account)
@@ -58,28 +57,29 @@ class CLI_Accounts:
                 f"Unable to delete account, likley because one or more transactions reference it.",
                 error_message=error,
             )
-            
+
     @app.command()
     def rename(
-        name: Annotated[str, typer.Argument(help="Current name of account to be renamed")]
+        name: Annotated[
+            str, typer.Argument(help="Current name of account to be renamed")
+        ]
     ) -> None:
         """
         Attempt to delete an existing account.
         """
-        
-        account_list: List[str] = Account_Database.get_all()
-        account_name_list: List[str] = [account.name for account in account_list]
 
-        target_index: int = Print_Utils.input_from_options(
-                    account_name_list, input=name
-        )
-        target_account: Account = account_list[target_index]
-        
+        account_list: List[str] = Account_Database.get_all()
+        target_account: Account = account_list[
+            Print_Utils.input_from_options(
+                [account.name for account in account_list], input=name
+            )
+        ]
+
         new_name: str = console.input("New account name >>> ")
 
         try:
             Account_Database.rename(target_account, new_name)
-            Print_Utils.success_message(f"Renamed account '{name}' to \'{new_name}\'")
+            Print_Utils.success_message(f"Renamed account '{name}' to '{new_name}'")
 
         except Exception as error:
             Print_Utils.error_message(

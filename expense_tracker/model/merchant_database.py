@@ -55,13 +55,13 @@ class Merchant_Database:
         with Session(engine) as session:
             session.delete(merchant)
             session.commit()
-            
+
     @staticmethod
     def rename(merchant: Merchant, new_name: str) -> None:
         """
         Renames a merchant in the database.
         """
-        
+
         with Session(engine) as session:
             session.add(merchant)
             merchant.name = new_name

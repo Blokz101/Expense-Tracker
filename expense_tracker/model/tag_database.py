@@ -42,9 +42,7 @@ class Tag_Database:
         """
 
         with Session(engine) as session:
-            return (
-                session.query(Tag).filter(Tag.name.like(f"%{filter}%")).all()
-            )
+            return session.query(Tag).filter(Tag.name.like(f"%{filter}%")).all()
 
     @staticmethod
     def delete(tag: Tag) -> None:
@@ -55,13 +53,13 @@ class Tag_Database:
         with Session(engine) as session:
             session.delete(tag)
             session.commit()
-            
+
     @staticmethod
     def rename(tag: Tag, new_name: str) -> None:
         """
         Renames a tag in the database.
         """
-        
+
         with Session(engine) as session:
             session.add(tag)
             tag.name = new_name

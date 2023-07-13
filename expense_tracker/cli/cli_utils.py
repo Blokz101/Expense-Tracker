@@ -54,7 +54,7 @@ class Print_Utils:
             table.add_row(str(merchant.id), merchant.name)
 
         console.print(table)
-        
+
     @staticmethod
     def tag_table(merchat_list: List[Tag]) -> None:
         """
@@ -71,7 +71,7 @@ class Print_Utils:
             table.add_row(str(tag.id), tag.name)
 
         console.print(table)
-    
+
     @staticmethod
     def account_table(merchat_list: List[Account]) -> None:
         """
@@ -88,13 +88,13 @@ class Print_Utils:
             table.add_row(str(account.id), account.name)
 
         console.print(table)
-        
+
     @staticmethod
     def input_rule(input_message) -> str:
         """
         Gets input from the user and prints a rule after it.
         """
-        
+
         console.print()
         input: str = console.input(input_message)
         console.rule()
@@ -120,7 +120,7 @@ class Print_Utils:
 
         elif input:
             user_input = input
-            
+
         selected_option: tuple
 
         while True:
@@ -146,9 +146,9 @@ class Print_Utils:
                 if index >= 0 and index <= len(sorted_options) - 1:
                     selected_option = sorted_options[index]
                     break
-                
-        console.print(f"Selected \'{selected_option[1]}\'\n")
-                
+
+        console.print(f"Selected '{selected_option[1]}'\n")
+
         return selected_option[2]
 
     @staticmethod

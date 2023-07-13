@@ -18,9 +18,7 @@ class CLI_Tags:
     app: typer.Typer = typer.Typer()
 
     @app.command()
-    def create(
-        name: Annotated[str, typer.Argument(help="Name of the tag.")]
-    ) -> None:
+    def create(name: Annotated[str, typer.Argument(help="Name of the tag.")]) -> None:
         """
         Create a new tag.
         """
@@ -40,28 +38,22 @@ class CLI_Tags:
         """
         Attempt to delete an existing tag.
         """
-        
+
         tag_list: List[str] = Tag_Database.get_all()
-        tag_name_list: List[str] = [tag.name for tag in tag_list]
+        target_tag: Tag = tag_list[
+            Print_Utils.input_from_options([tag.name for tag in tag_list], input=name)
+        ]
 
-        target_index: int = Print_Utils.input_from_options(
-                    tag_name_list, input=name
-        )
-        target_tag: Tag = tag_list[target_index]
+        try:
+            Tag_Database.delete(target_tag)
+            Print_Utils.success_message(f"Deleted tag '{target_tag.name}'")
 
-        Tag_Database.delete(target_tag)
-        Print_Utils.success_message(f"Deleted tag '{target_tag.name}'")
+        except Exception as error:
+            Print_Utils.error_message(
+                f"Unable to delete tag, likley because one or more transactions reference it.",
+                error_message=error,
+            )
 
-        # try:
-        #     Tag_Database.delete(target_tag)
-        #     Print_Utils.success_message(f"Deleted tag '{target_tag.name}'")
-
-        # except Exception as error:
-        #     Print_Utils.error_message(
-        #         f"Unable to delete tag, likley because one or more transactions reference it.",
-        #         error_message=error,
-        #     )
-            
     @app.command()
     def rename(
         name: Annotated[str, typer.Argument(help="Current name of tag to be renamed")]
@@ -69,20 +61,17 @@ class CLI_Tags:
         """
         Attempt to delete an existing tag.
         """
-        
-        tag_list: List[str] = Tag_Database.get_all()
-        tag_name_list: List[str] = [tag.name for tag in tag_list]
 
-        target_index: int = Print_Utils.input_from_options(
-                    tag_name_list, input=name
-        )
-        target_tag: Tag = tag_list[target_index]
-        
+        tag_list: List[str] = Tag_Database.get_all()
+        target_tag: Tag = tag_list[
+            Print_Utils.input_from_options([tag.name for tag in tag_list], input=name)
+        ]
+
         new_name: str = console.input("New tag name >>> ")
 
         try:
             Tag_Database.rename(target_tag, new_name)
-            Print_Utils.success_message(f"Renamed tag '{name}' to \'{new_name}\'")
+            Print_Utils.success_message(f"Renamed tag '{name}' to '{new_name}'")
 
         except Exception as error:
             Print_Utils.error_message(
