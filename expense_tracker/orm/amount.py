@@ -1,9 +1,9 @@
-# expense_tracker/model/amount.py
+# expense_tracker/orm/amount.py
 
 from typing import List
 
-from expense_tracker.model import Base
-from expense_tracker.model.branch_table import Branch_Table
+from expense_tracker.orm import Base
+from expense_tracker.orm.branch_table import Branch_Table
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped

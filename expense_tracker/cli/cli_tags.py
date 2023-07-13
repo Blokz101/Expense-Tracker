@@ -11,7 +11,7 @@ from expense_tracker.cli import console
 from expense_tracker.cli.cli_utils import Print_Utils
 
 from expense_tracker.model.tag_database import Tag_Database
-from expense_tracker.model.tag import Tag
+from expense_tracker.orm.tag import Tag
 
 
 class CLI_Tags:

@@ -4,8 +4,8 @@ from expense_tracker.constants import GeneralConstants
 
 from expense_tracker.cli import console
 
-from expense_tracker.model.merchant import Merchant
-from expense_tracker.model.tag import Tag
+from expense_tracker.orm.merchant import Merchant
+from expense_tracker.orm.tag import Tag
 
 from typing import Optional, List
 

@@ -11,7 +11,7 @@ from expense_tracker.cli import console
 from expense_tracker.cli.cli_utils import Print_Utils
 
 from expense_tracker.model.merchant_database import Merchant_Database
-from expense_tracker.model.merchant import Merchant
+from expense_tracker.orm.merchant import Merchant
 
 
 class CLI_Merchants:
