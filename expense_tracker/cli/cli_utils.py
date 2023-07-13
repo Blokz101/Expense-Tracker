@@ -5,6 +5,7 @@ from expense_tracker.constants import GeneralConstants
 from expense_tracker.cli import console
 
 from expense_tracker.model.merchant import Merchant
+from expense_tracker.model.tag import Tag
 
 from typing import Optional, List
 
@@ -50,6 +51,23 @@ class Print_Utils:
 
         for merchant in merchat_list:
             table.add_row(str(merchant.id), merchant.name)
+
+        console.print(table)
+        
+    @staticmethod
+    def tag_table(merchat_list: List[Tag]) -> None:
+        """
+        Print a tag table.
+        """
+
+        table: Table = Table(
+            Column("ID", style="bright_black"),
+            Column("Name"),
+            box=box.SIMPLE,
+        )
+
+        for tag in merchat_list:
+            table.add_row(str(tag.id), tag.name)
 
         console.print(table)
         

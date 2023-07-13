@@ -1,4 +1,4 @@
-# expense_tracker/cli/merchants.py
+# expense_tracker/cli/cli_merchants.py
 
 import typer
 
@@ -14,7 +14,7 @@ from expense_tracker.model.merchant_database import Merchant_Database
 from expense_tracker.model.merchant import Merchant
 
 
-class Merchants:
+class CLI_Merchants:
     app: typer.Typer = typer.Typer()
 
     @app.command()
