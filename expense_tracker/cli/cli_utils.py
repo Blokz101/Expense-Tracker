@@ -52,6 +52,17 @@ class Print_Utils:
             table.add_row(str(merchant.id), merchant.name)
 
         console.print(table)
+        
+    @staticmethod
+    def input_rule(input_message) -> str:
+        """
+        Gets input from the user and prints a rule after it.
+        """
+        
+        console.print()
+        input: str = console.input(input_message)
+        console.rule()
+        return input
 
     @staticmethod
     def input_from_options(
@@ -69,10 +80,12 @@ class Print_Utils:
         user_input: str
 
         if prompt_message:
-            user_input = console.input(f"{prompt_message} >>> ")
+            user_input = Print_Utils.input_rule(f"{prompt_message} >>> ")
 
         elif input:
             user_input = input
+            
+        selected_option: tuple
 
         while True:
             sorted_options: List[tuple] = Print_Utils._similar_strings(
@@ -80,23 +93,27 @@ class Print_Utils:
             )
 
             # Print the options
-            console.rule()
-            console.print(f"Options sorted by '{user_input}':\n")
+            console.print(f"\nOptions sorted by '{user_input}':\n")
             for index, option in enumerate(
                 sorted_options[: GeneralConstants.NUMBER_OF_DISPLAY_OPTIONS]
             ):
                 console.print(f"{index: <4}{option[1]}")
-            console.print()
 
-            user_input = console.input("Please select an option >>> ")
+            user_input = Print_Utils.input_rule("Please select an option >>> ")
 
             if not user_input:
-                return sorted_options[0][2]
+                selected_option = sorted_options[0]
+                break
 
             if str.isdigit(user_input):
                 index: int = int(user_input)
                 if index >= 0 and index <= len(sorted_options) - 1:
-                    return sorted_options[index][2]
+                    selected_option = sorted_options[index]
+                    break
+                
+        console.print(f"Selected \'{selected_option[1]}\'\n")
+                
+        return selected_option[2]
 
     @staticmethod
     def _similar_strings(main_string: str, str_list: List[str]) -> List[tuple]:

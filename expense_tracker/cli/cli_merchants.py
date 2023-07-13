@@ -6,6 +6,8 @@ from typing import Optional, List
 
 from typing_extensions import Annotated
 
+from expense_tracker.cli import console
+
 from expense_tracker.cli.cli_utils import Print_Utils
 
 from expense_tracker.model.merchant_database import Merchant_Database
@@ -33,7 +35,7 @@ class Merchants:
 
     @app.command()
     def delete(
-        name: Annotated[str, typer.Argument(help="name of merchant to be deleted")]
+        name: Annotated[str, typer.Argument(help="Name of merchant to be deleted")]
     ) -> None:
         """
         Attempt to delete an existing merchant.
@@ -54,6 +56,34 @@ class Merchants:
         except Exception as error:
             Print_Utils.error_message(
                 f"Unable to delete merchant, likley because one or more transactions reference it.",
+                error_message=error,
+            )
+            
+    @app.command()
+    def rename(
+        name: Annotated[str, typer.Argument(help="Current name of merchant to be renamed")]
+    ) -> None:
+        """
+        Attempt to delete an existing merchant.
+        """
+        
+        merchant_list: List[str] = Merchant_Database.get_all()
+        merchant_name_list: List[str] = [merchant.name for merchant in merchant_list]
+
+        target_index: int = Print_Utils.input_from_options(
+                    merchant_name_list, input=name
+        )
+        target_merchant: Merchant = merchant_list[target_index]
+        
+        new_name: str = console.input("New merchant name >>> ")
+
+        try:
+            Merchant_Database.rename(target_merchant, new_name)
+            Print_Utils.success_message(f"Renamed merchant '{name}' to \'{new_name}\'")
+
+        except Exception as error:
+            Print_Utils.error_message(
+                f"Unable to rename merchant.",
                 error_message=error,
             )
 

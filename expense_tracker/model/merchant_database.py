@@ -49,15 +49,6 @@ class Merchant_Database:
             )
 
     @staticmethod
-    def get_filterd_by_id(filter: int) -> list:
-        """
-        List merchants in database filtered by name.
-        """
-
-        with Session(engine) as session:
-            return session.query(Merchant).filter(Merchant.id == filter).all()
-
-    @staticmethod
     def delete(merchant: Merchant) -> None:
         """
         Delete a merchant in database.
@@ -65,4 +56,15 @@ class Merchant_Database:
 
         with Session(engine) as session:
             session.delete(merchant)
+            session.commit()
+            
+    @staticmethod
+    def rename(merchant: Merchant, new_name: str) -> None:
+        """
+        Renames a merchant in the database.
+        """
+        
+        with Session(engine) as session:
+            session.add(merchant)
+            merchant.name = new_name
             session.commit()
