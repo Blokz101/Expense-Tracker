@@ -6,6 +6,7 @@ from expense_tracker.cli import console
 
 from expense_tracker.orm.merchant import Merchant
 from expense_tracker.orm.tag import Tag
+from expense_tracker.orm.account import Account
 
 from typing import Optional, List
 
@@ -68,6 +69,23 @@ class Print_Utils:
 
         for tag in merchat_list:
             table.add_row(str(tag.id), tag.name)
+
+        console.print(table)
+    
+    @staticmethod
+    def account_table(merchat_list: List[Account]) -> None:
+        """
+        Print a account table.
+        """
+
+        table: Table = Table(
+            Column("ID", style="bright_black"),
+            Column("Name"),
+            box=box.SIMPLE,
+        )
+
+        for account in merchat_list:
+            table.add_row(str(account.id), account.name)
 
         console.print(table)
         

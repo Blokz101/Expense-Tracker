@@ -1,4 +1,4 @@
-# expense_tracker/model/tag_database.py
+# expense_tracker/model/account_database.py
 
 from sqlalchemy.orm import Session
 
@@ -11,58 +11,58 @@ from expense_tracker.orm.tag import Tag
 from expense_tracker.orm.account import Account
 
 
-class Tag_Database:
+class Account_Database:
     """
-    Tag sub commands
+    Account sub commands
     """
 
     @staticmethod
     def create(name: str) -> None:
         """
-        Create a new tag.
+        Create a new account.
         """
 
         with Session(engine) as session:
-            session.add(Tag(name=name))
+            session.add(Account(name=name))
             session.commit()
 
     @staticmethod
     def get_all() -> list:
         """
-        List all tags in database
+        List all accounts in database
         """
 
         with Session(engine) as session:
-            return session.query(Tag).all()
+            return session.query(Account).all()
 
     @staticmethod
     def get_filterd_by_name(filter: str) -> list:
         """
-        List tags in database filtered by name.
+        List accounts in database filtered by name.
         """
 
         with Session(engine) as session:
             return (
-                session.query(Tag).filter(Tag.name.like(f"%{filter}%")).all()
+                session.query(Account).filter(Account.name.like(f"%{filter}%")).all()
             )
 
     @staticmethod
-    def delete(tag: Tag) -> None:
+    def delete(account: Account) -> None:
         """
-        Delete a tag in database.
+        Delete a account in database.
         """
 
         with Session(engine) as session:
-            session.delete(tag)
+            session.delete(account)
             session.commit()
             
     @staticmethod
-    def rename(tag: Tag, new_name: str) -> None:
+    def rename(account: Account, new_name: str) -> None:
         """
-        Renames a tag in the database.
+        Renames a account in the database.
         """
         
         with Session(engine) as session:
-            session.add(tag)
-            tag.name = new_name
+            session.add(account)
+            account.name = new_name
             session.commit()

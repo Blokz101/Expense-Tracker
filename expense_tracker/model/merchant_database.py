@@ -1,7 +1,5 @@
 # expense_tracker/model/merchant_database.py
 
-from typing import List
-
 from sqlalchemy.orm import Session
 
 from expense_tracker.orm import engine

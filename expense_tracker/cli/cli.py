@@ -7,9 +7,8 @@ import typer
 from expense_tracker import __app_name__, __version__
 from expense_tracker.cli import configs, console
 from expense_tracker.cli.cli_merchants import CLI_Merchants
-from expense_tracker.constants import GeneralConstants
 from expense_tracker.cli.cli_tags import CLI_Tags
-from expense_tracker.cli.cli_utils import Print_Utils
+from expense_tracker.cli.cli_accounts import CLI_Accounts
 
 
 class CLI:
@@ -20,6 +19,7 @@ class CLI:
     app: typer.Typer = typer.Typer()
     app.add_typer(CLI_Merchants.app, name="merchant")
     app.add_typer(CLI_Tags.app, name="tag")
+    app.add_typer(CLI_Accounts.app, name="account")
 
     def _version_callback(value: bool) -> None:
         """
