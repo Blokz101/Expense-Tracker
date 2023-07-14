@@ -6,12 +6,20 @@ from typing import Optional, List
 
 from typing_extensions import Annotated
 
+from sqlalchemy.orm import Session
+
+from expense_tracker.model import engine
+from expense_tracker.model.merchant import Merchant
+from expense_tracker.model.amount import Amount
+from expense_tracker.model.merchant_location import Merchant_Location
+from expense_tracker.model.transaction import Transaction
+from expense_tracker.model.tag import Tag
+from expense_tracker.model.account import Account
+
 from expense_tracker.cli import console
+from expense_tracker.cli.cli_utils import Print_Utils, Print_Tables
 
-from expense_tracker.cli.cli_utils import Print_Utils
-
-from expense_tracker.model.account_database import Account_Database
-from expense_tracker.orm.account import Account
+from rich.table import Table
 
 
 class CLI_Accounts:
@@ -26,7 +34,9 @@ class CLI_Accounts:
         """
 
         try:
-            Account_Database.create(name)
+            with Session(engine) as session:
+                session.add(Account(name=name))
+                session.commit()
 
             Print_Utils.success_message(f"Created '{name}' account.")
 
@@ -41,22 +51,26 @@ class CLI_Accounts:
         Attempt to delete an existing account.
         """
 
-        account_list: List[str] = Account_Database.get_all()
-        target_account: Account = account_list[
-            Print_Utils.input_from_options(
-                [account.name for account in account_list], input=name
-            )
-        ]
+        with Session(engine) as session:
+            account_list: List[str] = session.query(Account).all()
 
-        try:
-            Account_Database.delete(target_account)
-            Print_Utils.success_message(f"Deleted account '{target_account.name}'")
+            target_account: Account = account_list[
+                Print_Utils.input_from_options(
+                    [account.name for account in account_list], input=name
+                )
+            ]
 
-        except Exception as error:
-            Print_Utils.error_message(
-                f"Unable to delete account, likley because one or more transactions reference it.",
-                error_message=error,
-            )
+            try:
+                session.delete(target_account)
+                session.commit()
+
+                Print_Utils.success_message(f"Deleted account '{target_account.name}'")
+
+            except Exception as error:
+                Print_Utils.error_message(
+                    f"Unable to delete account, likley because one or more transactions reference it.",
+                    error_message=error,
+                )
 
     @app.command()
     def rename(
@@ -68,24 +82,28 @@ class CLI_Accounts:
         Attempt to delete an existing account.
         """
 
-        account_list: List[str] = Account_Database.get_all()
-        target_account: Account = account_list[
-            Print_Utils.input_from_options(
-                [account.name for account in account_list], input=name
-            )
-        ]
+        with Session(engine) as session:
+            account_list: List[str] = session.query(Account).all()
 
-        new_name: str = console.input("New account name >>> ")
+            target_account: Account = account_list[
+                Print_Utils.input_from_options(
+                    [account.name for account in account_list], input=name
+                )
+            ]
 
-        try:
-            Account_Database.rename(target_account, new_name)
-            Print_Utils.success_message(f"Renamed account '{name}' to '{new_name}'")
+            new_name: str = console.input("New account name >>> ")
 
-        except Exception as error:
-            Print_Utils.error_message(
-                f"Unable to rename account.",
-                error_message=error,
-            )
+            try:
+                target_account.name = new_name
+                session.commit()
+
+                Print_Utils.success_message(f"Renamed account '{name}' to '{new_name}'")
+
+            except Exception as error:
+                Print_Utils.error_message(
+                    f"Unable to rename account.",
+                    error_message=error,
+                )
 
     @app.command()
     def list(
@@ -98,14 +116,15 @@ class CLI_Accounts:
         List all accounts, filter by name if needed
         """
 
-        accounts_list: List[Account]
+        with Session(engine) as session:
 
-        if filter:
-            accounts_list = Account_Database.get_filterd_by_name(filter)
-        else:
-            accounts_list = Account_Database.get_all()
-
-        Print_Utils.account_table(accounts_list)
+            table: Table = Print_Tables.account_table
+            
+            for account in session.query(Account).all():
+                table.add_row(str(account.id), account.name)
+                
+            console.print(table)
+            
 
     @app.callback()
     def callback() -> None:

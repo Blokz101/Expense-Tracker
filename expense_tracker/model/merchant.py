@@ -1,9 +1,9 @@
-# expense_tracker/orm/merchant.py
+# expense_tracker/model/merchant.py
 
 from typing import Optional, List
 
-from expense_tracker.orm import Base
-from expense_tracker.orm.branch_table import Branch_Table
+from expense_tracker.model import Base
+from expense_tracker.model.branch_table import Branch_Table
 
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import relationship, mapped_column

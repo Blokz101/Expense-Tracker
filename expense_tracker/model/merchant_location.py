@@ -1,6 +1,6 @@
-# expense_tracker/orm/location.py
+# expense_tracker/model/location.py
 
-from expense_tracker.orm import Base
+from expense_tracker.model import Base
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped

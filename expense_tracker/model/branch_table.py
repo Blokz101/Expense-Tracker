@@ -1,6 +1,6 @@
-# expense_tracker/orm/branch_table.py
+# expense_tracker/model/branch_table.py
 
-from expense_tracker.orm import Base
+from expense_tracker.model import Base
 
 from sqlalchemy import Table, Column, ForeignKey
 

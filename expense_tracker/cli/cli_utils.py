@@ -4,16 +4,37 @@ from expense_tracker.constants import GeneralConstants
 
 from expense_tracker.cli import console
 
-from expense_tracker.orm.merchant import Merchant
-from expense_tracker.orm.tag import Tag
-from expense_tracker.orm.account import Account
-
 from typing import Optional, List
 
 from difflib import SequenceMatcher
 
 from rich import box
 from rich.table import Column, Table
+
+
+class Print_Tables:
+    """
+    Returns predefined tables for each database.
+    """
+
+    merchant_table: Table = Table(
+        Column("ID", style="bright_black"),
+        Column("Name"),
+        Column("Default Tags"),
+        box=box.SIMPLE,
+    )
+
+    tag_table: Table = Table(
+        Column("ID", style="bright_black"),
+        Column("Name"),
+        box=box.SIMPLE,
+    )
+
+    account_table: Table = Table(
+        Column("ID", style="bright_black"),
+        Column("Name"),
+        box=box.SIMPLE,
+    )
 
 
 class Print_Utils:
@@ -37,57 +58,6 @@ class Print_Utils:
 
         if error_message:
             console.print(f"Failed with: {str(error_message)}\n", style="Red")
-
-    @staticmethod
-    def merchant_table(merchat_list: List[Merchant]) -> None:
-        """
-        Print a merchant table.
-        """
-
-        table: Table = Table(
-            Column("ID", style="bright_black"),
-            Column("Name"),
-            box=box.SIMPLE,
-        )
-
-        for merchant in merchat_list:
-            table.add_row(str(merchant.id), merchant.name)
-
-        console.print(table)
-
-    @staticmethod
-    def tag_table(merchat_list: List[Tag]) -> None:
-        """
-        Print a tag table.
-        """
-
-        table: Table = Table(
-            Column("ID", style="bright_black"),
-            Column("Name"),
-            box=box.SIMPLE,
-        )
-
-        for tag in merchat_list:
-            table.add_row(str(tag.id), tag.name)
-
-        console.print(table)
-
-    @staticmethod
-    def account_table(merchat_list: List[Account]) -> None:
-        """
-        Print a account table.
-        """
-
-        table: Table = Table(
-            Column("ID", style="bright_black"),
-            Column("Name"),
-            box=box.SIMPLE,
-        )
-
-        for account in merchat_list:
-            table.add_row(str(account.id), account.name)
-
-        console.print(table)
 
     @staticmethod
     def input_rule(input_message) -> str:
@@ -124,7 +94,7 @@ class Print_Utils:
         selected_option: tuple
 
         while True:
-            sorted_options: List[tuple] = Print_Utils._similar_strings(
+            sorted_options: List[tuple] = Print_Utils.similar_strings(
                 user_input, options_list
             )
 
@@ -152,7 +122,7 @@ class Print_Utils:
         return selected_option[2]
 
     @staticmethod
-    def _similar_strings(main_string: str, str_list: List[str]) -> List[tuple]:
+    def similar_strings(main_string: str, str_list: List[str]) -> List[tuple]:
         """
         Compare a string to a list of strings and return tuples with floats that describe how similar the two strings are and contain the origional index.
         """

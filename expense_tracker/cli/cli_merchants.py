@@ -6,12 +6,20 @@ from typing import Optional, List
 
 from typing_extensions import Annotated
 
+from sqlalchemy.orm import Session
+
+from expense_tracker.model import engine
+from expense_tracker.model.merchant import Merchant
+from expense_tracker.model.amount import Amount
+from expense_tracker.model.merchant_location import Merchant_Location
+from expense_tracker.model.transaction import Transaction
+from expense_tracker.model.tag import Tag
+from expense_tracker.model.account import Account
+
 from expense_tracker.cli import console
+from expense_tracker.cli.cli_utils import Print_Utils, Print_Tables
 
-from expense_tracker.cli.cli_utils import Print_Utils
-
-from expense_tracker.model.merchant_database import Merchant_Database
-from expense_tracker.orm.merchant import Merchant
+from rich.table import Table
 
 
 class CLI_Merchants:
@@ -26,7 +34,9 @@ class CLI_Merchants:
         """
 
         try:
-            Merchant_Database.create(name)
+            with Session(engine) as session:
+                session.add(Merchant(name=name))
+                session.commit()
 
             Print_Utils.success_message(f"Created '{name}' merchant.")
 
@@ -41,22 +51,26 @@ class CLI_Merchants:
         Attempt to delete an existing merchant.
         """
 
-        merchant_list: List[str] = Merchant_Database.get_all()
-        target_merchant: Merchant = merchant_list[
-            Print_Utils.input_from_options(
-                [merchant.name for merchant in merchant_list], input=name
-            )
-        ]
+        with Session(engine) as session:
+            merchant_list: List[str] = session.query(Merchant).all()
 
-        try:
-            Merchant_Database.delete(target_merchant)
-            Print_Utils.success_message(f"Deleted merchant '{target_merchant.name}'")
+            target_merchant: Merchant = merchant_list[
+                Print_Utils.input_from_options(
+                    [merchant.name for merchant in merchant_list], input=name
+                )
+            ]
 
-        except Exception as error:
-            Print_Utils.error_message(
-                f"Unable to delete merchant, likley because one or more transactions reference it.",
-                error_message=error,
-            )
+            try:
+                session.delete(target_merchant)
+                session.commit()
+
+                Print_Utils.success_message(f"Deleted merchant '{target_merchant.name}'")
+
+            except Exception as error:
+                Print_Utils.error_message(
+                    f"Unable to delete merchant, likley because one or more transactions reference it.",
+                    error_message=error,
+                )
 
     @app.command()
     def rename(
@@ -68,24 +82,28 @@ class CLI_Merchants:
         Attempt to delete an existing merchant.
         """
 
-        merchant_list: List[str] = Merchant_Database.get_all()
-        target_merchant: Merchant = merchant_list[
-            Print_Utils.input_from_options(
-                [merchant.name for merchant in merchant_list], input=name
-            )
-        ]
+        with Session(engine) as session:
+            merchant_list: List[str] = session.query(Merchant).all()
 
-        new_name: str = console.input("New merchant name >>> ")
+            target_merchant: Merchant = merchant_list[
+                Print_Utils.input_from_options(
+                    [merchant.name for merchant in merchant_list], input=name
+                )
+            ]
 
-        try:
-            Merchant_Database.rename(target_merchant, new_name)
-            Print_Utils.success_message(f"Renamed merchant '{name}' to '{new_name}'")
+            new_name: str = console.input("New merchant name >>> ")
 
-        except Exception as error:
-            Print_Utils.error_message(
-                f"Unable to rename merchant.",
-                error_message=error,
-            )
+            try:
+                target_merchant.name = new_name
+                session.commit()
+
+                Print_Utils.success_message(f"Renamed merchant '{name}' to '{new_name}'")
+
+            except Exception as error:
+                Print_Utils.error_message(
+                    f"Unable to rename merchant.",
+                    error_message=error,
+                )
 
     @app.command()
     def list(
@@ -98,14 +116,15 @@ class CLI_Merchants:
         List all merchants, filter by name if needed
         """
 
-        merchants_list: List[Merchant]
+        with Session(engine) as session:
 
-        if filter:
-            merchants_list = Merchant_Database.get_filterd_by_name(filter)
-        else:
-            merchants_list = Merchant_Database.get_all()
-
-        Print_Utils.merchant_table(merchants_list)
+            table: Table = Print_Tables.merchant_table
+            
+            for merchant in session.query(Merchant).all():
+                table.add_row(str(merchant.id), merchant.name)
+                
+            console.print(table)
+            
 
     @app.callback()
     def callback() -> None:

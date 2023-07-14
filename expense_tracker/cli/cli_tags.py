@@ -6,25 +6,37 @@ from typing import Optional, List
 
 from typing_extensions import Annotated
 
+from sqlalchemy.orm import Session
+
+from expense_tracker.model import engine
+from expense_tracker.model.merchant import Merchant
+from expense_tracker.model.amount import Amount
+from expense_tracker.model.merchant_location import Merchant_Location
+from expense_tracker.model.transaction import Transaction
+from expense_tracker.model.tag import Tag
+from expense_tracker.model.account import Account
+
 from expense_tracker.cli import console
+from expense_tracker.cli.cli_utils import Print_Utils, Print_Tables
 
-from expense_tracker.cli.cli_utils import Print_Utils
-
-from expense_tracker.model.tag_database import Tag_Database
-from expense_tracker.orm.tag import Tag
+from rich.table import Table
 
 
 class CLI_Tags:
     app: typer.Typer = typer.Typer()
 
     @app.command()
-    def create(name: Annotated[str, typer.Argument(help="Name of the tag.")]) -> None:
+    def create(
+        name: Annotated[str, typer.Argument(help="Name of the tag.")]
+    ) -> None:
         """
         Create a new tag.
         """
 
         try:
-            Tag_Database.create(name)
+            with Session(engine) as session:
+                session.add(Tag(name=name))
+                session.commit()
 
             Print_Utils.success_message(f"Created '{name}' tag.")
 
@@ -39,45 +51,59 @@ class CLI_Tags:
         Attempt to delete an existing tag.
         """
 
-        tag_list: List[str] = Tag_Database.get_all()
-        target_tag: Tag = tag_list[
-            Print_Utils.input_from_options([tag.name for tag in tag_list], input=name)
-        ]
+        with Session(engine) as session:
+            tag_list: List[str] = session.query(Tag).all()
 
-        try:
-            Tag_Database.delete(target_tag)
-            Print_Utils.success_message(f"Deleted tag '{target_tag.name}'")
+            target_tag: Tag = tag_list[
+                Print_Utils.input_from_options(
+                    [tag.name for tag in tag_list], input=name
+                )
+            ]
 
-        except Exception as error:
-            Print_Utils.error_message(
-                f"Unable to delete tag, likley because one or more transactions reference it.",
-                error_message=error,
-            )
+            try:
+                session.delete(target_tag)
+                session.commit()
+
+                Print_Utils.success_message(f"Deleted tag '{target_tag.name}'")
+
+            except Exception as error:
+                Print_Utils.error_message(
+                    f"Unable to delete tag, likley because one or more transactions reference it.",
+                    error_message=error,
+                )
 
     @app.command()
     def rename(
-        name: Annotated[str, typer.Argument(help="Current name of tag to be renamed")]
+        name: Annotated[
+            str, typer.Argument(help="Current name of tag to be renamed")
+        ]
     ) -> None:
         """
         Attempt to delete an existing tag.
         """
 
-        tag_list: List[str] = Tag_Database.get_all()
-        target_tag: Tag = tag_list[
-            Print_Utils.input_from_options([tag.name for tag in tag_list], input=name)
-        ]
+        with Session(engine) as session:
+            tag_list: List[str] = session.query(Tag).all()
 
-        new_name: str = console.input("New tag name >>> ")
+            target_tag: Tag = tag_list[
+                Print_Utils.input_from_options(
+                    [tag.name for tag in tag_list], input=name
+                )
+            ]
 
-        try:
-            Tag_Database.rename(target_tag, new_name)
-            Print_Utils.success_message(f"Renamed tag '{name}' to '{new_name}'")
+            new_name: str = console.input("New tag name >>> ")
 
-        except Exception as error:
-            Print_Utils.error_message(
-                f"Unable to rename tag.",
-                error_message=error,
-            )
+            try:
+                target_tag.name = new_name
+                session.commit()
+
+                Print_Utils.success_message(f"Renamed tag '{name}' to '{new_name}'")
+
+            except Exception as error:
+                Print_Utils.error_message(
+                    f"Unable to rename tag.",
+                    error_message=error,
+                )
 
     @app.command()
     def list(
@@ -90,14 +116,15 @@ class CLI_Tags:
         List all tags, filter by name if needed
         """
 
-        tags_list: List[Tag]
+        with Session(engine) as session:
 
-        if filter:
-            tags_list = Tag_Database.get_filterd_by_name(filter)
-        else:
-            tags_list = Tag_Database.get_all()
-
-        Print_Utils.tag_table(tags_list)
+            table: Table = Print_Tables.tag_table
+            
+            for tag in session.query(Tag).all():
+                table.add_row(str(tag.id), tag.name)
+                
+            console.print(table)
+            
 
     @app.callback()
     def callback() -> None:
