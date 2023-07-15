@@ -27,7 +27,7 @@ class CLI_Merchants:
 
     @app.command()
     def create(
-        name: Annotated[str, typer.Argument(help="Name of the merchant.")]
+        name: Annotated[str, typer.Argument(help="Name of the merchant")]
     ) -> None:
         """
         Create a new merchant.
@@ -38,10 +38,10 @@ class CLI_Merchants:
                 session.add(Merchant(name=name))
                 session.commit()
 
-            Print_Utils.success_message(f"Created '{name}' merchant.")
+            Print_Utils.success_message(f"Created '{name}' merchant")
 
         except Exception as error:
-            Print_Utils.error_message("Unable to create merchant.", error_message=error)
+            Print_Utils.error_message("Unable to create merchant", error_message=error)
 
     @app.command()
     def delete(
@@ -64,11 +64,13 @@ class CLI_Merchants:
                 session.delete(target_merchant)
                 session.commit()
 
-                Print_Utils.success_message(f"Deleted merchant '{target_merchant.name}'")
+                Print_Utils.success_message(
+                    f"Deleted merchant '{target_merchant.name}'"
+                )
 
             except Exception as error:
                 Print_Utils.error_message(
-                    f"Unable to delete merchant, likley because one or more transactions reference it.",
+                    f"Unable to delete merchant, likley because one or more transactions reference it",
                     error_message=error,
                 )
 
@@ -97,11 +99,13 @@ class CLI_Merchants:
                 target_merchant.name = new_name
                 session.commit()
 
-                Print_Utils.success_message(f"Renamed merchant '{name}' to '{new_name}'")
+                Print_Utils.success_message(
+                    f"Renamed merchant '{name}' to '{new_name}'"
+                )
 
             except Exception as error:
                 Print_Utils.error_message(
-                    f"Unable to rename merchant.",
+                    f"Unable to rename merchant",
                     error_message=error,
                 )
 
@@ -117,14 +121,56 @@ class CLI_Merchants:
         """
 
         with Session(engine) as session:
-
             table: Table = Print_Tables.merchant_table
-            
+
             for merchant in session.query(Merchant).all():
-                table.add_row(str(merchant.id), merchant.name)
-                
+                table.add_row(
+                    str(merchant.id),
+                    merchant.name,
+                    ", ".join([default.name for default in merchant.default_tags]),
+                )
+
             console.print(table)
-            
+
+    @app.command()
+    def default(
+        merchant_name: Annotated[str, typer.Argument(help="Name of merchant")],
+        tag_name: Annotated[str, typer.Argument(help="Name of tag to toggle")],
+    ) -> None:
+        """
+        Add or remove a default tag from a merchant.
+        """
+
+        with Session(engine) as session:
+            merchant_list: List[Merchant] = session.query(Merchant).all()
+
+            target_merchant: Merchant = merchant_list[
+                Print_Utils.input_from_options(
+                    [merchant.name for merchant in merchant_list], input=merchant_name
+                )
+            ]
+
+            tag_list: List[Tag] = session.query(Tag).all()
+
+            target_tag: Merchant = tag_list[
+                Print_Utils.input_from_options(
+                    [tag.name for tag in tag_list], input=tag_name
+                )
+            ]
+
+            if target_tag in target_merchant.default_tags:
+                target_merchant.default_tags.remove(target_tag)
+                Print_Utils.success_message(
+                    f"Removed default tag '{target_tag.name}' from merchant '{target_merchant.name}'"
+                )
+
+            else:
+                target_merchant.default_tags.append(target_tag)
+                Print_Utils.success_message(
+                    f"Added default tag '{target_tag.name}' to merchant '{target_merchant.name}'"
+                )
+
+            session.commit()
 
     @app.callback()
     def callback() -> None:

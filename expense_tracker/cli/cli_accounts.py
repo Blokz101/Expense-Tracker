@@ -27,7 +27,7 @@ class CLI_Accounts:
 
     @app.command()
     def create(
-        name: Annotated[str, typer.Argument(help="Name of the account.")]
+        name: Annotated[str, typer.Argument(help="Name of the account")]
     ) -> None:
         """
         Create a new account.
@@ -38,10 +38,10 @@ class CLI_Accounts:
                 session.add(Account(name=name))
                 session.commit()
 
-            Print_Utils.success_message(f"Created '{name}' account.")
+            Print_Utils.success_message(f"Created '{name}' account")
 
         except Exception as error:
-            Print_Utils.error_message("Unable to create account.", error_message=error)
+            Print_Utils.error_message("Unable to create account", error_message=error)
 
     @app.command()
     def delete(
@@ -68,7 +68,7 @@ class CLI_Accounts:
 
             except Exception as error:
                 Print_Utils.error_message(
-                    f"Unable to delete account, likley because one or more transactions reference it.",
+                    f"Unable to delete account, likley because one or more transactions reference it",
                     error_message=error,
                 )
 
@@ -101,7 +101,7 @@ class CLI_Accounts:
 
             except Exception as error:
                 Print_Utils.error_message(
-                    f"Unable to rename account.",
+                    f"Unable to rename account",
                     error_message=error,
                 )
 
@@ -117,14 +117,12 @@ class CLI_Accounts:
         """
 
         with Session(engine) as session:
-
             table: Table = Print_Tables.account_table
-            
+
             for account in session.query(Account).all():
                 table.add_row(str(account.id), account.name)
-                
+
             console.print(table)
-            
 
     @app.callback()
     def callback() -> None:

@@ -81,7 +81,7 @@ class Print_Utils:
         """
 
         if not (prompt_message or input):
-            raise ValueError("Argument 'prompt_message' or 'input' must be given.")
+            raise ValueError("Argument 'prompt_message' or 'input' must be given")
 
         user_input: str
 
@@ -99,11 +99,16 @@ class Print_Utils:
             )
 
             # Print the options
-            console.print(f"\nOptions sorted by '{user_input}':\n")
+            console.print(
+                f"\nPress enter to select the first option, enter a number to select another option, or type a phrase to search for antoher option. Options sorted by '{user_input}':\n"
+            )
             for index, option in enumerate(
                 sorted_options[: GeneralConstants.NUMBER_OF_DISPLAY_OPTIONS]
             ):
-                console.print(f"{index: <4}{option[1]}")
+                if index == 0:
+                    console.print(f"{' -->': <7}{option[1]}", style="cyan")
+                else:
+                    console.print(f"{f'[{index}]': <6}{option[1]}")
 
             user_input = Print_Utils.input_rule("Please select an option >>> ")
 

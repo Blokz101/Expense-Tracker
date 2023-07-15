@@ -26,9 +26,7 @@ class CLI_Tags:
     app: typer.Typer = typer.Typer()
 
     @app.command()
-    def create(
-        name: Annotated[str, typer.Argument(help="Name of the tag.")]
-    ) -> None:
+    def create(name: Annotated[str, typer.Argument(help="Name of the tag")]) -> None:
         """
         Create a new tag.
         """
@@ -38,10 +36,10 @@ class CLI_Tags:
                 session.add(Tag(name=name))
                 session.commit()
 
-            Print_Utils.success_message(f"Created '{name}' tag.")
+            Print_Utils.success_message(f"Created '{name}' tag")
 
         except Exception as error:
-            Print_Utils.error_message("Unable to create tag.", error_message=error)
+            Print_Utils.error_message("Unable to create tag", error_message=error)
 
     @app.command()
     def delete(
@@ -68,15 +66,13 @@ class CLI_Tags:
 
             except Exception as error:
                 Print_Utils.error_message(
-                    f"Unable to delete tag, likley because one or more transactions reference it.",
+                    f"Unable to delete tag, likley because one or more transactions reference it",
                     error_message=error,
                 )
 
     @app.command()
     def rename(
-        name: Annotated[
-            str, typer.Argument(help="Current name of tag to be renamed")
-        ]
+        name: Annotated[str, typer.Argument(help="Current name of tag to be renamed")]
     ) -> None:
         """
         Attempt to delete an existing tag.
@@ -101,7 +97,7 @@ class CLI_Tags:
 
             except Exception as error:
                 Print_Utils.error_message(
-                    f"Unable to rename tag.",
+                    f"Unable to rename tag",
                     error_message=error,
                 )
 
@@ -117,14 +113,12 @@ class CLI_Tags:
         """
 
         with Session(engine) as session:
-
             table: Table = Print_Tables.tag_table
-            
+
             for tag in session.query(Tag).all():
                 table.add_row(str(tag.id), tag.name)
-                
+
             console.print(table)
-            
 
     @app.callback()
     def callback() -> None:
