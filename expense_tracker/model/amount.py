@@ -14,7 +14,7 @@ class Amount(Base):
     """
     SQLAlchemy amounts table
 
-    Stores amounts, allows a transaction to be split into different amounts and each ammount tagged with its own tags.
+    Stores amounts, allows a transaction to be split into different amounts and each amount tagged with its own tags.
     """
 
     __tablename__ = "amounts"

@@ -31,6 +31,7 @@ class CLI_Tags:
         Create a new tag.
         """
 
+        # Attempt to create the tag
         try:
             with Session(engine) as session:
                 session.add(Tag(name=name))
@@ -38,6 +39,7 @@ class CLI_Tags:
 
             Print_Utils.success_message(f"Created '{name}' tag")
 
+        # If an error occurs, catch and print it
         except Exception as error:
             Print_Utils.error_message("Unable to create tag", error_message=error)
 
@@ -50,23 +52,27 @@ class CLI_Tags:
         """
 
         with Session(engine) as session:
+            # Get a list of tags from the database
             tag_list: List[str] = session.query(Tag).all()
 
+            # Prompt the user to select a tag and set it as the target tag
             target_tag: Tag = tag_list[
                 Print_Utils.input_from_options(
                     [tag.name for tag in tag_list], input=name
                 )
             ]
 
+            # Attempt to delete the tag
             try:
                 session.delete(target_tag)
                 session.commit()
 
                 Print_Utils.success_message(f"Deleted tag '{target_tag.name}'")
 
+            # If an error occurred, catch it and print the message
             except Exception as error:
                 Print_Utils.error_message(
-                    f"Unable to delete tag, likley because one or more transactions reference it",
+                    f"Unable to delete tag, likely because one or more transactions reference it",
                     error_message=error,
                 )
 
@@ -79,22 +85,27 @@ class CLI_Tags:
         """
 
         with Session(engine) as session:
+            # Get a list of tags from the database
             tag_list: List[str] = session.query(Tag).all()
 
+            # Prompt the user to select a tag and set it as the target tag
             target_tag: Tag = tag_list[
                 Print_Utils.input_from_options(
                     [tag.name for tag in tag_list], input=name
                 )
             ]
 
+            # Prompt the user for a new name
             new_name: str = console.input("New tag name >>> ")
 
+            # Attempt to commit the rename
             try:
                 target_tag.name = new_name
                 session.commit()
 
                 Print_Utils.success_message(f"Renamed tag '{name}' to '{new_name}'")
 
+            # If an error occurs, catch it and print the message
             except Exception as error:
                 Print_Utils.error_message(
                     f"Unable to rename tag",
@@ -113,11 +124,12 @@ class CLI_Tags:
         """
 
         with Session(engine) as session:
+            # Get the empty table object and populate it
             table: Table = Print_Tables.tag_table
-
             for tag in session.query(Tag).all():
                 table.add_row(str(tag.id), tag.name)
 
+            # Print the table
             console.print(table)
 
     @app.callback()

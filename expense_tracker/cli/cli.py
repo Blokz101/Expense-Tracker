@@ -5,7 +5,7 @@ from typing_extensions import Annotated
 import typer
 
 from expense_tracker import __app_name__, __version__
-from expense_tracker.cli import configs, console
+from expense_tracker.cli import console
 from expense_tracker.cli.cli_merchants import CLI_Merchants
 from expense_tracker.cli.cli_tags import CLI_Tags
 from expense_tracker.cli.cli_accounts import CLI_Accounts
@@ -16,6 +16,7 @@ class CLI:
     ViewController for the application. Deals with command line user interaction.
     """
 
+    # Link the commands from the other classes to the main CLI application
     app: typer.Typer = typer.Typer()
     app.add_typer(CLI_Merchants.app, name="merchant")
     app.add_typer(CLI_Tags.app, name="tag")
@@ -46,8 +47,6 @@ class CLI:
         """
         Reconcile and track expenses using receipt photos and bank statements.
         """
-
-        pass
 
     @staticmethod
     @app.command()

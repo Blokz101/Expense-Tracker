@@ -33,6 +33,7 @@ class CLI_Merchants:
         Create a new merchant.
         """
 
+        # Attempt to create the merchant
         try:
             with Session(engine) as session:
                 session.add(Merchant(name=name))
@@ -40,6 +41,7 @@ class CLI_Merchants:
 
             Print_Utils.success_message(f"Created '{name}' merchant")
 
+        # If an error occurs, catch it and print the message
         except Exception as error:
             Print_Utils.error_message("Unable to create merchant", error_message=error)
 
@@ -52,14 +54,17 @@ class CLI_Merchants:
         """
 
         with Session(engine) as session:
+            # Get a list of merchants from the database
             merchant_list: List[str] = session.query(Merchant).all()
 
+            # Prompt the user to select a merchant and set it as the target account
             target_merchant: Merchant = merchant_list[
                 Print_Utils.input_from_options(
                     [merchant.name for merchant in merchant_list], input=name
                 )
             ]
 
+            # Attempt to delete the merchant
             try:
                 session.delete(target_merchant)
                 session.commit()
@@ -68,9 +73,10 @@ class CLI_Merchants:
                     f"Deleted merchant '{target_merchant.name}'"
                 )
 
+            # If an error occurs, catch it and print the message
             except Exception as error:
                 Print_Utils.error_message(
-                    f"Unable to delete merchant, likley because one or more transactions reference it",
+                    f"Unable to delete merchant, likely because one or more transactions reference it",
                     error_message=error,
                 )
 
@@ -85,16 +91,20 @@ class CLI_Merchants:
         """
 
         with Session(engine) as session:
+            # get a list of merchants from the database
             merchant_list: List[str] = session.query(Merchant).all()
 
+            # Prompt the user to select a merchant and set it as the target account
             target_merchant: Merchant = merchant_list[
                 Print_Utils.input_from_options(
                     [merchant.name for merchant in merchant_list], input=name
                 )
             ]
 
+            # Prompt the user for a new name
             new_name: str = console.input("New merchant name >>> ")
 
+            # Attempt to commit the rename
             try:
                 target_merchant.name = new_name
                 session.commit()
@@ -103,6 +113,7 @@ class CLI_Merchants:
                     f"Renamed merchant '{name}' to '{new_name}'"
                 )
 
+            # If an error occurs, catch it and print the message
             except Exception as error:
                 Print_Utils.error_message(
                     f"Unable to rename merchant",
@@ -121,8 +132,8 @@ class CLI_Merchants:
         """
 
         with Session(engine) as session:
+            # Get the empty table object and populate it
             table: Table = Print_Tables.merchant_table
-
             for merchant in session.query(Merchant).all():
                 table.add_row(
                     str(merchant.id),
@@ -130,6 +141,7 @@ class CLI_Merchants:
                     ", ".join([default.name for default in merchant.default_tags]),
                 )
 
+            # Print the table
             console.print(table)
 
     @app.command()
@@ -142,28 +154,34 @@ class CLI_Merchants:
         """
 
         with Session(engine) as session:
+            # Get a list of merchants from the database
             merchant_list: List[Merchant] = session.query(Merchant).all()
 
+            # Prompt the user to select an account and set it as the target merchant
             target_merchant: Merchant = merchant_list[
                 Print_Utils.input_from_options(
                     [merchant.name for merchant in merchant_list], input=merchant_name
                 )
             ]
 
+            # Get a list of tags from the database
             tag_list: List[Tag] = session.query(Tag).all()
 
+            # Prompt the user to select a tag and set it as the target tag
             target_tag: Merchant = tag_list[
                 Print_Utils.input_from_options(
                     [tag.name for tag in tag_list], input=tag_name
                 )
             ]
 
+            # If the merchant already has the tag, remove it
             if target_tag in target_merchant.default_tags:
                 target_merchant.default_tags.remove(target_tag)
                 Print_Utils.success_message(
                     f"Removed default tag '{target_tag.name}' from merchant '{target_merchant.name}'"
                 )
 
+            # if the merchant does not have the tag, add it
             else:
                 target_merchant.default_tags.append(target_tag)
                 Print_Utils.success_message(

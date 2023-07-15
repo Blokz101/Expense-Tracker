@@ -23,6 +23,10 @@ from rich.table import Table
 
 
 class CLI_Accounts:
+    """
+    Commands to edit the accounts database.
+    """
+
     app: typer.Typer = typer.Typer()
 
     @app.command()
@@ -33,6 +37,7 @@ class CLI_Accounts:
         Create a new account.
         """
 
+        # Attempt to create the account
         try:
             with Session(engine) as session:
                 session.add(Account(name=name))
@@ -40,6 +45,7 @@ class CLI_Accounts:
 
             Print_Utils.success_message(f"Created '{name}' account")
 
+        # If an error occurs, catch it and print the message
         except Exception as error:
             Print_Utils.error_message("Unable to create account", error_message=error)
 
@@ -52,23 +58,27 @@ class CLI_Accounts:
         """
 
         with Session(engine) as session:
+            # Get a list of accounts from the database
             account_list: List[str] = session.query(Account).all()
 
+            # Prompt the user to select an account and set it as the target account
             target_account: Account = account_list[
                 Print_Utils.input_from_options(
                     [account.name for account in account_list], input=name
                 )
             ]
 
+            # Attempt to delete the account
             try:
                 session.delete(target_account)
                 session.commit()
 
                 Print_Utils.success_message(f"Deleted account '{target_account.name}'")
 
+            # If an error occurred, catch it and print the message
             except Exception as error:
                 Print_Utils.error_message(
-                    f"Unable to delete account, likley because one or more transactions reference it",
+                    f"Unable to delete account, likely because one or more transactions reference it",
                     error_message=error,
                 )
 
@@ -83,22 +93,27 @@ class CLI_Accounts:
         """
 
         with Session(engine) as session:
+            # Get a list of accounts from the database
             account_list: List[str] = session.query(Account).all()
 
+            # Prompt the user to select an account and set it as the target account
             target_account: Account = account_list[
                 Print_Utils.input_from_options(
                     [account.name for account in account_list], input=name
                 )
             ]
 
+            # Prompt the user for a new name
             new_name: str = console.input("New account name >>> ")
 
+            # Attempt to commit the rename
             try:
                 target_account.name = new_name
                 session.commit()
 
                 Print_Utils.success_message(f"Renamed account '{name}' to '{new_name}'")
 
+            # If an error occurs, catch it and print the message
             except Exception as error:
                 Print_Utils.error_message(
                     f"Unable to rename account",
@@ -117,11 +132,12 @@ class CLI_Accounts:
         """
 
         with Session(engine) as session:
+            # Get the empty table object and populate it
             table: Table = Print_Tables.account_table
-
             for account in session.query(Account).all():
                 table.add_row(str(account.id), account.name)
 
+            # Print the table
             console.print(table)
 
     @app.callback()

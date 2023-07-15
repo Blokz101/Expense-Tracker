@@ -45,14 +45,14 @@ class Print_Utils:
     @staticmethod
     def success_message(message: str) -> None:
         """
-        Print a message with success formating.
+        Print a message with success formatting.
         """
         console.print(f"\n{message}\n", style="Green")
 
     @staticmethod
     def error_message(message: str, error_message: Optional[str] = None) -> None:
         """
-        Print a message with error formating.
+        Print a message with error formatting.
         """
         console.print(f"\n{message}\n", style="Red")
 
@@ -80,27 +80,29 @@ class Print_Utils:
         Prompts the user to pick an option from a list of options. Returns the index of the option picked
         """
 
+        # Raise an exception if there is no initial input option
         if not (prompt_message or input):
             raise ValueError("Argument 'prompt_message' or 'input' must be given")
 
+        # Set the user input based on the initial input option
         user_input: str
-
         if prompt_message:
             user_input = Print_Utils.input_rule(f"{prompt_message} >>> ")
-
         elif input:
             user_input = input
 
         selected_option: tuple
 
         while True:
+            
+            # Sort the list of strings by similarity to the user input
             sorted_options: List[tuple] = Print_Utils.similar_strings(
                 user_input, options_list
             )
 
-            # Print the options
+            # Print the help and first five sorted options
             console.print(
-                f"\nPress enter to select the first option, enter a number to select another option, or type a phrase to search for antoher option. Options sorted by '{user_input}':\n"
+                f"\nPress enter to select the first option, enter a number to select another option, or type a phrase to search for another option. Options sorted by '{user_input}':\n"
             )
             for index, option in enumerate(
                 sorted_options[: GeneralConstants.NUMBER_OF_DISPLAY_OPTIONS]
@@ -110,33 +112,38 @@ class Print_Utils:
                 else:
                     console.print(f"{f'[{index}]': <6}{option[1]}")
 
+            # Prompt the user to select an option
             user_input = Print_Utils.input_rule("Please select an option >>> ")
 
+            # If the user selects 0, return the set of the selected option and break
             if not user_input:
                 selected_option = sorted_options[0]
                 break
 
+            # If the user selects another number, set the index of the selected option and break
             if str.isdigit(user_input):
                 index: int = int(user_input)
                 if index >= 0 and index <= len(sorted_options) - 1:
                     selected_option = sorted_options[index]
                     break
 
+        # Print the selected option and return
         console.print(f"Selected '{selected_option[1]}'\n")
-
         return selected_option[2]
 
     @staticmethod
-    def similar_strings(main_string: str, str_list: List[str]) -> List[tuple]:
+    def similar_strings(target_string: str, str_list: List[str]) -> List[tuple]:
         """
-        Compare a string to a list of strings and return tuples with floats that describe how similar the two strings are and contain the origional index.
+        Compare a string to a list of strings and return tuples with floats that describe how similar the two strings are and contain the original index.
         """
 
         result_list: List[tuple] = []
 
+        # Calculate the similarity to the target string, save the original list index as well
         for index, string in enumerate(str_list):
             result_list.append(
-                (SequenceMatcher(None, main_string, string).ratio(), string, index)
+                (SequenceMatcher(None, target_string, string).ratio(), string, index)
             )
 
+        # Sort the list by similarity and return
         return sorted(result_list, reverse=True)
