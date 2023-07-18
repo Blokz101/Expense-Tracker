@@ -23,7 +23,9 @@ class Merchant_Location(Base):
     )
     merchant_id: Mapped[int] = mapped_column(
         ForeignKey("merchants.id"),
-        unique=True,
+        nullable=False,
+    )
+    name: Mapped[str] = mapped_column(
         nullable=False,
     )
     x_coord: Mapped[float] = mapped_column(

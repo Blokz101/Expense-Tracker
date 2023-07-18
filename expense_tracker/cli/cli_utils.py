@@ -1,8 +1,14 @@
 # expense_tracker/cli/cli_utils.py
 
-from expense_tracker.constants import GeneralConstants
+from expense_tracker.config_manager import ConfigManager
 
 from expense_tracker.cli import console
+
+from pathlib import Path
+
+import os
+
+import re
 
 from typing import Optional, List
 
@@ -21,6 +27,15 @@ class Print_Tables:
         Column("ID", style="bright_black"),
         Column("Name"),
         Column("Default Tags"),
+        box=box.SIMPLE,
+    )
+
+    merchant_location_table: Table = Table(
+        Column("ID", style="bright_black"),
+        Column("Name"),
+        Column("Merchant"),
+        Column("X Coord"),
+        Column("Y Coord"),
         box=box.SIMPLE,
     )
 
@@ -66,7 +81,7 @@ class Print_Utils:
         """
 
         console.print()
-        input: str = console.input(input_message)
+        input: str = console.input(f"{input_message} >>> ")
         console.rule()
         return input
 
@@ -84,17 +99,20 @@ class Print_Utils:
         if not (prompt_message or input):
             raise ValueError("Argument 'prompt_message' or 'input' must be given")
 
+        # If there are no options in options list, raise an exception
+        if len(options_list) == 0:
+            raise ValueError("'options_list' has no options")
+
         # Set the user input based on the initial input option
         user_input: str
         if prompt_message:
-            user_input = Print_Utils.input_rule(f"{prompt_message} >>> ")
+            user_input = Print_Utils.input_rule(prompt_message)
         elif input:
             user_input = input
 
         selected_option: tuple
 
         while True:
-            
             # Sort the list of strings by similarity to the user input
             sorted_options: List[tuple] = Print_Utils.similar_strings(
                 user_input, options_list
@@ -105,7 +123,7 @@ class Print_Utils:
                 f"\nPress enter to select the first option, enter a number to select another option, or type a phrase to search for another option. Options sorted by '{user_input}':\n"
             )
             for index, option in enumerate(
-                sorted_options[: GeneralConstants.NUMBER_OF_DISPLAY_OPTIONS]
+                sorted_options[: ConfigManager().get_number_of_options()]
             ):
                 if index == 0:
                     console.print(f"{' -->': <7}{option[1]}", style="cyan")
@@ -113,7 +131,7 @@ class Print_Utils:
                     console.print(f"{f'[{index}]': <6}{option[1]}")
 
             # Prompt the user to select an option
-            user_input = Print_Utils.input_rule("Please select an option >>> ")
+            user_input = Print_Utils.input_rule("Please select an option")
 
             # If the user selects 0, return the set of the selected option and break
             if not user_input:
@@ -147,3 +165,18 @@ class Print_Utils:
 
         # Sort the list by similarity and return
         return sorted(result_list, reverse=True)
+
+    @staticmethod
+    def input_file_path(prompt_message: str) -> Path:
+        """
+        Get user input and validate it as an existing path.
+        """
+
+        input: str = Print_Utils.input_rule(prompt_message)
+
+        input = re.sub("['\"]", "", input)
+
+        if not os.path.exists(input) or not os.path.isfile(input):
+            raise ValueError(f"'{input}' is not a valid path to a file.")
+
+        return Path(input)

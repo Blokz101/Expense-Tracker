@@ -23,6 +23,10 @@ from rich.table import Table
 
 
 class CLI_Tags:
+    """
+    Commands for interacting with the tags database.
+    """
+
     app: typer.Typer = typer.Typer()
 
     @app.command()

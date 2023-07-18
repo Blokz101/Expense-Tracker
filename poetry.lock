@@ -104,6 +104,20 @@ files = [
 test = ["pytest (>=6)"]
 
 [[package]]
+name = "exif"
+version = "1.6.0"
+description = "Read and modify image EXIF metadata using Python."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "exif-1.6.0-py3-none-any.whl", hash = "sha256:2d002b5740eb897da43de1e6a8f4ebacf5171b4d0b8bc0182c70aebde1be86d3"},
+    {file = "exif-1.6.0.tar.gz", hash = "sha256:36288d1ffc60030084a04c26f50cc32e19383a36cd234fcfa1fb1c6f698e1d36"},
+]
+
+[package.dependencies]
+plum-py = ">=0.5.0,<2.0.0"
+
+[[package]]
 name = "greenlet"
 version = "2.0.2"
 description = "Lightweight in-process concurrent programming"
@@ -286,20 +300,14 @@ dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
-name = "pyexiftool"
-version = "0.5.5"
-description = "Python wrapper for exiftool"
+name = "plum-py"
+version = "0.8.6"
+description = "Pack/Unpack Memory."
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "PyExifTool-0.5.5-py3-none-any.whl", hash = "sha256:7048aab1cb83726d7bf0113a5acb9d9d52f9e16817e39595fa59c8ea0563bf5a"},
-    {file = "PyExifTool-0.5.5.tar.gz", hash = "sha256:9dce4638c1d4d1b3414eb4e720647582f2ec14e940f97e42d4ba202580e04a66"},
+    {file = "plum_py-0.8.6-py3-none-any.whl", hash = "sha256:c0ce6d03fc4bf09dbd838b520085e9dfb690d1604f3eb7a553fb6331c1155b78"},
 ]
-
-[package.extras]
-docs = ["packaging", "sphinx", "sphinx-autoapi", "sphinx-autodoc-typehints", "sphinx-rtd-theme"]
-json = ["ujson"]
-test = ["packaging"]
 
 [[package]]
 name = "pygments"
@@ -489,4 +497,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "c853c5a4d9b68fc78ee59ef6e4f65f454f12b36dede12192463c111102278b13"
+content-hash = "9019f4e636b20caf391560a373d09e09f106c3520c05f126985953d92e70a89c"
