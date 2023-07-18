@@ -1,10 +1,11 @@
 # expense_tracker/model/coords_utils.py
 
+
 class Coords_Utils:
     """
     Utility functions for coordinates
     """
-    
+
     @staticmethod
     def decimal_coords(coords, ref):
         """

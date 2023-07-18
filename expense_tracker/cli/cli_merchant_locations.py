@@ -74,8 +74,10 @@ class CLI_Merchant_Locations:
                     path: str = Print_Utils.input_file_path("Enter the path to photo")
 
                     coords = Photo_Manager.get_coords(path)
-                    
-                    Print_Utils.success_message(f"Found coordinates from photo: ( {coords[0]}, {coords[1]} )")
+
+                    Print_Utils.success_message(
+                        f"Found coordinates from photo: ( {coords[0]}, {coords[1]} )"
+                    )
 
                 # If an error occurs, catch it and print
                 except AttributeError as error:
@@ -98,7 +100,7 @@ class CLI_Merchant_Locations:
                     Print_Utils.error_message("Invalid y coordinate.")
 
                 coords = (x_coord, y_coord)
-                
+
             # TODO Check if the coordinates are near an existing location
 
             # Get the name of the new location
@@ -117,13 +119,15 @@ class CLI_Merchant_Locations:
 
             # Print success message
             Print_Utils.success_message(f"Created '{location_name}'.")
-            
+
     @app.command()
     def delete(
         merchant_name: Annotated[
             str, typer.Argument(help="Name of merchant that the location belongs to.")
         ],
-        merchant_location_name: Annotated[str, typer.Argument(help="Current name of location.")],
+        merchant_location_name: Annotated[
+            str, typer.Argument(help="Current name of location.")
+        ],
     ) -> None:
         """
         Attempt to rename an existing merchant location.
@@ -139,14 +143,17 @@ class CLI_Merchant_Locations:
                     [merchant.name for merchant in merchant_list], input=merchant_name
                 )
             ]
-            
+
             # Get a list of merchants from the database
-            location_list: List[str] = session.query(Merchant_Location).where(Merchant_Location.merchant_id == target_merchant.id)
+            location_list: List[str] = session.query(Merchant_Location).where(
+                Merchant_Location.merchant_id == target_merchant.id
+            )
 
             # Prompt the user to select a merchant and set it as the target account
             target_merchant_location: Merchant = location_list[
                 Print_Utils.input_from_options(
-                    [merchant_location.name for merchant_location in location_list], input=merchant_location_name
+                    [merchant_location.name for merchant_location in location_list],
+                    input=merchant_location_name,
                 )
             ]
 
@@ -156,7 +163,7 @@ class CLI_Merchant_Locations:
                 session.commit()
 
                 Print_Utils.success_message(
-                    f"Deleted location \'{merchant_location_name}\'."
+                    f"Deleted location '{merchant_location_name}'."
                 )
 
             # If an error occurs, catch it and print the message
@@ -165,13 +172,15 @@ class CLI_Merchant_Locations:
                     f"Unable to delete location.",
                     error_message=error,
                 )
-            
+
     @app.command()
     def rename(
         merchant_name: Annotated[
             str, typer.Argument(help="Name of merchant that the location belongs to.")
         ],
-        merchant_location_name: Annotated[str, typer.Argument(help="Current name of location.")],
+        merchant_location_name: Annotated[
+            str, typer.Argument(help="Current name of location.")
+        ],
     ) -> None:
         """
         Attempt to rename an existing merchant location.
@@ -187,14 +196,17 @@ class CLI_Merchant_Locations:
                     [merchant.name for merchant in merchant_list], input=merchant_name
                 )
             ]
-            
+
             # Get a list of merchants from the database
-            location_list: List[str] = session.query(Merchant_Location).where(Merchant_Location.merchant_id == target_merchant.id)
+            location_list: List[str] = session.query(Merchant_Location).where(
+                Merchant_Location.merchant_id == target_merchant.id
+            )
 
             # Prompt the user to select a merchant and set it as the target account
             target_merchant_location: Merchant = location_list[
                 Print_Utils.input_from_options(
-                    [merchant_location.name for merchant_location in location_list], input=merchant_location_name
+                    [merchant_location.name for merchant_location in location_list],
+                    input=merchant_location_name,
                 )
             ]
 
@@ -226,7 +238,11 @@ class CLI_Merchant_Locations:
         with Session(engine) as session:
             # Get the empty table object and populate it
             table: Table = Print_Tables.merchant_location_table
-            merchant_list: List[Merchant_Location] = session.query(Merchant_Location).order_by(Merchant_Location.merchant_id).all()
+            merchant_list: List[Merchant_Location] = (
+                session.query(Merchant_Location)
+                .order_by(Merchant_Location.merchant_id)
+                .all()
+            )
             for merchant_location in merchant_list:
                 table.add_row(
                     str(merchant_location.id),

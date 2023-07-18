@@ -30,3 +30,19 @@ class Photo_Manager:
                     image.gps_longitude, image.gps_longitude_ref
                 ),
             )
+
+    @staticmethod
+    def get_description(path: Path) -> str:
+        """
+        Get the description from the photo
+        """
+
+        with open(path, "rb") as src:
+            image: Image = Image(src)
+
+            # Check if the image has any exif data at all
+            if not image.has_exif:
+                raise AttributeError("Image does not have exif data.")
+
+            # Return the image description if there is one
+            return image.image_description
