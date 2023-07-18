@@ -1,5 +1,7 @@
 # expense_tracker/model/coords_utils.py
 
+from typing import Tuple
+
 
 class Coords_Utils:
     """
@@ -7,7 +9,7 @@ class Coords_Utils:
     """
 
     @staticmethod
-    def decimal_coords(coords, ref):
+    def decimal_coords(coords: Tuple[float, float], ref: str):
         """
         Convert coords and ref to decimal degrees format
         """

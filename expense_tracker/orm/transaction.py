@@ -1,10 +1,10 @@
-# expense_tracker/model/transaction.py
+# expense_tracker/orm/transaction.py
 
 from datetime import datetime
 
 from typing import List
 
-from expense_tracker.model import Base
+from expense_tracker.orm import Base
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped

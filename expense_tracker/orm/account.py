@@ -1,8 +1,8 @@
-# expense_tracker/model/account.py
+# expense_tracker/orm/account.py
 
 from typing import Optional, List
 
-from expense_tracker.model import Base
+from expense_tracker.orm import Base
 
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import relationship, mapped_column

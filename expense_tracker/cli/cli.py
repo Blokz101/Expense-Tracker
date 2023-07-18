@@ -13,14 +13,14 @@ from expense_tracker.cli.cli_tags import CLI_Tags
 from expense_tracker.cli.cli_accounts import CLI_Accounts
 from expense_tracker.cli.cli_merchant_locations import CLI_Merchant_Locations
 
-from expense_tracker.model import Base
-from expense_tracker.model import engine
-from expense_tracker.model.merchant import Merchant
-from expense_tracker.model.amount import Amount
-from expense_tracker.model.merchant_location import Merchant_Location
-from expense_tracker.model.transaction import Transaction
-from expense_tracker.model.tag import Tag
-from expense_tracker.model.account import Account
+from expense_tracker.orm import Base
+from expense_tracker.orm import engine
+from expense_tracker.orm.merchant import Merchant
+from expense_tracker.orm.amount import Amount
+from expense_tracker.orm.merchant_location import Merchant_Location
+from expense_tracker.orm.transaction import Transaction
+from expense_tracker.orm.tag import Tag
+from expense_tracker.orm.account import Account
 
 
 class CLI:
