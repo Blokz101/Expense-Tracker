@@ -8,8 +8,6 @@ from typing_extensions import Annotated
 
 from sqlalchemy.orm import Session
 
-from pathlib import Path
-
 from expense_tracker.model import engine
 from expense_tracker.model.merchant import Merchant
 from expense_tracker.model.amount import Amount
@@ -17,7 +15,7 @@ from expense_tracker.model.merchant_location import Merchant_Location
 from expense_tracker.model.transaction import Transaction
 from expense_tracker.model.tag import Tag
 from expense_tracker.model.account import Account
-from expense_tracker.model.photo_coords import Coords_Manager
+from expense_tracker.model.photo_manager import Photo_Manager
 
 from expense_tracker.cli import console
 from expense_tracker.cli.cli_utils import Print_Utils, Print_Tables
@@ -75,7 +73,7 @@ class CLI_Merchant_Locations:
                 try:
                     path: str = Print_Utils.input_file_path("Enter the path to photo")
 
-                    coords = Coords_Manager.get_coords_from_photo(path)
+                    coords = Photo_Manager.get_coords(path)
                     
                     Print_Utils.success_message(f"Found coordinates from photo: ( {coords[0]}, {coords[1]} )")
 
