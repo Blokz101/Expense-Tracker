@@ -25,12 +25,14 @@ class Photo_Manager:
                 AttributeError("Image does not have exif data.")
 
             return (
-                Photo_Manager._to_decimal_coords(image.gps_latitude, image.gps_latitude_ref),
+                Photo_Manager._to_decimal_coords(
+                    image.gps_latitude, image.gps_latitude_ref
+                ),
                 Photo_Manager._to_decimal_coords(
                     image.gps_longitude, image.gps_longitude_ref
                 ),
             )
-            
+
     @staticmethod
     def _to_decimal_coords(coords: Tuple[float, float], ref: str):
         """

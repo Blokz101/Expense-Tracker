@@ -2,11 +2,13 @@
 
 import typer
 
-from typing import Optional, List
+from typing import Optional, List, Tuple
 
 from typing_extensions import Annotated
 
 from sqlalchemy.orm import Session
+
+from expense_tracker.config_manager import ConfigManager
 
 from expense_tracker.orm import engine
 from expense_tracker.orm.merchant import Merchant
@@ -15,6 +17,7 @@ from expense_tracker.orm.merchant_location import Merchant_Location
 from expense_tracker.orm.transaction import Transaction
 from expense_tracker.orm.tag import Tag
 from expense_tracker.orm.account import Account
+
 from expense_tracker.model.photo_manager import Photo_Manager
 
 from expense_tracker.cli import console
@@ -66,17 +69,17 @@ class CLI_Merchant_Locations:
                 )
             ]
 
-            coords: tuple[float, float]
+            new_coords: tuple[float, float]
 
             # If photo is set then try to get the coords from a photo
             if photo:
                 try:
                     path: str = Print_Utils.input_file_path("Enter the path to photo")
 
-                    coords = Photo_Manager.get_coords(path)
+                    new_coords = Photo_Manager.get_coords(path)
 
                     Print_Utils.success_message(
-                        f"Found coordinates from photo: ( {coords[0]}, {coords[1]} )"
+                        f"Found coordinates from photo: ( {new_coords[0]}, {new_coords[1]} )"
                     )
 
                 # If an error occurs, catch it and print
@@ -99,9 +102,46 @@ class CLI_Merchant_Locations:
                 if not y_coord.isdecimal():
                     Print_Utils.error_message("Invalid y coordinate.")
 
-                coords = (x_coord, y_coord)
+                new_coords = (x_coord, y_coord)
 
-            # TODO Check if the coordinates are near an existing location
+            # Query the database to find get the x and y coords for the target merchant and format it into a list of paired coords
+            target_merchant_x_coord_query: List[List[float]] = session.query(
+                Merchant_Location.x_coord
+            ).where(Merchant_Location.merchant == target_merchant)
+            target_merchant_y_coord_query: List[List[float]] = session.query(
+                Merchant_Location.y_coord
+            ).where(Merchant_Location.merchant == target_merchant)
+
+            target_merchant_x_coord_list = list(
+                [result[0] for result in target_merchant_x_coord_query]
+            )
+            target_merchant_y_coord_list = list(
+                [result[0] for result in target_merchant_y_coord_query]
+            )
+
+            target_merchant_coord_list: List[Tuple[float, float]] = list(
+                zip(target_merchant_x_coord_list, target_merchant_y_coord_list)
+            )
+
+            # If it exists, get the index of an existing coordinates within a specified radius of incoming coordinates
+            possible_location_index: Optional[
+                int
+            ] = Merchant_Location.possible_location(
+                new_coords,
+                target_merchant_coord_list,
+                ConfigManager().get_same_merchant_mile_radius(),
+            )
+
+            # If the location might already be in the database, print an error and exit
+            if not possible_location_index == None:
+                
+                possible_location: Tuple[float, float] = target_merchant_coord_list[
+                    possible_location_index
+                ]
+                Print_Utils.error_message(
+                    f"The new coordinate ({new_coords[0]}, {new_coords[1]}) is close enough to existing location ({possible_location[0]}{possible_location[1]}) to be the same location."
+                )
+                raise typer.Exit()
 
             # Get the name of the new location
             location_name: str = Print_Utils.input_rule("Enter a location name")
@@ -111,8 +151,8 @@ class CLI_Merchant_Locations:
                 Merchant_Location(
                     merchant_id=target_merchant.id,
                     name=location_name,
-                    x_coord=coords[0],
-                    y_coord=coords[1],
+                    x_coord=new_coords[0],
+                    y_coord=new_coords[1],
                 )
             )
             session.commit()
