@@ -40,6 +40,10 @@ class Transaction(Base):
         ForeignKey("merchants.id"),
         nullable=False,
     )
+    merchant_location_id: Mapped[int] = mapped_column(
+        ForeignKey("merchant_locations.id"),
+        nullable=True,
+    )
     date: Mapped[datetime] = mapped_column(
         nullable=False,
     )
@@ -52,12 +56,6 @@ class Transaction(Base):
     )
     receipt_photo_path: Mapped[str] = mapped_column(
         unique=True,
-        nullable=True,
-    )
-    x_coord: Mapped[float] = mapped_column(
-        nullable=True,
-    )
-    y_coord: Mapped[float] = mapped_column(
         nullable=True,
     )
 

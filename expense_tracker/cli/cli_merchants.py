@@ -23,6 +23,10 @@ from rich.table import Table
 
 
 class CLI_Merchants:
+    """
+    Commands to edit the merchants database.
+    """
+
     app: typer.Typer = typer.Typer()
 
     @app.command()

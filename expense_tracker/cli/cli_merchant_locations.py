@@ -134,7 +134,6 @@ class CLI_Merchant_Locations:
 
             # If the location might already be in the database, print an error and exit
             if not possible_location_index == None:
-                
                 possible_location: Tuple[float, float] = target_merchant_coord_list[
                     possible_location_index
                 ]
