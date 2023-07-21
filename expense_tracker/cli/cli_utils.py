@@ -1,5 +1,6 @@
 # expense_tracker/cli/cli_utils.py
 
+from expense_tracker.constants import GeneralConstants
 from expense_tracker.config_manager import ConfigManager
 
 from expense_tracker.cli import console
@@ -13,6 +14,8 @@ import re
 from typing import Optional, List
 
 from difflib import SequenceMatcher
+
+from datetime import datetime, timedelta
 
 from rich import box
 from rich.table import Column, Table
@@ -82,8 +85,54 @@ class Print_Utils:
 
         console.print()
         input: str = console.input(f"{input_message} >>> ")
-        console.rule()
+        console.rule(style="white")
         return input
+    
+    def input_date(
+        prompt_message: str = "Enter a date (mm/dd/yyyy)",
+        input: Optional[str] = None,
+    ) -> datetime:
+        """
+        Prompt the user to enter a datetime
+        """
+        
+        # Set the user input based on the initial input option
+        user_input: str
+        if input:
+            user_input = input
+        else:
+            user_input = Print_Utils.input_rule(prompt_message)
+
+
+        selected_date: datetime
+
+        while True:
+            
+            # If the user input is equal to today return today as a datetime
+            if user_input == "today":
+                selected_date = datetime.today()
+                break
+            
+            # If the user input is equal to yesterday return yesterday as a datetime
+            if user_input == "yesterday":
+                selected_date = datetime.today() - timedelta(days=1)
+                break
+            
+            # If the user input can be converted to a date then return it as a datetime
+            try:
+                selected_date = datetime.strptime(user_input, "%m/%d/%Y")
+                break
+            except ValueError:
+                pass
+                
+            # Prompt the user to input a new string and restart the process
+            Print_Utils.error_message(f"Cannot convert '{user_input}' to a date.")
+            user_input = Print_Utils.input_rule(prompt_message)
+        
+        # Print the selected date and return
+        Print_Utils.success_message(f"Selected '{selected_date.strftime('%A %B %-d %Y')}'.")
+        return selected_date
+            
 
     @staticmethod
     def input_from_options(
@@ -146,7 +195,7 @@ class Print_Utils:
                     break
 
         # Print the selected option and return
-        console.print(f"Selected '{selected_option[1]}'\n")
+        Print_Utils.success_message(f"Selected '{selected_option[1]}'.\n")
         return selected_option[2]
 
     @staticmethod
