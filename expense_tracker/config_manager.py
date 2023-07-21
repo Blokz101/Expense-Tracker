@@ -49,22 +49,13 @@ class ConfigManager(ConfigParser):
         self.write(open(GeneralConstants.SETTINGS_FILE_NAME, "w"))
 
     def get_database_path(self) -> str:
-        """
-        Return section files option database_path.
-        """
-
-        return self.get("files", "database_path")
+        return self.get("general", "database_path")
 
     def get_number_of_options(self) -> Optional[str]:
-        """
-        Return section files option database_path.
-        """
-
-        return int(self.get("display", "number_of_options"))
+        return int(self.get("general", "number_of_options"))
 
     def get_same_merchant_mile_radius(self) -> Optional[str]:
-        """
-        Return section files option database_path.
-        """
-
-        return float(self.get("locations", "same_merchant_mile_radius"))
+        return float(self.get("general", "same_merchant_mile_radius"))
+    
+    def get_default_account_id_(self) -> int:
+        return int(self.get("general", "get_database_path"))

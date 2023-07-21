@@ -14,7 +14,13 @@ class GeneralConstants:
     SETTINGS_FILE_NAME: str = "settings.ini"
 
     SETTINGS_FILE_DEFAULTS: list = (
-        ("display", {"number_of_options": "5"}),
-        ("files", {"database_path": str(Path().absolute() / "database.db")}),
-        ("locations", {"same_merchant_mile_radius": "0.2"}),
+        (
+            "general",
+            {
+                "number_of_options": "5",
+                "database_path": str(Path().absolute() / "database.db"),
+                "same_merchant_mile_radius": "0.2",
+                "default_account_id": "1",
+            },
+        ),
     )
