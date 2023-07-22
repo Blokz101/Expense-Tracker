@@ -62,13 +62,12 @@ class CLI_Merchant_Locations:
             merchant_list: List[Merchant] = session.query(Merchant).all()
 
             # Prompt the user to select a merchant and set it as the target merchant
-            target_merchant: Merchant = merchant_list[
-                Print_Utils.input_from_options(
-                    [mernt.name for mernt in merchant_list],
-                    "Select a merchant",
-                    input=merchant,
-                )
-            ]
+            target_merchant: Merchant = Print_Utils.input_from_options(
+                merchant_list,
+                lambda x: x.name,
+                prompt_message="Select a merchant",
+                first_input=merchant,
+            )
 
             new_coords: tuple[float, float]
 
@@ -178,27 +177,27 @@ class CLI_Merchant_Locations:
             merchant_list: List[str] = session.query(Merchant).all()
 
             # Prompt the user to select a merchant and set it as the target merchant
-            target_merchant: Merchant = merchant_list[
-                Print_Utils.input_from_options(
-                    [merchant.name for merchant in merchant_list],
-                    "Select a merchant",
-                    input=merchant_name,
-                )
-            ]
+            target_merchant: Merchant = Print_Utils.input_from_options(
+                merchant_list,
+                lambda x: x.name,
+                prompt_message="Select a merchant",
+                first_input=merchant_name,
+            )
 
             # Get a list of merchants from the database
-            location_list: List[str] = session.query(Merchant_Location).where(
-                Merchant_Location.merchant_id == target_merchant.id
+            location_list: List[str] = (
+                session.query(Merchant_Location)
+                .where(Merchant_Location.merchant_id == target_merchant.id)
+                .all()
             )
 
             # Prompt the user to select a merchant location and set it as the target location
-            target_merchant_location: Merchant = location_list[
-                Print_Utils.input_from_options(
-                    [merchant_location.name for merchant_location in location_list],
-                    "Select a location",
-                    input=merchant_location_name,
-                )
-            ]
+            target_merchant_location: Merchant = Print_Utils.input_from_options(
+                location_list,
+                lambda x: x.name,
+                prompt_message="Select a location",
+                first_input=merchant_location_name,
+            )
 
             # Attempt to commit the rename
             try:
@@ -234,27 +233,27 @@ class CLI_Merchant_Locations:
             merchant_list: List[str] = session.query(Merchant).all()
 
             # Prompt the user to select a merchant and set it as the target account
-            target_merchant: Merchant = merchant_list[
-                Print_Utils.input_from_options(
-                    [merchant.name for merchant in merchant_list],
-                    "Select a merchant",
-                    input=merchant_name,
-                )
-            ]
+            target_merchant: Merchant = Print_Utils.input_from_options(
+                merchant_list,
+                lambda x: x.name,
+                prompt_message="Select a merchant",
+                first_input=merchant_name,
+            )
 
             # Get a list of merchants from the database
-            location_list: List[str] = session.query(Merchant_Location).where(
-                Merchant_Location.merchant_id == target_merchant.id
+            location_list: List[str] = (
+                session.query(Merchant_Location)
+                .where(Merchant_Location.merchant_id == target_merchant.id)
+                .all()
             )
 
             # Prompt the user to select a merchant and set it as the target account
-            target_merchant_location: Merchant = location_list[
-                Print_Utils.input_from_options(
-                    [merchant_location.name for merchant_location in location_list],
-                    "Select a location",
-                    input=merchant_location_name,
-                )
-            ]
+            target_merchant_location: Merchant = Print_Utils.input_from_options(
+                location_list,
+                lambda x: x.name,
+                prompt_message="Select a location",
+                first_input=merchant_location_name,
+            )
 
             # Prompt the user for a new name
             new_name: str = console.input("New location name >>> ")

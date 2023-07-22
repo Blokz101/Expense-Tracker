@@ -62,13 +62,12 @@ class CLI_Merchants:
             merchant_list: List[str] = session.query(Merchant).all()
 
             # Prompt the user to select a merchant and set it as the target account
-            target_merchant: Merchant = merchant_list[
-                Print_Utils.input_from_options(
-                    [merchant.name for merchant in merchant_list],
-                    "Select a merchant",
-                    input=name,
-                )
-            ]
+            target_merchant: Merchant = Print_Utils.input_from_options(
+                merchant_list,
+                lambda x: x.name,
+                prompt_message="Select a merchant",
+                first_input=name,
+            )
 
             # Attempt to delete the merchant
             try:
@@ -101,13 +100,12 @@ class CLI_Merchants:
             merchant_list: List[str] = session.query(Merchant).all()
 
             # Prompt the user to select a merchant and set it as the target account
-            target_merchant: Merchant = merchant_list[
-                Print_Utils.input_from_options(
-                    [merchant.name for merchant in merchant_list],
-                    "Select a merchant",
-                    input=name,
-                )
-            ]
+            target_merchant: Merchant = Print_Utils.input_from_options(
+                merchant_list,
+                lambda x: x.name,
+                prompt_message="Select a merchant",
+                first_input=name,
+            )
 
             # Prompt the user for a new name
             new_name: str = console.input("New merchant name >>> ")
@@ -166,23 +164,23 @@ class CLI_Merchants:
             merchant_list: List[Merchant] = session.query(Merchant).all()
 
             # Prompt the user to select an account and set it as the target merchant
-            target_merchant: Merchant = merchant_list[
-                Print_Utils.input_from_options(
-                    [merchant.name for merchant in merchant_list],
-                    "Select a merchant",
-                    input=merchant_name,
-                )
-            ]
+            target_merchant: Merchant = Print_Utils.input_from_options(
+                merchant_list,
+                lambda x: x.name,
+                prompt_message="Select a merchant",
+                first_input=merchant_name,
+            )
 
             # Get a list of tags from the database
             tag_list: List[Tag] = session.query(Tag).all()
 
             # Prompt the user to select a tag and set it as the target tag
-            target_tag: Merchant = tag_list[
-                Print_Utils.input_from_options(
-                    [tag.name for tag in tag_list], "Select a tag", input=tag_name
-                )
-            ]
+            target_tag: Merchant = Print_Utils.input_from_options(
+                tag_list,
+                lambda x: x.name,
+                prompt_message="Select a tag",
+                first_input=tag_name,
+            )
 
             # If the merchant already has the tag, remove it
             if target_tag in target_merchant.default_tags:

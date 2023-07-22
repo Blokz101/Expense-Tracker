@@ -60,11 +60,12 @@ class CLI_Tags:
             tag_list: List[str] = session.query(Tag).all()
 
             # Prompt the user to select a tag and set it as the target tag
-            target_tag: Tag = tag_list[
-                Print_Utils.input_from_options(
-                    [tag.name for tag in tag_list], "Select a tag", input=name
-                )
-            ]
+            target_tag: Tag = Print_Utils.input_from_options(
+                tag_list,
+                lambda x: x.name,
+                prompt_message="Select a tag",
+                first_input=name,
+            )
 
             # Attempt to delete the tag
             try:
@@ -93,11 +94,12 @@ class CLI_Tags:
             tag_list: List[str] = session.query(Tag).all()
 
             # Prompt the user to select a tag and set it as the target tag
-            target_tag: Tag = tag_list[
-                Print_Utils.input_from_options(
-                    [tag.name for tag in tag_list], "Select a tag", input=name
-                )
-            ]
+            target_tag: Tag = Print_Utils.input_from_options(
+                tag_list,
+                lambda x: x.name,
+                prompt_message="Select a tag",
+                first_input=name,
+            )
 
             # Prompt the user for a new name
             new_name: str = console.input("New tag name >>> ")

@@ -11,7 +11,7 @@ import os
 
 import re
 
-from typing import Optional, List
+from typing import Optional, List, Any, Tuple
 
 from difflib import SequenceMatcher
 
@@ -135,75 +135,126 @@ class Print_Utils:
 
     @staticmethod
     def input_from_options(
-        options_list: List[str],
-        prompt_message: Optional[str],
-        input: Optional[str] = "",
-    ) -> int:
+        options_list: List[Any],
+        key,
+        prompt_message: Optional[str] = "Select an option",
+        first_input: Optional[str] = "",
+        default: Optional[Any] = None,
+    ) -> Any:
         """
-        Prompts the user to pick an option from a list of options. Returns the index of the option picked
+        Prompts the user to select an option from a list of options.
         """
 
         # If there are no options in options list, raise an exception
         if len(options_list) == 0:
             raise ValueError("'options_list' has no options")
 
-        user_input: str = input
-        selected_option: tuple
-        sorted_options_list: List[str] = options_list
+        user_input: str = first_input
+        selected_option: Any
+        prompt_default: bool = not default == None
 
         while True:
-            # Sort the list of strings by similarity to the user input
-            sorted_options_list: List[tuple] = Print_Utils.similar_strings(
-                user_input, options_list
+            # Sort the options list based on what the user input
+            sorted_options_list: List[Tuple] = Print_Utils._search_options_list(
+                options_list, key, user_input
             )
 
-            # Print the help and first five sorted options
+            # Print instructions
             console.print(
-                f"\n{prompt_message}\n[bright_black]Press enter to select the first option, enter a number to select another option, or type a phrase to search for another option.[/bright_black]\n"
+                "Press enter to select the highlighted option, input a number to select an option choice, or input a string to search for another option."
             )
-            for index, option in enumerate(
-                sorted_options_list[: ConfigManager().get_number_of_options()]
-            ):
-                if index == 0:
-                    console.print(f"{' -->': <7}{option[1]}", style="cyan")
-                else:
-                    console.print(f"{f'[{index}]': <6}{option[1]}")
+            console.print()
 
-            # Prompt the user to select an option
-            user_input = Print_Utils.input_rule("Please select an option")
+            # If there is a default, display it the first time
+            if prompt_default:
+                prompt_default = False
+                sorted_options_list = [default] + sorted_options_list
 
-            # If the user selects 0, return the set of the selected option and break
-            if not user_input:
+                Print_Utils._print_options(
+                    list(key(option) for option in sorted_options_list),
+                    limit=ConfigManager().get_number_of_options(),
+                    default=True,
+                )
+
+            # If there is no default, display the list
+            else:
+                Print_Utils._print_options(
+                    list(key(option) for option in sorted_options_list),
+                    limit=ConfigManager().get_number_of_options(),
+                )
+
+            # Get the user input
+            user_input = Print_Utils.input_rule(prompt_message)
+
+            # If the user pressed enter, return the first option
+            if user_input == "":
                 selected_option = sorted_options_list[0]
                 break
 
-            # If the user selects another number, set the index of the selected option and break
-            if str.isdigit(user_input):
-                index: int = int(user_input)
-                if index >= 0 and index <= len(sorted_options_list) - 1:
-                    selected_option = sorted_options_list[index]
-                    break
+            # If the user entered a number, return their choice
+            if (
+                user_input.isdigit()
+                and int(user_input) > 1
+                and int(user_input) <= ConfigManager().get_number_of_options()
+            ):
+                selected_option = sorted_options_list[int(user_input) - 1]
+                break
 
-        # Print the selected option and return
-        Print_Utils.success_message(f"Selected '{selected_option[1]}'.\n")
-        return selected_option[2]
+        # Print confirmation and return
+        Print_Utils.success_message(f"Selected {key(selected_option)}.")
+        return selected_option
 
     @staticmethod
-    def similar_strings(target_string: str, str_list: List[str]) -> List[tuple]:
+    def _print_options(
+        option_name_list: List[str], default: bool = False, limit: Optional[int] = None
+    ) -> None:
         """
-        Compare a string to a list of strings and return tuples with floats that describe how similar the two strings are and contain the original index.
+        Prints a list of options in a user friendly format.
         """
 
-        result_list: List[tuple] = []
+        for index, option in enumerate(option_name_list):
+            # If the limit has been reached print a footer and exit
+            if limit and index >= limit:
+                console.print(
+                    f"and {len(option_name_list) - limit} more...", style="bright_black"
+                )
+                break
 
-        # Calculate the similarity to the target string, save the original list index as well
-        for index, string in enumerate(str_list):
-            result_list.append(
-                (SequenceMatcher(None, target_string.lower(), string.lower()).ratio(), string, index)
+            # If this is the first option, format it differently
+            if index == 0:
+                if default:
+                    console.print(f"(default) --> {option}", style="cyan")
+                    console.print()
+                else:
+                    console.print(f" -->  {option}", style="cyan")
+
+            # Print the option in standard format
+            else:
+                option_display: str = f"[{index + 1}]"
+                console.print(f"{option_display: <6}{option}")
+
+    @staticmethod
+    def _search_options_list(
+        options_list: List[Any], key, search_input: str
+    ) -> List[Any]:
+        """
+        Sort a list of options based on how close it is to a given search_input.
+        """
+
+        # Create a list with each option and a value that relates the similarity of the option key to the search_input
+        compared_options_list: List[Tuple[float, Any]] = []
+        for option in options_list:
+            compared_option: Tuple[float, Any] = (
+                option,
+                SequenceMatcher(
+                    None, key(option).lower(), search_input.lower()
+                ).ratio(),
             )
+            compared_options_list.append(compared_option)
 
-        # Sort the list by similarity and return
-        return sorted(result_list, reverse=True)
+        # Sort the list and return
+        compared_options_list.sort(key=lambda x: x[1], reverse=True)
+        return list(option[0] for option in compared_options_list)
 
     @staticmethod
     def input_file_path(prompt_message: str) -> Path:
@@ -219,3 +270,12 @@ class Print_Utils:
             raise ValueError(f"'{input}' is not a valid path to a file.")
 
         return Path(input)
+
+    @staticmethod
+    def input_float(prompt_message: str) -> float:
+        """
+        Get user input and validate it as a float.
+        """
+
+        input: str = Print_Utils.input_rule(prompt_message)
+        return float(input)

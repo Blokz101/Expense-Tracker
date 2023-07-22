@@ -62,13 +62,12 @@ class CLI_Accounts:
             account_list: List[str] = session.query(Account).all()
 
             # Prompt the user to select an account and set it as the target account
-            target_account: Account = account_list[
-                Print_Utils.input_from_options(
-                    [account.name for account in account_list],
-                    "Select an account",
-                    input=name,
-                )
-            ]
+            target_account: Account = Print_Utils.input_from_options(
+                account_list,
+                lambda x: x.name,
+                prompt_message="Select an account",
+                first_input=name,
+            )
 
             # Attempt to delete the account
             try:
@@ -99,13 +98,12 @@ class CLI_Accounts:
             account_list: List[str] = session.query(Account).all()
 
             # Prompt the user to select an account and set it as the target account
-            target_account: Account = account_list[
-                Print_Utils.input_from_options(
-                    [account.name for account in account_list],
-                    "Select an account",
-                    input=name,
-                )
-            ]
+            target_account: Account = Print_Utils.input_from_options(
+                account_list,
+                lambda x: x.name,
+                prompt_message="Select an account",
+                first_input=name,
+            )
 
             # Prompt the user for a new name
             new_name: str = console.input("New account name >>> ")
