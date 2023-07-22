@@ -159,7 +159,7 @@ class Print_Utils:
 
             # Print the help and first five sorted options
             console.print(
-                f"\n{prompt_message}\nPress enter to select the first option, enter a number to select another option, or type a phrase to search for another option.\n"
+                f"\n{prompt_message}\n[bright_black]Press enter to select the first option, enter a number to select another option, or type a phrase to search for another option.[/bright_black]\n"
             )
             for index, option in enumerate(
                 sorted_options_list[: ConfigManager().get_number_of_options()]
