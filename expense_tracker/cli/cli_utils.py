@@ -199,7 +199,7 @@ class Print_Utils:
         # Calculate the similarity to the target string, save the original list index as well
         for index, string in enumerate(str_list):
             result_list.append(
-                (SequenceMatcher(None, target_string, string).ratio(), string, index)
+                (SequenceMatcher(None, target_string.lower(), string.lower()).ratio(), string, index)
             )
 
         # Sort the list by similarity and return

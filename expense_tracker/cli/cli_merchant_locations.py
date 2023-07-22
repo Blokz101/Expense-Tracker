@@ -139,7 +139,7 @@ class CLI_Merchant_Locations:
                     possible_location_index
                 ]
                 Print_Utils.error_message(
-                    f"The new coordinate ({new_coords[0]}, {new_coords[1]}) is close enough to existing location ({possible_location[0]}{possible_location[1]}) to be the same location."
+                    f"The new coordinate ({new_coords[0]}, {new_coords[1]}) is close enough to existing location ({possible_location[0]}, {possible_location[1]}) to be the same location."
                 )
                 raise typer.Exit()
 
