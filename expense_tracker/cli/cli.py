@@ -12,6 +12,7 @@ from expense_tracker.cli.cli_merchants import CLI_Merchants
 from expense_tracker.cli.cli_tags import CLI_Tags
 from expense_tracker.cli.cli_accounts import CLI_Accounts
 from expense_tracker.cli.cli_merchant_locations import CLI_Merchant_Locations
+from expense_tracker.cli.cli_transactions import CLI_Transactions
 
 from expense_tracker.orm import Base
 from expense_tracker.orm import engine
@@ -34,6 +35,7 @@ class CLI:
     app.add_typer(CLI_Tags.app, name="tag")
     app.add_typer(CLI_Accounts.app, name="account")
     app.add_typer(CLI_Merchant_Locations.app, name="location")
+    app.add_typer(CLI_Transactions.app, name="trans")
 
     def _version_callback(value: bool) -> None:
         """
@@ -78,37 +80,3 @@ class CLI:
         """
         Reconcile and track expenses using receipt photos and bank statements.
         """
-
-    @staticmethod
-    @app.command()
-    def add(
-        photo: Annotated[
-            bool,
-            typer.Option("--photo", help="Create transactions based on photos."),
-        ] = True,
-        auto: Annotated[
-            bool,
-            typer.Option(
-                "--auto",
-                help="Automatically create transactions based on photos and bank statement.",
-            ),
-        ] = False,
-    ) -> None:
-        """
-        Create new transactions.
-        """
-
-        console.print("Add")
-
-        # TODO Finish this method
-
-    @staticmethod
-    @app.command()
-    def reconcile() -> None:
-        """
-        Reconcile new transactions with bank statement.
-        """
-
-        print("Reconcile")
-
-        # TODO Finish this method

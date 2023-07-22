@@ -64,7 +64,9 @@ class CLI_Accounts:
             # Prompt the user to select an account and set it as the target account
             target_account: Account = account_list[
                 Print_Utils.input_from_options(
-                    [account.name for account in account_list], input=name
+                    [account.name for account in account_list],
+                    "Select an account",
+                    input=name,
                 )
             ]
 
@@ -99,7 +101,9 @@ class CLI_Accounts:
             # Prompt the user to select an account and set it as the target account
             target_account: Account = account_list[
                 Print_Utils.input_from_options(
-                    [account.name for account in account_list], input=name
+                    [account.name for account in account_list],
+                    "Select an account",
+                    input=name,
                 )
             ]
 

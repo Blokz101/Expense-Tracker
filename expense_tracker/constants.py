@@ -11,6 +11,8 @@ class GeneralConstants:
     General constants for the program
     """
 
+    DATE_REGEX: str = "^[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{4}$"
+
     SETTINGS_FILE_NAME: str = "settings.ini"
 
     SETTINGS_FILE_DEFAULTS: list = (

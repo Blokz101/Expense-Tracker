@@ -61,10 +61,11 @@ class CLI_Merchant_Locations:
             # Get a list of merchants from the database
             merchant_list: List[Merchant] = session.query(Merchant).all()
 
-            # Prompt the user to select a merchant and set it as the target account
+            # Prompt the user to select a merchant and set it as the target merchant
             target_merchant: Merchant = merchant_list[
                 Print_Utils.input_from_options(
                     [mernt.name for mernt in merchant_list],
+                    "Select a merchant",
                     input=merchant,
                 )
             ]
@@ -176,10 +177,12 @@ class CLI_Merchant_Locations:
             # Get a list of merchants from the database
             merchant_list: List[str] = session.query(Merchant).all()
 
-            # Prompt the user to select a merchant and set it as the target account
+            # Prompt the user to select a merchant and set it as the target merchant
             target_merchant: Merchant = merchant_list[
                 Print_Utils.input_from_options(
-                    [merchant.name for merchant in merchant_list], input=merchant_name
+                    [merchant.name for merchant in merchant_list],
+                    "Select a merchant",
+                    input=merchant_name,
                 )
             ]
 
@@ -188,10 +191,11 @@ class CLI_Merchant_Locations:
                 Merchant_Location.merchant_id == target_merchant.id
             )
 
-            # Prompt the user to select a merchant and set it as the target account
+            # Prompt the user to select a merchant location and set it as the target location
             target_merchant_location: Merchant = location_list[
                 Print_Utils.input_from_options(
                     [merchant_location.name for merchant_location in location_list],
+                    "Select a location",
                     input=merchant_location_name,
                 )
             ]
@@ -232,7 +236,9 @@ class CLI_Merchant_Locations:
             # Prompt the user to select a merchant and set it as the target account
             target_merchant: Merchant = merchant_list[
                 Print_Utils.input_from_options(
-                    [merchant.name for merchant in merchant_list], input=merchant_name
+                    [merchant.name for merchant in merchant_list],
+                    "Select a merchant",
+                    input=merchant_name,
                 )
             ]
 
@@ -245,6 +251,7 @@ class CLI_Merchant_Locations:
             target_merchant_location: Merchant = location_list[
                 Print_Utils.input_from_options(
                     [merchant_location.name for merchant_location in location_list],
+                    "Select a location",
                     input=merchant_location_name,
                 )
             ]

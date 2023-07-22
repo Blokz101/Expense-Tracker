@@ -87,7 +87,7 @@ class Print_Utils:
         input: str = console.input(f"{input_message} >>> ")
         console.rule(style="white")
         return input
-    
+
     def input_date(
         prompt_message: str = "Enter a date (mm/dd/yyyy)",
         input: Optional[str] = None,
@@ -95,7 +95,7 @@ class Print_Utils:
         """
         Prompt the user to enter a datetime
         """
-        
+
         # Set the user input based on the initial input option
         user_input: str
         if input:
@@ -103,76 +103,66 @@ class Print_Utils:
         else:
             user_input = Print_Utils.input_rule(prompt_message)
 
-
         selected_date: datetime
 
         while True:
-            
             # If the user input is equal to today return today as a datetime
             if user_input == "today":
                 selected_date = datetime.today()
                 break
-            
+
             # If the user input is equal to yesterday return yesterday as a datetime
             if user_input == "yesterday":
                 selected_date = datetime.today() - timedelta(days=1)
                 break
-            
+
             # If the user input can be converted to a date then return it as a datetime
             try:
                 selected_date = datetime.strptime(user_input, "%m/%d/%Y")
                 break
             except ValueError:
                 pass
-                
+
             # Prompt the user to input a new string and restart the process
             Print_Utils.error_message(f"Cannot convert '{user_input}' to a date.")
             user_input = Print_Utils.input_rule(prompt_message)
-        
+
         # Print the selected date and return
-        Print_Utils.success_message(f"Selected '{selected_date.strftime('%A %B %-d %Y')}'.")
+        Print_Utils.success_message(
+            f"Selected '{selected_date.strftime('%A %B %-d %Y')}'."
+        )
         return selected_date
-            
 
     @staticmethod
     def input_from_options(
         options_list: List[str],
-        prompt_message: Optional[str] = None,
-        input: Optional[str] = None,
+        prompt_message: Optional[str],
+        input: Optional[str] = "",
     ) -> int:
         """
         Prompts the user to pick an option from a list of options. Returns the index of the option picked
         """
 
-        # Raise an exception if there is no initial input option
-        if not (prompt_message or input):
-            raise ValueError("Argument 'prompt_message' or 'input' must be given")
-
         # If there are no options in options list, raise an exception
         if len(options_list) == 0:
             raise ValueError("'options_list' has no options")
 
-        # Set the user input based on the initial input option
-        user_input: str
-        if prompt_message:
-            user_input = Print_Utils.input_rule(prompt_message)
-        elif input:
-            user_input = input
-
+        user_input: str = input
         selected_option: tuple
+        sorted_options_list: List[str] = options_list
 
         while True:
             # Sort the list of strings by similarity to the user input
-            sorted_options: List[tuple] = Print_Utils.similar_strings(
+            sorted_options_list: List[tuple] = Print_Utils.similar_strings(
                 user_input, options_list
             )
 
             # Print the help and first five sorted options
             console.print(
-                f"\nPress enter to select the first option, enter a number to select another option, or type a phrase to search for another option. Options sorted by '{user_input}':\n"
+                f"\n{prompt_message}\nPress enter to select the first option, enter a number to select another option, or type a phrase to search for another option.\n"
             )
             for index, option in enumerate(
-                sorted_options[: ConfigManager().get_number_of_options()]
+                sorted_options_list[: ConfigManager().get_number_of_options()]
             ):
                 if index == 0:
                     console.print(f"{' -->': <7}{option[1]}", style="cyan")
@@ -184,14 +174,14 @@ class Print_Utils:
 
             # If the user selects 0, return the set of the selected option and break
             if not user_input:
-                selected_option = sorted_options[0]
+                selected_option = sorted_options_list[0]
                 break
 
             # If the user selects another number, set the index of the selected option and break
             if str.isdigit(user_input):
                 index: int = int(user_input)
-                if index >= 0 and index <= len(sorted_options) - 1:
-                    selected_option = sorted_options[index]
+                if index >= 0 and index <= len(sorted_options_list) - 1:
+                    selected_option = sorted_options_list[index]
                     break
 
         # Print the selected option and return

@@ -62,7 +62,7 @@ class CLI_Tags:
             # Prompt the user to select a tag and set it as the target tag
             target_tag: Tag = tag_list[
                 Print_Utils.input_from_options(
-                    [tag.name for tag in tag_list], input=name
+                    [tag.name for tag in tag_list], "Select a tag", input=name
                 )
             ]
 
@@ -95,7 +95,7 @@ class CLI_Tags:
             # Prompt the user to select a tag and set it as the target tag
             target_tag: Tag = tag_list[
                 Print_Utils.input_from_options(
-                    [tag.name for tag in tag_list], input=name
+                    [tag.name for tag in tag_list], "Select a tag", input=name
                 )
             ]
 

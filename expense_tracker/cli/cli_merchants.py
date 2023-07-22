@@ -64,7 +64,9 @@ class CLI_Merchants:
             # Prompt the user to select a merchant and set it as the target account
             target_merchant: Merchant = merchant_list[
                 Print_Utils.input_from_options(
-                    [merchant.name for merchant in merchant_list], input=name
+                    [merchant.name for merchant in merchant_list],
+                    "Select a merchant",
+                    input=name,
                 )
             ]
 
@@ -101,7 +103,9 @@ class CLI_Merchants:
             # Prompt the user to select a merchant and set it as the target account
             target_merchant: Merchant = merchant_list[
                 Print_Utils.input_from_options(
-                    [merchant.name for merchant in merchant_list], input=name
+                    [merchant.name for merchant in merchant_list],
+                    "Select a merchant",
+                    input=name,
                 )
             ]
 
@@ -164,7 +168,9 @@ class CLI_Merchants:
             # Prompt the user to select an account and set it as the target merchant
             target_merchant: Merchant = merchant_list[
                 Print_Utils.input_from_options(
-                    [merchant.name for merchant in merchant_list], input=merchant_name
+                    [merchant.name for merchant in merchant_list],
+                    "Select a merchant",
+                    input=merchant_name,
                 )
             ]
 
@@ -174,7 +180,7 @@ class CLI_Merchants:
             # Prompt the user to select a tag and set it as the target tag
             target_tag: Merchant = tag_list[
                 Print_Utils.input_from_options(
-                    [tag.name for tag in tag_list], input=tag_name
+                    [tag.name for tag in tag_list], "Select a tag", input=tag_name
                 )
             ]
 
