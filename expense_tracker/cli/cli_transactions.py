@@ -9,6 +9,7 @@ from typing_extensions import Annotated
 from sqlalchemy.orm import Session
 
 from expense_tracker.config_manager import ConfigManager
+from expense_tracker.constants import GeneralConstants
 
 from expense_tracker.orm import engine
 from expense_tracker.orm.merchant import Merchant
@@ -96,6 +97,43 @@ class CLI_Transactions:
             session.commit()
 
         Print_Utils.success_message("Created transaction.")
+
+    @app.command()
+    def list(
+        account_name: Annotated[str, typer.Argument(help="Name of the account")]
+    ) -> None:
+        """
+        List transactions from an account.
+        """
+        
+        with Session(engine) as session:
+            # Get a list of transactions that have the specified account
+            target_account: Account = Print_Utils.input_from_options(
+                session.query(Account).all(),
+                lambda x: x.name,
+                prompt_message="Select an account",
+                first_input=account_name,
+            )
+            transaction_list: List[Transaction] = session.query(Transaction).where(
+                Transaction.account_id == target_account.id
+            )
+
+            table: Table = Print_Tables.transaction_table
+
+            # TODO Edit the method of adding rows so it accounts for multiple amounts and tags
+
+            for transaction in transaction_list:
+                table.add_row(
+                    str(transaction.id),
+                    str(transaction.reconciled_status),
+                    transaction.description,
+                    transaction.merchant.name,
+                    datetime.strftime(transaction.date, GeneralConstants.DATE_FORMAT),
+                    str(transaction.amounts[0].amount),
+                    ", ".join(tag.name for tag in transaction.amounts[0].tags),
+                )
+
+            console.print(table)
 
     @app.command()
     def delete(

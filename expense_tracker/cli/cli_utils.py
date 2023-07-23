@@ -26,6 +26,17 @@ class Print_Tables:
     Returns predefined tables for each database.
     """
 
+    transaction_table: Table = Table(
+        Column("ID", style="bright_black"),
+        Column("Reconciled"),
+        Column("Description"),
+        Column("Merchant"),
+        Column("Date"),
+        Column("Amount"),
+        Column("Tags"),
+        box=box.SIMPLE,
+    )
+
     merchant_table: Table = Table(
         Column("ID", style="bright_black"),
         Column("Name"),
