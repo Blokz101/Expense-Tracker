@@ -57,5 +57,5 @@ class ConfigManager(ConfigParser):
     def get_same_merchant_mile_radius(self) -> Optional[str]:
         return float(self.get("general", "same_merchant_mile_radius"))
 
-    def get_default_account_id_(self) -> int:
-        return int(self.get("general", "get_database_path"))
+    def get_default_account_id(self) -> int:
+        return int(self.get("general", "default_account_id"))

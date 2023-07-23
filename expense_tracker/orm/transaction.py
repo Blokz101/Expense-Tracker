@@ -34,7 +34,7 @@ class Transaction(Base):
     )
     description: Mapped[str] = mapped_column(
         unique=True,
-        nullable=True,
+        nullable=False,
     )
     merchant_id: Mapped[int] = mapped_column(
         ForeignKey("merchants.id"),
