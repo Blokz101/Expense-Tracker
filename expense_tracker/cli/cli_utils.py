@@ -365,3 +365,73 @@ class Print_Utils:
         # Print the selected path and return it
         Print_Utils.success_message(f"Selected {selected_path}.")
         return selected_path
+
+    @staticmethod
+    def input_from_toggle_list(
+        options_list: List[Any],
+        key,
+        prompt_message: str,
+        initial_selected_list: List[Any] = [],
+    ) -> List[Any]:
+        """
+        Prompts the user to select options from a toggle list
+        """
+
+        selected_options_list: List[Any] = initial_selected_list
+
+        while True:
+            # Print the instructions and options
+            console.print(
+                "Toggle the options by entering their corresponding integer or press enter to submit.\n"
+            )
+            Print_Utils._print_toggle_options(
+                list(key(option) for option in options_list),
+                list(key(option) for option in selected_options_list),
+            )
+
+            # Get the user input
+            user_input: str = Print_Utils.input_rule(prompt_message)
+
+            # If the user didn't input anything then break
+            if user_input == "":
+                break
+
+            # Try to find the target option, if unable print an error and continue
+            toggle_option: Any
+            try:
+                toggle_option = options_list[int(user_input) - 1]
+            except:
+                Print_Utils.error_message(f"'{user_input}' is not an option.")
+                continue
+
+            # Toggle the option
+            if toggle_option in selected_options_list:
+                selected_options_list.remove(toggle_option)
+            else:
+                selected_options_list.append(toggle_option)
+
+        # Print confirmation and return
+        if len(selected_options_list) == 0:
+            Print_Utils.success_message("Selected no options.")
+        else:
+            Print_Utils.success_message(
+                f"Selected {', '.join(list(key(option) for option in selected_options_list))}."
+            )
+        return selected_options_list
+
+    @staticmethod
+    def _print_toggle_options(
+        option_name_list: List[str], selected_option_name_list: List[int]
+    ) -> None:
+        """
+        Prints options in a list displaying them differently if they have been selected
+        """
+
+        for index, option in enumerate(option_name_list):
+            if option in selected_option_name_list:
+                option_display: str = f"[{index + 1} X ]"
+                console.print(f"{option_display: <8}{option}", style="cyan")
+
+            else:
+                option_display: str = f"[{index + 1}   ]"
+                console.print(f"{option_display: <8}{option}", style="bright_black")
