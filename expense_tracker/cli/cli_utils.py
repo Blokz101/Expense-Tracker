@@ -76,17 +76,26 @@ class Print_Utils:
         """
         Print a message with success formatting.
         """
-        console.print(f"\n{message}\n", style="Green")
+        console.print(message, style="Green")
 
     @staticmethod
     def error_message(message: str, error_message: Optional[str] = None) -> None:
         """
         Print a message with error formatting.
         """
-        console.print(f"\n{message}\n", style="Red")
+        console.print(message, style="Red")
 
         if error_message:
-            console.print(f"Failed with: {str(error_message)}\n", style="Red")
+            console.print(f"Failed with: {str(error_message)}", style="Red")
+
+    @staticmethod
+    def extract_message(message: str, extracted: str) -> None:
+        """
+        Print a extracted message and what was extracted.
+        """
+
+        console.print(message)
+        console.print(f" + {extracted}", style=GeneralConstants.HIGHLIGHTED_STYLE)
 
     @staticmethod
     def input_rule(prompt_message, default: str = None) -> str:
@@ -99,7 +108,7 @@ class Print_Utils:
         # If the default is set then print it
         if default:
             console.print("Press enter to select default or input another string.\n")
-            console.print(f"(default) --> {default}\n", style="cyan")
+            console.print(f"(default) --> {default}\n", style=GeneralConstants.SELECTED_STYLE)
 
         # Get user input
         input: str = console.input(f"{prompt_message} >>> ")
@@ -125,17 +134,17 @@ class Print_Utils:
             # If the default is set then print it and instructions
             if default:
                 console.print(
-                    "Press enter to select default, input 'today' for today, 'yesterday' for yesterday, or input a date in mm/dd/yyyy format.\n"
+                    "\nPress enter to select default, input 'today' for today, 'yesterday' for yesterday, or input a date in mm/dd/yyyy format.\n"
                 )
                 console.print(
                     f"(default) --> {datetime.strftime(default, GeneralConstants.DATE_FORMAT)}",
-                    style="cyan",
+                    style=GeneralConstants.SELECTED_STYLE,
                 )
 
             # If the default is not set then print the instructions
             else:
                 console.print(
-                    "Enter 'today' for today, 'yesterday' for yesterday, or input a date in mm/dd/yyyy format."
+                    "\nEnter 'today' for today, 'yesterday' for yesterday, or input a date in mm/dd/yyyy format."
                 )
 
             # Get user input
@@ -197,7 +206,7 @@ class Print_Utils:
 
             # Print instructions
             console.print(
-                "Press enter to select the highlighted option, input a number to select an option choice, or input a string to search for another option."
+                "\nPress enter to select the highlighted option, input a number to select an option choice, or input a string to search for another option."
             )
             console.print()
 
@@ -259,10 +268,10 @@ class Print_Utils:
             # If this is the first option, format it differently
             if index == 0:
                 if default:
-                    console.print(f"(default) --> {option}", style="cyan")
+                    console.print(f"(default) --> {option}", style=GeneralConstants.SELECTED_STYLE)
                     console.print()
                 else:
-                    console.print(f" -->  {option}", style="cyan")
+                    console.print(f" -->  {option}", style=GeneralConstants.SELECTED_STYLE)
 
             # Print the option in standard format
             else:
@@ -303,15 +312,15 @@ class Print_Utils:
         while True:
             # If the default is set then print it and the instructions
             if default:
-                console.print("Press enter to select default or enter a path.")
+                console.print("\nPress enter to select default or enter a path.")
                 console.print(
                     f"(default) --> {str(default)}",
-                    style="cyan",
+                    style=GeneralConstants.SELECTED_STYLE,
                 )
 
             # If the default is not set then print the instructions
             else:
-                console.print("Enter a path.")
+                console.print("\nEnter a path.")
 
             # Get the user input
             user_input: str = Print_Utils.input_rule(prompt_message)
@@ -346,15 +355,15 @@ class Print_Utils:
         while True:
             # If the default is set then print it and the instructions
             if default:
-                console.print("Press enter to select default or enter a float.\n")
+                console.print("\nPress enter to select default or enter a float.\n")
                 console.print(
                     f"(default) --> {str(default)}",
-                    style="cyan",
+                    style=GeneralConstants.SELECTED_STYLE,
                 )
 
             # If the default is not set then print the instructions
             else:
-                console.print("Enter a float.")
+                console.print("\nEnter a float.")
 
             # Get the user input
             user_input: str = Print_Utils.input_rule(prompt_message)
@@ -393,7 +402,7 @@ class Print_Utils:
         while True:
             # Print the instructions and options
             console.print(
-                "Toggle the options by entering their corresponding integer or press enter to submit.\n"
+                "\nToggle the options by entering their corresponding integer or press enter to submit.\n"
             )
             Print_Utils._print_toggle_options(
                 list(key(option) for option in options_list),
@@ -441,7 +450,7 @@ class Print_Utils:
         for index, option in enumerate(option_name_list):
             if option in selected_option_name_list:
                 option_display: str = f"[{index + 1} X ]"
-                console.print(f"{option_display: <8}{option}", style="cyan")
+                console.print(f"{option_display: <8}{option}", style=GeneralConstants.SELECTED_STYLE)
 
             else:
                 option_display: str = f"[{index + 1}   ]"

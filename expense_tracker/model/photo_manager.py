@@ -4,7 +4,11 @@ from typing import Tuple
 
 from exif import Image
 
+import re
+
 from pathlib import Path
+
+from datetime import datetime
 
 
 class Photo_Manager:
@@ -59,4 +63,20 @@ class Photo_Manager:
                 raise AttributeError("Image does not have exif data.")
 
             # Return the image description if there is one
-            return image.image_description
+            return re.sub("\n", " ", image.image_description)
+
+    @staticmethod
+    def get_date(path: Path) -> datetime:
+        """
+        Get the date and time that the photo was taken
+        """
+
+        with open(path, "rb") as src:
+            image: Image = Image(src)
+
+            # Check if the image has any exif data at all
+            if not image.has_exif:
+                raise AttributeError("Image does not have exif data.")
+
+            # Return the image description if there is one
+            return datetime.strptime(image.datetime, "%Y:%m:%d %H:%M:%S")

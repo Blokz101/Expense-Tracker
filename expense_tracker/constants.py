@@ -13,6 +13,10 @@ class GeneralConstants:
 
     DATE_FORMAT: str = "%A, %B %-d %Y"
 
+    SELECTED_STYLE: str = "cyan"
+
+    HIGHLIGHTED_STYLE: str = "purple4"
+
     SETTINGS_FILE_NAME: str = "settings.ini"
 
     SETTINGS_FILE_DEFAULTS: list = (
