@@ -78,58 +78,83 @@ class Print_Utils:
             console.print(f"Failed with: {str(error_message)}\n", style="Red")
 
     @staticmethod
-    def input_rule(input_message) -> str:
+    def input_rule(prompt_message, default: str = None) -> str:
         """
         Gets input from the user and prints a rule after it.
         """
 
         console.print()
-        input: str = console.input(f"{input_message} >>> ")
+
+        # If the default is set then print it
+        if default:
+            console.print("Press enter to select default or input another string.\n")
+            console.print(f"(default) --> {default}\n", style="cyan")
+
+        # Get user input
+        input: str = console.input(f"{prompt_message} >>> ")
         console.rule(style="white")
-        return input
+
+        # Return default if default is set and user pressed enter, if not return the user input
+        if default and input == "":
+            return default
+        else:
+            return input
 
     def input_date(
-        prompt_message: str = "Enter a date (mm/dd/yyyy)",
-        input: Optional[str] = None,
+        prompt_message: str,
+        default: Optional[datetime] = None,
     ) -> datetime:
         """
         Prompt the user to enter a datetime
         """
 
-        # Set the user input based on the initial input option
-        user_input: str
-        if input:
-            user_input = input
-        else:
-            user_input = Print_Utils.input_rule(prompt_message)
-
         selected_date: datetime
 
         while True:
-            # If the user input is equal to today return today as a datetime
+            # If the default is set then print it and instructions
+            if default:
+                console.print(
+                    "Press enter to select default, input 'today' for today, 'yesterday' for yesterday, or input a date in mm/dd/yyyy format.\n"
+                )
+                console.print(
+                    f"(default) --> {datetime.strftime(default, GeneralConstants.DATE_FORMAT)}",
+                    style="cyan",
+                )
+
+            # If the default is not set then print the instructions
+            else:
+                console.print(
+                    "Enter 'today' for today, 'yesterday' for yesterday, or input a date in mm/dd/yyyy format."
+                )
+
+            # Get user input
+            user_input: str = Print_Utils.input_rule(prompt_message)
+
+            # Check for special cases
+            if default and user_input == "":
+                selected_date = default
+                break
+
             if user_input == "today":
                 selected_date = datetime.today()
                 break
 
-            # If the user input is equal to yesterday return yesterday as a datetime
             if user_input == "yesterday":
                 selected_date = datetime.today() - timedelta(days=1)
                 break
 
-            # If the user input can be converted to a date then return it as a datetime
+            # Attempt to convert user input to date, print message if it fails
             try:
                 selected_date = datetime.strptime(user_input, "%m/%d/%Y")
                 break
             except ValueError:
-                pass
+                Print_Utils.error_message(
+                    f"Could not convert '{user_input}' into date."
+                )
 
-            # Prompt the user to input a new string and restart the process
-            Print_Utils.error_message(f"Cannot convert '{user_input}' to a date.")
-            user_input = Print_Utils.input_rule(prompt_message)
-
-        # Print the selected date and return
+        # Print the selected date and return it
         Print_Utils.success_message(
-            f"Selected '{selected_date.strftime('%A %B %-d %Y')}'."
+            f"Selected {datetime.strftime(selected_date, GeneralConstants.DATE_FORMAT)}"
         )
         return selected_date
 
@@ -257,25 +282,86 @@ class Print_Utils:
         return list(option[0] for option in compared_options_list)
 
     @staticmethod
-    def input_file_path(prompt_message: str) -> Path:
+    def input_file_path(prompt_message: str, default: Optional[Path] = None) -> Path:
         """
         Get user input and validate it as an existing path.
         """
 
-        input: str = Print_Utils.input_rule(prompt_message)
+        selected_path: Path
 
-        input = re.sub("['\"]", "", input)
+        while True:
+            # If the default is set then print it and the instructions
+            if default:
+                console.print("Press enter to select default or enter a path.")
+                console.print(
+                    f"(default) --> {str(default)}",
+                    style="cyan",
+                )
 
-        if not os.path.exists(input) or not os.path.isfile(input):
-            raise ValueError(f"'{input}' is not a valid path to a file.")
+            # If the default is not set then print the instructions
+            else:
+                console.print("Enter a path.")
 
-        return Path(input)
+            # Get the user input
+            user_input: str = Print_Utils.input_rule(prompt_message)
+            user_input = re.sub("['\"]", "", user_input)
+
+            # Check for special cases
+            if default and user_input == "":
+                selected_path = default
+                break
+
+            # Attempt to convert user input to date, print message if it fails
+            try:
+                selected_path = Path(user_input)
+                break
+            except ValueError:
+                Print_Utils.error_message(
+                    f"Could not convert '{user_input}' into path."
+                )
+
+        # Print the selected path and return it
+        Print_Utils.success_message(f"Selected {selected_path}.")
+        return selected_path
 
     @staticmethod
-    def input_float(prompt_message: str) -> float:
+    def input_float(prompt_message: str, default: float = None) -> float:
         """
         Get user input and validate it as a float.
         """
 
-        input: str = Print_Utils.input_rule(prompt_message)
-        return float(input)
+        selected_path: Path
+
+        while True:
+            # If the default is set then print it and the instructions
+            if default:
+                console.print("Press enter to select default or enter a float.\n")
+                console.print(
+                    f"(default) --> {str(default)}",
+                    style="cyan",
+                )
+
+            # If the default is not set then print the instructions
+            else:
+                console.print("Enter a float.")
+
+            # Get the user input
+            user_input: str = Print_Utils.input_rule(prompt_message)
+
+            # Check for special cases
+            if default and user_input == "":
+                selected_path = default
+                break
+
+            # Attempt to convert user input to date, print message if it fails
+            try:
+                selected_path = float(user_input)
+                break
+            except ValueError:
+                Print_Utils.error_message(
+                    f"Could not convert '{user_input}' into float."
+                )
+
+        # Print the selected path and return it
+        Print_Utils.success_message(f"Selected {selected_path}.")
+        return selected_path
