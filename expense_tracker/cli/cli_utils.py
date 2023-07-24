@@ -7,7 +7,7 @@ from expense_tracker.cli import console
 
 from pathlib import Path
 
-import os
+import copy
 
 import re
 
@@ -403,7 +403,7 @@ class Print_Utils:
         Prompts the user to select options from a toggle list
         """
 
-        selected_options_list: List[Any] = initial_selected_list
+        selected_options_list: List[Any] = copy.copy(initial_selected_list)
 
         while True:
             # Print the instructions and options
