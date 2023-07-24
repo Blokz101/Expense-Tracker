@@ -20,6 +20,8 @@ from expense_tracker.orm.merchant_location import Merchant_Location
 from expense_tracker.orm.transaction import Transaction
 from expense_tracker.orm.tag import Tag
 from expense_tracker.orm.account import Account
+from expense_tracker.orm.budget import Budget
+from expense_tracker.orm.month_budget import Month_Budget
 
 from expense_tracker.model.photo_manager import Photo_Manager
 
@@ -43,7 +45,11 @@ class CLI_Transactions:
         manual: Annotated[
             bool,
             typer.Option("--manual", help="Set to input all information manually."),
-        ] = False
+        ] = False,
+        income: Annotated[
+            bool,
+            typer.Option("--income", help="Set mark the transaction as income."),
+        ] = False,
     ) -> None:
         """
         Create a new transaction.
@@ -80,9 +86,15 @@ class CLI_Transactions:
             )
 
             # Get the amount
-            amount: float = Print_Utils.input_float(
-                "Enter an amount",
-            )
+            amount: float
+            if income:
+                amount = Print_Utils.input_float(
+                    "Enter an [bold]income[/bold] amount",
+                )
+            else:
+                amount = -1 * Print_Utils.input_float(
+                    "Enter an [bold]expense[/bold] amount",
+                )
 
             # Set the default as either today or the date that the photo was taken based no if a photo was provided
             description_default: Optional[str] = None

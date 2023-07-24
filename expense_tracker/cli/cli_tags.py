@@ -15,6 +15,8 @@ from expense_tracker.orm.merchant_location import Merchant_Location
 from expense_tracker.orm.transaction import Transaction
 from expense_tracker.orm.tag import Tag
 from expense_tracker.orm.account import Account
+from expense_tracker.orm.budget import Budget
+from expense_tracker.orm.month_budget import Month_Budget
 
 from expense_tracker.cli import console
 from expense_tracker.cli.cli_utils import Print_Utils, Print_Tables
