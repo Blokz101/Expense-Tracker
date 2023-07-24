@@ -47,20 +47,24 @@ class Merchant_Location(Base):
     @staticmethod
     def possible_location(
         target_coord: Tuple[float, float],
-        compare_coords_list: List[Tuple[float, float]],
+        coords_list: List[Tuple[float, float]],
         same_location__mile_radius: float,
-    ) -> Optional[int]:
+    ) -> Optional[Tuple[float, float]]:
         """
         Check if a location is close enough, to any coordinate in a provided list, to be the same location. If so return the first index of such a coordinate.
         """
-
-        # Check if each coordinate in compare_coords_list is within the specified radius of target_coord
-        for index, compare_coord in enumerate(compare_coords_list):
-            distance: float = geodesic(compare_coord, target_coord).miles
-
-            # If it is then return the index of the match
+        
+        # If the coords are within the specified radius, add it to the result list along with its distance.
+        compared_coords_list: List[Tuple[float, Tuple[float, float]]] = []
+        for coord in coords_list:
+            distance: float = geodesic(coord, target_coord).miles
             if distance <= same_location__mile_radius:
-                return index
+                compared_coords_list.append((coord, distance))
 
-        # Return None if no matches are found
-        return None
+        # If there are no matches, return none
+        if len(compared_coords_list) == 0:
+            return None
+
+        # If there are matches, sort the list by distance and return the closest coords
+        compared_coords_list.sort(key=lambda x: x[1])
+        return compared_coords_list[0][0]

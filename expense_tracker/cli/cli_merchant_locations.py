@@ -123,20 +123,15 @@ class CLI_Merchant_Locations:
                 zip(target_merchant_x_coord_list, target_merchant_y_coord_list)
             )
 
-            # If it exists, get the index of an existing coordinates within a specified radius of incoming coordinates
-            possible_location_index: Optional[
-                int
-            ] = Merchant_Location.possible_location(
+            # If it exists, get an existing coordinates within a specified radius of incoming coordinates
+            possible_location: Optional[Tuple[float, float]] = Merchant_Location.possible_location(
                 new_coords,
                 target_merchant_coord_list,
                 ConfigManager().get_same_merchant_mile_radius(),
             )
 
             # If the location might already be in the database, print an error and exit
-            if not possible_location_index == None:
-                possible_location: Tuple[float, float] = target_merchant_coord_list[
-                    possible_location_index
-                ]
+            if possible_location:
                 Print_Utils.error_message(
                     f"The new coordinate ({new_coords[0]}, {new_coords[1]}) is close enough to existing location ({possible_location[0]}, {possible_location[1]}) to be the same location."
                 )
