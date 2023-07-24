@@ -28,7 +28,10 @@ class Amount(Base):
         unique=True,
         nullable=True,
     )
-    transaction_id: Mapped[int] = mapped_column(ForeignKey("transactions.id"))
+    transaction_id: Mapped[int] = mapped_column(
+        ForeignKey("transactions.id"),
+        nullable=False,
+    )
     amount: Mapped[float] = mapped_column(
         nullable=False,
     )

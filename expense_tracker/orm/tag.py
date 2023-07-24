@@ -37,3 +37,7 @@ class Tag(Base):
         secondary=Branch_Table.merchant_tag_default,
         back_populates="default_tags",
     )
+    budgets: Mapped[List["Budget"]] = relationship(
+        secondary=Branch_Table.budget_tag,
+        back_populates="tags",
+    )

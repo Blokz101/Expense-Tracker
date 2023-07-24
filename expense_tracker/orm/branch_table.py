@@ -23,3 +23,17 @@ class Branch_Table:
         Column("merchant_id", ForeignKey("merchants.id")),
         Column("tag_id", ForeignKey("tags.id")),
     )
+
+    budget_account: Table = Table(
+        "budget_account_branches",
+        Base.metadata,
+        Column("budget_id", ForeignKey("budgets.id")),
+        Column("account_id", ForeignKey("accounts.id")),
+    )
+
+    budget_tag: Table = Table(
+        "budget_tag_branches",
+        Base.metadata,
+        Column("budget_id", ForeignKey("budgets.id")),
+        Column("tag_id", ForeignKey("tags.id")),
+    )
