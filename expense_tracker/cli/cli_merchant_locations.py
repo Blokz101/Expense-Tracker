@@ -104,36 +104,21 @@ class CLI_Merchant_Locations:
 
                 new_coords = (x_coord, y_coord)
 
-            # Query the database to find get the x and y coords for the target merchant and format it into a list of paired coords
-            target_merchant_x_coord_query: List[List[float]] = session.query(
-                Merchant_Location.x_coord
-            ).where(Merchant_Location.merchant == target_merchant)
-            target_merchant_y_coord_query: List[List[float]] = session.query(
-                Merchant_Location.y_coord
-            ).where(Merchant_Location.merchant == target_merchant)
-
-            target_merchant_x_coord_list = list(
-                [result[0] for result in target_merchant_x_coord_query]
-            )
-            target_merchant_y_coord_list = list(
-                [result[0] for result in target_merchant_y_coord_query]
-            )
-
-            target_merchant_coord_list: List[Tuple[float, float]] = list(
-                zip(target_merchant_x_coord_list, target_merchant_y_coord_list)
-            )
-
-            # If it exists, get an existing coordinates within a specified radius of incoming coordinates
-            possible_location: Optional[Tuple[float, float]] = Merchant_Location.possible_location(
+            # Get any locations that the new coords might be close to.
+            possible_location: Optional[
+                Merchant_Location
+            ] = Merchant_Location.possible_location(
                 new_coords,
-                target_merchant_coord_list,
+                session.query(Merchant_Location)
+                .where(Merchant_Location.merchant == target_merchant)
+                .all(),
                 ConfigManager().get_same_merchant_mile_radius(),
             )
 
             # If the location might already be in the database, print an error and exit
             if possible_location:
                 Print_Utils.error_message(
-                    f"The new coordinate ({new_coords[0]}, {new_coords[1]}) is close enough to existing location ({possible_location[0]}, {possible_location[1]}) to be the same location."
+                    f"The new coordinate ({new_coords[0]}, {new_coords[1]}) is close enough to existing location ({possible_location.x_coord}, {possible_location.y_coord}) to be the same location."
                 )
                 raise typer.Exit()
 

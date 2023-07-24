@@ -108,7 +108,9 @@ class Print_Utils:
         # If the default is set then print it
         if default:
             console.print("Press enter to select default or input another string.\n")
-            console.print(f"(default) --> {default}\n", style=GeneralConstants.SELECTED_STYLE)
+            console.print(
+                f"(default) --> {default}\n", style=GeneralConstants.SELECTED_STYLE
+            )
 
         # Get user input
         input: str = console.input(f"{prompt_message} >>> ")
@@ -268,10 +270,14 @@ class Print_Utils:
             # If this is the first option, format it differently
             if index == 0:
                 if default:
-                    console.print(f"(default) --> {option}", style=GeneralConstants.SELECTED_STYLE)
+                    console.print(
+                        f"(default) --> {option}", style=GeneralConstants.SELECTED_STYLE
+                    )
                     console.print()
                 else:
-                    console.print(f" -->  {option}", style=GeneralConstants.SELECTED_STYLE)
+                    console.print(
+                        f" -->  {option}", style=GeneralConstants.SELECTED_STYLE
+                    )
 
             # Print the option in standard format
             else:
@@ -450,7 +456,10 @@ class Print_Utils:
         for index, option in enumerate(option_name_list):
             if option in selected_option_name_list:
                 option_display: str = f"[{index + 1} X ]"
-                console.print(f"{option_display: <8}{option}", style=GeneralConstants.SELECTED_STYLE)
+                console.print(
+                    f"{option_display: <8}{option}",
+                    style=GeneralConstants.SELECTED_STYLE,
+                )
 
             else:
                 option_display: str = f"[{index + 1}   ]"
