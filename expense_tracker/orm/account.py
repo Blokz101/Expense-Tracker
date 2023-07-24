@@ -22,9 +22,18 @@ class Account(Base):
         primary_key=True,
         nullable=False,
     )
-    name: Mapped[Optional[str]] = mapped_column(
+    name: Mapped[str] = mapped_column(
         unique=True,
         nullable=False,
+    )
+    statement_description_column_index: Mapped[Optional[int]] = mapped_column(
+        nullable=True,
+    )
+    statement_amount_column_index: Mapped[Optional[int]] = mapped_column(
+        nullable=True,
+    )
+    statement_date_column_index: Mapped[Optional[int]] = mapped_column(
+        nullable=True,
     )
 
     # ORM objects
