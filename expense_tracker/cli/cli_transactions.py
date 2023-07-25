@@ -34,6 +34,8 @@ from rich.table import Table
 
 import re
 
+import os
+
 
 class CLI_Transactions:
     """
@@ -55,22 +57,24 @@ class CLI_Transactions:
 
         photo_path: Optional[Path] = None
 
-        # Attempt to convert user input to date, if it fails continue without setting the photo path
+        # Get the user input and clean it
         user_input: str = Print_Utils.input_rule("Path to photo")
-        if user_input:
-            try:
-                user_input = re.sub("'", "", user_input)
-                photo_path = Path(user_input)
-            except:
-                pass
+        user_input = re.sub("'", "", user_input)
+
+        # Attempt to convert user input to path
+        try:
+            photo_path = Path(user_input)
+        except:
+            pass
 
         # Print a message based on if a photo is being used or not
-        if photo_path:
+        if photo_path and os.path.isfile(photo_path):
             Print_Utils.success_message(
-                f"Importing information from photo at {photo_path}."
+                f"Importing information from photo at '{photo_path}'."
             )
         else:
-            Print_Utils.error_message("No photo found, continuing in manual mode.")
+            Print_Utils.error_message("Unable to use photo, continuing in manual mode.")
+            photo_path = None
 
         CLI_Transactions._create_transaction(photo_path=photo_path, income=income)
 
@@ -82,13 +86,48 @@ class CLI_Transactions:
         Create a transaction and submit it to the database.
         """
 
-        account: Account = CLI_Transactions._get_account()
-        date: datetime = CLI_Transactions._get_date(photo_path=photo_path)
+        date_default: datetime = None
+        description_default: str = None
+        merchant_default: Merchant_Location = None
+
+        # Get the defaults for each field if a photo is provided
+        if photo_path:
+            date_default = CLI_Transactions._get_date_default(photo_path)
+            description_default = CLI_Transactions._get_description_default(photo_path)
+            merchant_default = CLI_Transactions._get_merchant_default(photo_path)
+
+            console.print("Found defaults from photo metadata:")
+
+            console.print(f" + Date: ", end="")
+            console.print(
+                datetime.strftime(date_default, GeneralConstants.DATE_FORMAT),
+                style=GeneralConstants.HIGHLIGHTED_STYLE,
+            )
+
+            console.print(f" + Description: ", end="")
+            console.print(description_default, style=GeneralConstants.HIGHLIGHTED_STYLE)
+
+            console.print(f" + Merchant: ", end="")
+            if merchant_default:
+                console.print(
+                    merchant_default.name, style=GeneralConstants.HIGHLIGHTED_STYLE
+                )
+            else:
+                console.print("None", style="red")
+
+        # Prompt the user to select each field
+        account: Account = CLI_Transactions._get_account(
+            default=CLI_Transactions._get_account_default()
+        )
+        date: datetime = CLI_Transactions._get_date(default=date_default)
         amount: float = CLI_Transactions._get_amount(income=income)
-        description: str = CLI_Transactions._get_description(photo_path=photo_path)
-        merchant: Merchant = CLI_Transactions._get_merchant(photo_path=photo_path)
+        description: str = CLI_Transactions._get_description(
+            default=description_default
+        )
+        merchant: Merchant = CLI_Transactions._get_merchant(default=merchant_default)
         tag_list: List[Tag] = CLI_Transactions._get_tags(merchant=merchant)
 
+        # Create and commit the new transaction
         with Session(engine) as session:
             # Add the new transaction
             new_transaction: Transaction = Transaction(
@@ -101,18 +140,30 @@ class CLI_Transactions:
             session.add(new_transaction)
             session.flush()
 
-            # Add the new amount, its tags, and commit
+            # Add the new amount and its tags
             new_amount: Amount = Amount(
                 transaction_id=new_transaction.id, amount=amount
             )
             new_amount.tags = tag_list
             session.add(new_amount)
+
             session.commit()
 
         Print_Utils.success_message("Created transaction.")
 
     @staticmethod
-    def _get_account() -> Account:
+    def _get_account_default() -> Account:
+        """
+        Return the default account specified by the user in the settings
+        """
+
+        with Session(engine) as session:
+            return session.query(Account).all()[
+                ConfigManager().get_default_account_id()
+            ]
+
+    @staticmethod
+    def _get_account(default: Optional[Account] = None) -> Account:
         """
         Get the account from the user
         """
@@ -122,25 +173,27 @@ class CLI_Transactions:
                 session.query(Account).all(),
                 lambda x: x.name,
                 "Enter a transaction account",
-                default=session.query(Account).all()[
-                    ConfigManager().get_default_account_id()
-                ],
+                default=default,
             )
 
     @staticmethod
-    def _get_date(photo_path: Optional[Path] = None) -> datetime:
+    def _get_date_default(photo_path: Path) -> datetime:
+        """
+        Get the date default from a given photo
+        """
+
+        return Photo_Manager.get_date(photo_path)
+
+    @staticmethod
+    def _get_date(default: Optional[datetime] = None) -> datetime:
         """
         Get the date from the user
         """
 
-        # Set the default as either today or the date that the photo was taken based no if a photo was provided
-        date_default: datetime = datetime.today()
-        if photo_path:
-            date_default = Photo_Manager.get_date(photo_path)
-            Print_Utils.extract_message(
-                "Extracted date from photo:",
-                datetime.strftime(date_default, GeneralConstants.DATE_FORMAT),
-            )
+        # Set the default as today if one was not provided
+        date_default: datetime = default
+        if not date_default:
+            date_default = datetime.today()
 
         # Return the the date
         return Print_Utils.input_date(
@@ -164,64 +217,59 @@ class CLI_Transactions:
             )
 
     @staticmethod
-    def _get_description(photo_path: Optional[Path] = None) -> str:
+    def _get_description_default(photo_path: Path) -> str:
+        """
+        Get the description default from a given photo
+        """
+
+        return Photo_Manager.get_description(photo_path)
+
+    @staticmethod
+    def _get_description(default: Optional[str] = None) -> str:
         """
         Get the description from the user
         """
 
-        # Set the default as either today or the date that the photo was taken based no if a photo was provided
-        description_default: Optional[str] = None
-        if photo_path:
-            description_default = Photo_Manager.get_description(photo_path)
-            Print_Utils.extract_message(
-                "Extracted description from photo:", description_default
-            )
-
-        # Return the description
         return Print_Utils.input_rule(
             "Enter a description",
-            default=description_default,
+            default=default,
         )
 
     @staticmethod
-    def _get_merchant(photo_path: Optional[Path] = None) -> Merchant:
+    def _get_merchant_default(photo_path: Path) -> Optional[Merchant]:
+        """
+        Get the merchant default from a given photo
+        """
+
+        # Get the photo coords and print them
+        photo_coords = Photo_Manager.get_coords(photo_path)
+
+        with Session(engine) as session:
+            # Find possible locations, if there is one, return it
+            possible_location: Optional[
+                Merchant_Location
+            ] = Merchant_Location.possible_location(
+                photo_coords,
+                session.query(Merchant_Location).all(),
+                same_location__mile_radius=ConfigManager().get_same_merchant_mile_radius(),
+            )
+            if possible_location:
+                return possible_location.merchant
+
+        return None
+
+    @staticmethod
+    def _get_merchant(default: Optional[Merchant] = None) -> Merchant:
         """
         Get the merchant from the user
         """
 
         with Session(engine) as session:
-            # Set the default as either today or the date that the photo was taken based no if a photo was provided
-            merchant_default: Optional[Merchant] = None
-            if photo_path:
-                # Get the photo coords and print them
-                photo_coords = Photo_Manager.get_coords(photo_path)
-                Print_Utils.extract_message(
-                    "Extracted coords from photo:", photo_coords
-                )
-
-                # Check for any possible locations if there are any, print them
-                possible_location: Optional[
-                    Merchant_Location
-                ] = Merchant_Location.possible_location(
-                    photo_coords,
-                    session.query(Merchant_Location).all(),
-                    same_location__mile_radius=ConfigManager().get_same_merchant_mile_radius(),
-                )
-                if possible_location:
-                    merchant_default = possible_location.merchant
-                    console.print(f"Coordinates match possible location ", end="")
-                    console.print(
-                        merchant_default.name, style=GeneralConstants.HIGHLIGHTED_STYLE
-                    )
-                else:
-                    console.print("Coordinates do not match any location.")
-
-            # Return the merchant
             return Print_Utils.input_from_options(
                 session.query(Merchant).all(),
                 lambda x: x.name,
                 "Enter a transaction merchant",
-                default=merchant_default,
+                default=default,
             )
 
     @staticmethod
@@ -230,7 +278,6 @@ class CLI_Transactions:
         Get the list of tags from the user
         """
         with Session(engine) as session:
-            
             # If a merchant is set then get the default tags from it
             tags_default: Optional[List[Tag]] = None
             if merchant:
