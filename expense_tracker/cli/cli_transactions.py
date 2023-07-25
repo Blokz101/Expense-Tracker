@@ -32,6 +32,8 @@ from datetime import datetime
 
 from rich.table import Table
 
+import re
+
 
 class CLI_Transactions:
     """
@@ -42,10 +44,6 @@ class CLI_Transactions:
 
     @app.command()
     def create(
-        manual: Annotated[
-            bool,
-            typer.Option("--manual", help="Set to input all information manually."),
-        ] = False,
         income: Annotated[
             bool,
             typer.Option("--income", help="Set mark the transaction as income."),
@@ -55,13 +53,72 @@ class CLI_Transactions:
         Create a new transaction.
         """
 
-        photo_path: Path
-        if not manual:
-            photo_path = Print_Utils.input_file_path("Path to photo")
+        photo_path: Optional[Path] = None
+
+        # Attempt to convert user input to date, if it fails continue without setting the photo path
+        user_input: str = Print_Utils.input_rule("Path to photo")
+        if user_input:
+            try:
+                user_input = re.sub("'", "", user_input)
+                photo_path = Path(user_input)
+            except:
+                pass
+
+        # Print a message based on if a photo is being used or not
+        if photo_path:
+            Print_Utils.success_message(
+                f"Importing information from photo at {photo_path}."
+            )
+        else:
+            Print_Utils.error_message("No photo found, continuing in manual mode.")
+
+        CLI_Transactions._create_transaction(photo_path=photo_path, income=income)
+
+    @staticmethod
+    def _create_transaction(
+        photo_path: Optional[Path] = None, income: bool = False
+    ) -> None:
+        """
+        Create a transaction and submit it to the database.
+        """
+
+        account: Account = CLI_Transactions._get_account()
+        date: datetime = CLI_Transactions._get_date(photo_path=photo_path)
+        amount: float = CLI_Transactions._get_amount(income=income)
+        description: str = CLI_Transactions._get_description(photo_path=photo_path)
+        merchant: Merchant = CLI_Transactions._get_merchant(photo_path=photo_path)
+        tag_list: List[Tag] = CLI_Transactions._get_tags(merchant=merchant)
 
         with Session(engine) as session:
-            # Get the account, date, merchant, and amount
-            account: Account = Print_Utils.input_from_options(
+            # Add the new transaction
+            new_transaction: Transaction = Transaction(
+                account_id=account.id,
+                description=description,
+                merchant_id=merchant.id,
+                date=date,
+                reconciled_status=False,
+            )
+            session.add(new_transaction)
+            session.flush()
+
+            # Add the new amount, its tags, and commit
+            new_amount: Amount = Amount(
+                transaction_id=new_transaction.id, amount=amount
+            )
+            new_amount.tags = tag_list
+            session.add(new_amount)
+            session.commit()
+
+        Print_Utils.success_message("Created transaction.")
+
+    @staticmethod
+    def _get_account() -> Account:
+        """
+        Get the account from the user
+        """
+
+        with Session(engine) as session:
+            return Print_Utils.input_from_options(
                 session.query(Account).all(),
                 lambda x: x.name,
                 "Enter a transaction account",
@@ -70,49 +127,72 @@ class CLI_Transactions:
                 ],
             )
 
-            # Set the default as either today or the date that the photo was taken based no if a photo was provided
-            date_default: datetime = datetime.today()
-            if not manual:
-                date_default = Photo_Manager.get_date(photo_path)
-                Print_Utils.extract_message(
-                    "Extracted date from photo:",
-                    datetime.strftime(date_default, GeneralConstants.DATE_FORMAT),
-                )
+    @staticmethod
+    def _get_date(photo_path: Optional[Path] = None) -> datetime:
+        """
+        Get the date from the user
+        """
 
-            # Get the date
-            date: datetime = Print_Utils.input_date(
-                "Enter a transaction date",
-                default=date_default,
+        # Set the default as either today or the date that the photo was taken based no if a photo was provided
+        date_default: datetime = datetime.today()
+        if photo_path:
+            date_default = Photo_Manager.get_date(photo_path)
+            Print_Utils.extract_message(
+                "Extracted date from photo:",
+                datetime.strftime(date_default, GeneralConstants.DATE_FORMAT),
             )
 
-            # Get the amount
-            amount: float
-            if income:
-                amount = Print_Utils.input_float(
-                    "Enter an [bold]income[/bold] amount",
-                )
-            else:
-                amount = -1 * Print_Utils.input_float(
-                    "Enter an [bold]expense[/bold] amount",
-                )
+        # Return the the date
+        return Print_Utils.input_date(
+            "Enter a transaction date",
+            default=date_default,
+        )
 
-            # Set the default as either today or the date that the photo was taken based no if a photo was provided
-            description_default: Optional[str] = None
-            if not manual:
-                description_default = Photo_Manager.get_description(photo_path)
-                Print_Utils.extract_message(
-                    "Extracted description from photo:", description_default
-                )
+    @staticmethod
+    def _get_amount(income=False) -> float:
+        """
+        Get the amount from the user
+        """
 
-            # Get the description
-            description: str = Print_Utils.input_rule(
-                "Enter a description",
-                default=description_default,
+        if income:
+            return Print_Utils.input_float(
+                "Enter an [bold]income[/bold] amount",
+            )
+        else:
+            return -1 * Print_Utils.input_float(
+                "Enter an [bold]expense[/bold] amount",
             )
 
+    @staticmethod
+    def _get_description(photo_path: Optional[Path] = None) -> str:
+        """
+        Get the description from the user
+        """
+
+        # Set the default as either today or the date that the photo was taken based no if a photo was provided
+        description_default: Optional[str] = None
+        if photo_path:
+            description_default = Photo_Manager.get_description(photo_path)
+            Print_Utils.extract_message(
+                "Extracted description from photo:", description_default
+            )
+
+        # Return the description
+        return Print_Utils.input_rule(
+            "Enter a description",
+            default=description_default,
+        )
+
+    @staticmethod
+    def _get_merchant(photo_path: Optional[Path] = None) -> Merchant:
+        """
+        Get the merchant from the user
+        """
+
+        with Session(engine) as session:
             # Set the default as either today or the date that the photo was taken based no if a photo was provided
             merchant_default: Optional[Merchant] = None
-            if not manual:
+            if photo_path:
                 # Get the photo coords and print them
                 photo_coords = Photo_Manager.get_coords(photo_path)
                 Print_Utils.extract_message(
@@ -136,42 +216,33 @@ class CLI_Transactions:
                 else:
                     console.print("Coordinates do not match any location.")
 
-            # Get the merchant
-            merchant: Merchant = Print_Utils.input_from_options(
+            # Return the merchant
+            return Print_Utils.input_from_options(
                 session.query(Merchant).all(),
                 lambda x: x.name,
                 "Enter a transaction merchant",
                 default=merchant_default,
             )
 
-            # Get the tags
-            tag_list: List[Tag] = Print_Utils.input_from_toggle_list(
+    @staticmethod
+    def _get_tags(merchant: Optional[Merchant] = None) -> List[Tag]:
+        """
+        Get the list of tags from the user
+        """
+        with Session(engine) as session:
+            
+            # If a merchant is set then get the default tags from it
+            tags_default: Optional[List[Tag]] = None
+            if merchant:
+                session.add(merchant)
+                tags_default = merchant.default_tags
+
+            return Print_Utils.input_from_toggle_list(
                 session.query(Tag).all(),
                 lambda x: x.name,
                 "Select a tag",
-                initial_selected_list=merchant.default_tags,
+                initial_selected_list=tags_default,
             )
-
-            # Add the new transaction
-            new_transaction: Transaction = Transaction(
-                account_id=account.id,
-                description=description,
-                merchant_id=merchant.id,
-                date=date,
-                reconciled_status=False,
-            )
-            session.add(new_transaction)
-            session.flush()
-
-            # Add the new amount, its tags, and commit
-            new_amount: Amount = Amount(
-                transaction_id=new_transaction.id, amount=amount
-            )
-            new_amount.tags = tag_list
-            session.add(new_amount)
-            session.commit()
-
-        Print_Utils.success_message("Created transaction.")
 
     @app.command()
     def list(

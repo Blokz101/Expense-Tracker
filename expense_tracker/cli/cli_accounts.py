@@ -34,23 +34,40 @@ class CLI_Accounts:
     @app.command()
     def create(
         name: Annotated[str, typer.Argument(help="Name of the account")],
-        description_index: Annotated[int, typer.Argument(help="Index of the column containing descriptions on the account statement.")],
-        amount_index: Annotated[int, typer.Argument(help="Index of the column containing amounts on the account statement.")],
-        date_index: Annotated[int, typer.Argument(help="Index of the column containing dates on the account statement.")],
+        description_index: Annotated[
+            int,
+            typer.Argument(
+                help="Index of the column containing descriptions on the account statement."
+            ),
+        ],
+        amount_index: Annotated[
+            int,
+            typer.Argument(
+                help="Index of the column containing amounts on the account statement."
+            ),
+        ],
+        date_index: Annotated[
+            int,
+            typer.Argument(
+                help="Index of the column containing dates on the account statement."
+            ),
+        ],
     ) -> None:
         """
         Create a new account.
         """
-        
+
         # Attempt to create the account
         try:
             with Session(engine) as session:
-                session.add(Account(
-                    name=name,
-                    statement_description_column_index=description_index,
-                    statement_amount_column_index=amount_index,
-                    statement_date_column_index=date_index,
-                ))
+                session.add(
+                    Account(
+                        name=name,
+                        statement_description_column_index=description_index,
+                        statement_amount_column_index=amount_index,
+                        statement_date_column_index=date_index,
+                    )
+                )
                 session.commit()
 
             Print_Utils.success_message(f"Created '{name}' account")
