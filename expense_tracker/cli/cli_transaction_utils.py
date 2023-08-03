@@ -209,7 +209,7 @@ class CLI_Transaction_Utils:
             ):
                 tag_list_field.set_field_object(
                     CLI_Transaction_Utils._get_tags(
-                        default=tag_list_field.field_object
+                        selected_list=tag_list_field.field_object
                     ),
                     Field_Constant.USER_INPUT,
                 )
@@ -419,20 +419,14 @@ class CLI_Transaction_Utils:
             )
 
     @staticmethod
-    def _get_tags(default: Optional[List[Tag]] = None) -> List[Tag]:
+    def _get_tags(selected_list: List[Tag] = []) -> List[Tag]:
         """
         Get the list of tags from the user
         """
         with Session(engine) as session:
-            # If a merchant is set then get the default tags from it
-            tags_default: Optional[List[Tag]] = None
-            if default:
-                session.add(default)
-                tags_default = default.default_tags
-
             return Print_Utils.input_from_toggle_list(
                 session.query(Tag).all(),
                 lambda x: x.name,
                 "Select a tag",
-                initial_selected_list=tags_default,
+                initial_selected_list=selected_list,
             )
