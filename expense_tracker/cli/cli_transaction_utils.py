@@ -38,6 +38,13 @@ class CLI_Transaction_Utils:
         Prompt the user for the information needed to create a transaction and submit it to the database.
         """
 
+        # Check if the photo exists in the archive already
+        if photo_path and Photo_Manager.photo_exists_in_archive(
+            photo_path.name, ConfigManager().get_photo_archive_path()
+        ):
+            Print_Utils.error_message("Photo already exists in archive.\nAborting.")
+            return
+
         # Initialize all fields as none, these will be filled out later
         account_field: Transaction_Field = Transaction_Field(
             "Account",
@@ -423,7 +430,7 @@ class CLI_Transaction_Utils:
         """
         Get the list of tags from the user
         """
-        
+
         with Session(engine) as session:
             session.add_all(selected_list)
             return Print_Utils.input_from_toggle_list(

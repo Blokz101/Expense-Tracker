@@ -19,6 +19,18 @@ class Photo_Manager:
     """
 
     @staticmethod
+    def photo_exists_in_archive(photo_name: str, archive_dir: Path) -> bool:
+        """
+        Check if the photo already exists in the archive directory
+        """
+
+        for file in archive_dir.iterdir():
+            if file.is_file() and file.name == photo_name:
+                return True
+
+        return False
+
+    @staticmethod
     def archive_photo(current_path: Path, new_path: Path) -> None:
         """
         Move a photo found at one path to an existing folder
@@ -26,7 +38,7 @@ class Photo_Manager:
 
         if not current_path.is_file():
             raise ValueError(f"'{current_path}' is not a file.")
-        
+
         if new_path.exists():
             raise FileExistsError(f"Destination '{new_path}' already exists.")
 
