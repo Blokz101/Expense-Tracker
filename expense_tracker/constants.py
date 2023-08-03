@@ -30,6 +30,7 @@ class GeneralConstants:
             {
                 "number_of_options": "5",
                 "database_path": str(Path().absolute() / "database.db"),
+                "photo_archive_path": str(Path().absolute() / "photos"),
                 "same_merchant_mile_radius": "0.2",
                 "default_account_id": "1",
             },

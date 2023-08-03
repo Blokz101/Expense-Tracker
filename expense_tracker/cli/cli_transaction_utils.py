@@ -22,7 +22,7 @@ from expense_tracker.orm.month_budget import Month_Budget
 from expense_tracker.model.photo_manager import Photo_Manager
 
 from expense_tracker.cli import console
-from expense_tracker.cli.cli_utils import Print_Utils
+from expense_tracker.cli.cli_utils import Print_Utils, Logic_Utils
 from expense_tracker.cli.transaction_field import Transaction_Field
 
 from datetime import datetime
@@ -117,17 +117,17 @@ class CLI_Transaction_Utils:
 
         while True:
             # Declare if all the fields are satisfied
-            all_fields_satisfied: bool = (
-                not account_field.field_object == None
-                and not amount_field.field_object == None
-                and not date_field.field_object == None
-                and not description_field.field_object == None
-                and not merchant_field.field_object == None
-                and not tag_list_field.field_object == None
+            all_fields_satisfied: bool = Logic_Utils.is_something(
+                account_field.field_object,
+                amount_field.field_object,
+                date_field.field_object,
+                description_field.field_object,
+                merchant_field.field_object,
+                tag_list_field.field_object,
             )
 
             # Print instructions and current fields
-            console.print("Transaction fields")
+            console.print("\nTransaction fields")
             console.print(
                 "Press enter to jump to next required field or submit, or enter a number to select what field to modify.\n",
                 style=GeneralConstants.LOWLIGHT_STYLE,
@@ -224,7 +224,7 @@ class CLI_Transaction_Utils:
                 Print_Utils.error_message("Invalid Input.\n")
 
         # Create and commit the new transaction
-        CLI_Transaction_Utils._commit_transaction(
+        new_transaction: Transaction = CLI_Transaction_Utils._commit_transaction(
             account_field.field_object,
             description_field.field_object,
             merchant_field.field_object,
@@ -233,6 +233,15 @@ class CLI_Transaction_Utils:
             tag_list_field.field_object,
         )
         Print_Utils.success_message("Created transaction.")
+
+        # Move the photo
+        if photo_path:
+            with Session(engine) as session:
+                session.add(new_transaction)
+                new_path: Path = (
+                    ConfigManager().get_photo_archive_path() / photo_path.name
+                )
+                Photo_Manager.archive_photo(photo_path, new_path)
 
     @staticmethod
     def _selected_field(user_input: str, option_int: int, value: Optional[Any]) -> bool:
@@ -255,7 +264,7 @@ class CLI_Transaction_Utils:
         date: datetime,
         amount: float,
         tag_list: List[Tag],
-    ) -> None:
+    ) -> Transaction:
         """
         Commit a transaction
         """
@@ -280,6 +289,8 @@ class CLI_Transaction_Utils:
             session.add(new_amount)
 
             session.commit()
+
+            return new_transaction
 
     @staticmethod
     def _get_account_default() -> Account:
@@ -349,12 +360,15 @@ class CLI_Transaction_Utils:
             )
 
     @staticmethod
-    def _get_description_default(photo_path: Path) -> str:
+    def _get_description_default(photo_path: Path) -> Optional[str]:
         """
         Get the description default from a given photo
         """
 
-        return Photo_Manager.get_description(photo_path)
+        try:
+            return Photo_Manager.get_description(photo_path)
+        except AttributeError:
+            return None
 
     @staticmethod
     def _get_description(default: Optional[str] = None) -> str:

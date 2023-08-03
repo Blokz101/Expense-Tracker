@@ -21,6 +21,24 @@ from rich import box
 from rich.table import Column, Table
 
 
+class Logic_Utils:
+    """
+    Logic utility for the command line
+    """
+
+    @staticmethod
+    def is_something(*obj_list: Any) -> bool:
+        """
+        Check if an object or list of objects have some value
+        """
+
+        for obj in obj_list:
+            if obj == None:
+                return False
+
+        return True
+
+
 class Print_Tables:
     """
     Returns predefined tables for each database.

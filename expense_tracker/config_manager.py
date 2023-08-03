@@ -8,6 +8,8 @@ from configparser import ConfigParser
 
 from expense_tracker.constants import GeneralConstants
 
+from pathlib import Path
+
 
 class ConfigManager(ConfigParser):
     """
@@ -48,13 +50,16 @@ class ConfigManager(ConfigParser):
 
         self.write(open(GeneralConstants.SETTINGS_FILE_NAME, "w"))
 
-    def get_database_path(self) -> str:
-        return self.get("general", "database_path")
+    def get_database_path(self) -> Path:
+        return Path(self.get("general", "database_path"))
 
-    def get_number_of_options(self) -> Optional[str]:
+    def get_photo_archive_path(self) -> Path:
+        return Path(self.get("general", "photo_archive_path"))
+
+    def get_number_of_options(self) -> int:
         return int(self.get("general", "number_of_options"))
 
-    def get_same_merchant_mile_radius(self) -> Optional[str]:
+    def get_same_merchant_mile_radius(self) -> float:
         return float(self.get("general", "same_merchant_mile_radius"))
 
     def get_default_account_id(self) -> int:

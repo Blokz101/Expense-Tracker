@@ -26,8 +26,11 @@ class Photo_Manager:
         Move a photo found at one path to an existing folder
         """
 
-        if not os.path.isfile(current_path):
-            raise ValueError(f"{current_path} is not a file.")
+        if not current_path.is_file():
+            raise ValueError(f"'{current_path}' is not a file.")
+
+        if not new_path.parent.exists():
+            Path.mkdir(new_path.parent, parents=True, exist_ok=True)
 
         shutil.move(current_path, new_path)
 

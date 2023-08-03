@@ -32,6 +32,10 @@ class Transaction_Field:
         """
         Set a new field object and input location
         """
+
+        if new_object == None:
+            return
+
         self.field_object = new_object
         self.input_location: str = new_input_location_pair[0]
         self.style = new_input_location_pair[1]

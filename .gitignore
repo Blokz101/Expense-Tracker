@@ -164,3 +164,4 @@ settings.ini
 *.db
 test.py
 .vscode
+photos
