@@ -10,11 +10,26 @@ from pathlib import Path
 
 from datetime import datetime
 
+import shutil
+
+import os
+
 
 class Photo_Manager:
     """
     Functions to manage and interact with photos
     """
+
+    @staticmethod
+    def archive_photo(current_path: Path, new_path: Path) -> None:
+        """
+        Move a photo found at one path to an existing folder
+        """
+
+        if not os.path.isfile(current_path):
+            raise ValueError(f"{current_path} is not a file.")
+
+        shutil.move(current_path, new_path)
 
     @staticmethod
     def get_coords(path: Path) -> tuple[float, float]:

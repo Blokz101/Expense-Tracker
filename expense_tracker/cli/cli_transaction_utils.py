@@ -35,9 +35,10 @@ class CLI_Transaction_Utils:
         income: bool = False,
     ) -> None:
         """
-        Create a transaction and submit it to the database.
+        Prompt the user for the information needed to create a transaction and submit it to the database.
         """
 
+        # Initialize all fields as none, these will be filled out later
         account_field: Transaction_Field = Transaction_Field(
             "Account",
             None,
@@ -115,7 +116,6 @@ class CLI_Transaction_Utils:
                     )
 
         while True:
-            
             # Declare if all the fields are satisfied
             all_fields_satisfied: bool = (
                 not account_field.field_object == None
@@ -138,7 +138,7 @@ class CLI_Transaction_Utils:
             console.print(description_field, style=description_field.style)
             console.print(merchant_field, style=merchant_field.style)
             console.print(tag_list_field, style=tag_list_field.style)
-            
+
             # Print a commit status
             console.print("\nCommit status: ", end="")
             if all_fields_satisfied:
