@@ -33,7 +33,7 @@ class Transaction(Base):
         nullable=True,
     )
     description: Mapped[str] = mapped_column(
-        unique=True,
+        unique=False,
         nullable=False,
     )
     merchant_id: Mapped[int] = mapped_column(
