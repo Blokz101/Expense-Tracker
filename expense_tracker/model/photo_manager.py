@@ -12,8 +12,6 @@ from datetime import datetime
 
 import shutil
 
-import os
-
 
 class Photo_Manager:
     """
@@ -28,6 +26,9 @@ class Photo_Manager:
 
         if not current_path.is_file():
             raise ValueError(f"'{current_path}' is not a file.")
+        
+        if new_path.exists():
+            raise FileExistsError(f"Destination '{new_path}' already exists.")
 
         if not new_path.parent.exists():
             Path.mkdir(new_path.parent, parents=True, exist_ok=True)
