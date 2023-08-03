@@ -423,7 +423,9 @@ class CLI_Transaction_Utils:
         """
         Get the list of tags from the user
         """
+        
         with Session(engine) as session:
+            session.add_all(selected_list)
             return Print_Utils.input_from_toggle_list(
                 session.query(Tag).all(),
                 lambda x: x.name,
