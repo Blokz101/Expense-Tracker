@@ -11,7 +11,7 @@ from expense_tracker.constants import GeneralConstants
 from pathlib import Path
 
 
-class ConfigManager(ConfigParser):
+class Config_Manager(ConfigParser):
     """
     Handles setting and getting config settings from settings file
     """
@@ -21,7 +21,7 @@ class ConfigManager(ConfigParser):
         Define the class as a singleton.
         """
         if not hasattr(cls, "instance"):
-            cls.instance = super(ConfigManager, cls).__new__(cls)
+            cls.instance = super(Config_Manager, cls).__new__(cls)
 
         return cls.instance
 
