@@ -23,9 +23,13 @@ class Merchant(Base):
         primary_key=True,
         nullable=False,
     )
-    name: Mapped[Optional[str]] = mapped_column(
+    name: Mapped[str] = mapped_column(
         unique=True,
         nullable=False,
+    )
+    naming_rule: Mapped[Optional[str]] = mapped_column(
+        unique=False,
+        nullable=True,
     )
 
     # ORM objects
