@@ -1,14 +1,16 @@
 # expense_tracker/model/photo_coords.py
 
-from typing import Tuple
-
 from exif import Image
+
+from typing import Iterable
 
 import re
 
 from pathlib import Path
 
 from datetime import datetime
+
+from expense_tracker.constants import GeneralConstants
 
 import shutil
 
@@ -17,6 +19,18 @@ class Photo_Manager:
     """
     Functions to manage and interact with photos
     """
+
+    @staticmethod
+    def files_in_directory(dir_path: Path) -> Iterable:
+        """
+        Returns the files in a directory in a generator
+        """
+        for file in dir_path.iterdir():
+            if (
+                file.is_file()
+                and file.suffix in GeneralConstants.SUPPORTED_IMAGE_EXTENSIONS
+            ):
+                yield file
 
     @staticmethod
     def photo_exists_in_archive(photo_name: str, archive_dir: Path) -> bool:
@@ -69,7 +83,7 @@ class Photo_Manager:
             )
 
     @staticmethod
-    def _to_decimal_coords(coords: Tuple[float, float], ref: str):
+    def _to_decimal_coords(coords: tuple[float, float], ref: str):
         """
         Convert coords and ref to decimal degrees format
         """

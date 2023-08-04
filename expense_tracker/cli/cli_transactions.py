@@ -57,42 +57,31 @@ class CLI_Transactions:
         """
 
         # Get the user input
-        user_input: str = Print_Utils.input_rule("Path to photo")
+        user_input: str = Print_Utils.input_rule("Path to photo or folder")
 
         # If the user did not enter a path skip path validation
         if user_input == "":
-            CLI_Transaction_Utils._create_transaction(income=income)
+            CLI_Transaction_Utils.create_transaction(income=income)
             return
 
-        # Clean the user input
+        # Clean the user input and convert to path
         user_input = re.sub("'", "", user_input)
         if user_input[len(user_input) - 1] == " ":
             user_input = user_input[:-1]
+        input_path: Path = Path(user_input)
 
-        # Validate the path
-        photo_path: Optional[Path] = None
-        try:
-            photo_path = Path(user_input)
-        except:
-            Print_Utils.error_message(f"'{photo_path}' is not a valid path.")
-
-        if photo_path and not photo_path.exists():
-            Print_Utils.error_message(f"'{photo_path}' does not exist.")
-            photo_path = None
-
-        if photo_path and not photo_path.is_file():
-            Print_Utils.error_message(f"'{photo_path}' is not a valid photo.")
-            photo_path = None
-
-        # Print a message based on if a photo is being used or not
-        if photo_path:
-            Print_Utils.success_message(
-                f"Importing information from photo at '{photo_path}'."
-            )
-        else:
+        # If the path does not exist continue in manual mode
+        if not input_path.exists():
+            Print_Utils.error_message(f"'{input_path}' does not exist.")
             console.print("Continuing in manual mode.")
+            CLI_Transaction_Utils.create_transaction(income=income)
+            return
 
-        CLI_Transaction_Utils._create_transaction(photo_path=photo_path, income=income)
+        if input_path.is_file():
+            CLI_Transaction_Utils.create_transaction(photo_path=input_path)
+
+        if input_path.is_dir():
+            CLI_Transaction_Utils.create_batch_transactions(input_path)
 
     @app.command()
     def list(

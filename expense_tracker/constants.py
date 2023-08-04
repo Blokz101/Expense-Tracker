@@ -1,8 +1,8 @@
 # expense_tracker/constants.py
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
-from typing import Tuple
+from typing import Literal
 
 from pathlib import Path
 
@@ -24,7 +24,9 @@ class GeneralConstants:
 
     SETTINGS_FILE_NAME: str = "settings.ini"
 
-    SETTINGS_FILE_DEFAULTS: list = (
+    SUPPORTED_IMAGE_EXTENSIONS: tuple[str, ...] = (".png", ".jpg", ".jpeg")
+
+    SETTINGS_FILE_DEFAULTS: tuple[tuple[str, dict[str, str]], ...] = (
         (
             "general",
             {
@@ -40,8 +42,8 @@ class GeneralConstants:
 
 @dataclass
 class Field_Constant:
-    USER_INPUT: Tuple = ("User Input", GeneralConstants.SUCCESS_STYLE)
-    DEFAULT: dict = ("Default", GeneralConstants.WARNING_STYLE)
-    PHOTO: dict = ("Photo", GeneralConstants.SUCCESS_STYLE)
-    MERCHANT: dict = ("Merchant", GeneralConstants.WARNING_STYLE)
-    NONE: dict = ("None", GeneralConstants.ERROR_STYLE)
+    USER_INPUT: tuple = ("User Input", GeneralConstants.SUCCESS_STYLE)
+    DEFAULT: dict[str, str] = ("Default", GeneralConstants.WARNING_STYLE)
+    PHOTO: dict[str, str] = ("Photo", GeneralConstants.SUCCESS_STYLE)
+    MERCHANT: dict[str, str] = ("Merchant", GeneralConstants.WARNING_STYLE)
+    NONE: dict[str, str] = ("None", GeneralConstants.ERROR_STYLE)
