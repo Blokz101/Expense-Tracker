@@ -334,15 +334,18 @@ class CLI_Transaction_Utils:
             return new_transaction
 
     @staticmethod
-    def _get_account_default() -> Account:
+    def _get_account_default() -> Optional[Account]:
         """
         Return the default account specified by the user in the settings
         """
 
         with Session(engine) as session:
-            return session.query(Account).all()[
-                ConfigManager().get_default_account_id()
-            ]
+            try:
+                return session.query(Account).all()[
+                    ConfigManager().get_default_account_id()
+                ]
+            except IndexError:
+                return None
 
     @staticmethod
     def _get_account(default: Optional[Account] = None) -> Account:
