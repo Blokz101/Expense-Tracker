@@ -11,6 +11,8 @@ import copy
 
 import re
 
+import typer
+
 from typing import Optional, List, Any, Tuple
 
 from difflib import SequenceMatcher
@@ -212,6 +214,9 @@ class Print_Utils:
 
         # If there are no options in options list, raise an exception
         if len(options_list) == 0:
+            # ! Bad way of handling this error, fix later
+            Print_Utils.error_message("Unable to select options because there are no options in this list. Please create options.")
+            raise typer.Exit()
             raise ValueError("'options_list' has no options")
 
         user_input: str = first_input
