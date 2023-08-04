@@ -302,6 +302,7 @@ class CLI_Transaction_Utils:
         date: datetime,
         amount: float,
         tag_list: List[Tag],
+        photo_path: Optional[Path] = None
     ) -> Transaction:
         """
         Commit a transaction
@@ -315,6 +316,7 @@ class CLI_Transaction_Utils:
                 merchant_id=merchant.id,
                 date=date,
                 reconciled_status=False,
+                receipt_photo_path=(photo_path.name if photo_path else None),
             )
             session.add(new_transaction)
             session.flush()

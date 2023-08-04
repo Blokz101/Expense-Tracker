@@ -37,6 +37,9 @@ class Photo_Manager:
         """
         Check if the photo already exists in the archive directory
         """
+        
+        if not archive_dir.exists():
+            return False
 
         for file in archive_dir.iterdir():
             if file.is_file() and file.name == photo_name:
