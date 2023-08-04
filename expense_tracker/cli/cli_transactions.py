@@ -61,7 +61,7 @@ class CLI_Transactions:
 
         # If the user did not enter a path skip path validation
         if user_input == "":
-            CLI_Transaction_Utils.create_transaction(income=income)
+            CLI_Transaction_Utils.create_transaction()
             return
 
         # Clean the user input and convert to path
