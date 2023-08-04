@@ -27,13 +27,40 @@ from expense_tracker.cli.transaction_field import Transaction_Field
 
 from datetime import datetime
 
+from pathlib import Path
+
 
 class CLI_Transaction_Utils:
+    """
+    Util functions for the cli_transactions class
+    """
+
     @staticmethod
-    def _create_transaction(
-        photo_path: Optional[Path] = None,
+    def create_batch_transactions(
+        dir_path: Path,
         income: bool = False,
     ) -> None:
+        """
+        Get the photos in a directory and run the create transaction command for each
+        """
+
+        # Get a list of files in the target directory
+        photo_list: list[Path] = list(Photo_Manager.files_in_directory(dir_path))
+
+        # Print out the photos that were found
+        console.print(f"Using photos found in '{dir_path}' for imports:")
+        console.print(
+            "\n".join(
+                [f"{index+1: <5}{photo.name}" for index, photo in enumerate(photo_list)]
+            )
+        )
+        console.print()
+
+        for photo_path in photo_list:
+            CLI_Transaction_Utils.create_transaction(photo_path=photo_path)
+
+    @staticmethod
+    def create_transaction(photo_path: Optional[Path] = None) -> None:
         """
         Prompt the user for the information needed to create a transaction and submit it to the database.
         """
@@ -97,6 +124,10 @@ class CLI_Transaction_Utils:
 
         # Get the defaults that can be filled with the info from the photo
         if photo_path:
+            Print_Utils.success_message(
+                f"Importing information from photo at '{photo_path}'."
+            )
+
             date_field.set_field_object(
                 CLI_Transaction_Utils._get_date_default(photo_path),
                 Field_Constant.PHOTO,
@@ -325,12 +356,15 @@ class CLI_Transaction_Utils:
             )
 
     @staticmethod
-    def _get_date_default(photo_path: Path) -> datetime:
+    def _get_date_default(photo_path: Path) -> Optional[datetime]:
         """
         Get the date default from a given photo
         """
 
-        return Photo_Manager.get_date(photo_path)
+        try:
+            return Photo_Manager.get_date(photo_path)
+        except AttributeError:
+            return None
 
     @staticmethod
     def _get_date(default: Optional[datetime] = None) -> datetime:
@@ -394,8 +428,12 @@ class CLI_Transaction_Utils:
         Get the merchant default from a given photo
         """
 
-        # Get the photo coords and print them
-        photo_coords = Photo_Manager.get_coords(photo_path)
+        # Get the photo coords if possible
+        photo_coords: tuple[float, float]
+        try:
+            photo_coords = Photo_Manager.get_coords(photo_path)
+        except AttributeError:
+            return None
 
         with Session(engine) as session:
             # Find possible locations, if there is one, return it
