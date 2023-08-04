@@ -346,9 +346,11 @@ class Print_Utils:
             else:
                 console.print("\nEnter a path.")
 
-            # Get the user input
+            # Get the user input and clean it
             user_input: str = Print_Utils.input_rule(prompt_message)
             user_input = re.sub("['\"]", "", user_input)
+            if user_input[len(user_input) - 1] == " ":
+                user_input = user_input[:-1]
 
             # Check for special cases
             if default and user_input == "":
