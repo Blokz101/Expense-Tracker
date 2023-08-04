@@ -10,7 +10,7 @@ from pathlib import Path
 
 from datetime import datetime
 
-from expense_tracker.constants import GeneralConstants
+from expense_tracker.constants import Constants
 
 import shutil
 
@@ -28,7 +28,7 @@ class Photo_Manager:
         for file in dir_path.iterdir():
             if (
                 file.is_file()
-                and file.suffix in GeneralConstants.SUPPORTED_IMAGE_EXTENSIONS
+                and file.suffix in Constants.SUPPORTED_IMAGE_EXTENSIONS
             ):
                 yield file
 
@@ -37,7 +37,7 @@ class Photo_Manager:
         """
         Check if the photo already exists in the archive directory
         """
-        
+
         if not archive_dir.exists():
             return False
 

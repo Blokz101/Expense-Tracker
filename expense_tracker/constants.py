@@ -8,19 +8,12 @@ from pathlib import Path
 
 
 @dataclass
-class GeneralConstants:
+class Constants:
     """
     General constants for the program
     """
 
     DATE_FORMAT: str = "%A, %B %-d %Y"
-
-    SELECTED_STYLE: str = "cyan"
-    HIGHLIGHTED_STYLE: str = "purple4"
-    LOWLIGHT_STYLE: str = "bright_black"
-    ERROR_STYLE = "red"
-    SUCCESS_STYLE: str = "green"
-    WARNING_STYLE: str = "dark_goldenrod"
 
     SETTINGS_FILE_NAME: str = "settings.ini"
 
@@ -42,8 +35,8 @@ class GeneralConstants:
 
 @dataclass
 class Field_Constant:
-    USER_INPUT: tuple = ("User Input", GeneralConstants.SUCCESS_STYLE)
-    DEFAULT: dict[str, str] = ("Default", GeneralConstants.WARNING_STYLE)
-    PHOTO: dict[str, str] = ("Photo", GeneralConstants.SUCCESS_STYLE)
-    MERCHANT: dict[str, str] = ("Merchant", GeneralConstants.WARNING_STYLE)
-    NONE: dict[str, str] = ("None", GeneralConstants.ERROR_STYLE)
+    USER_INPUT: tuple = ("User Input", Constants.SUCCESS_STYLE)
+    DEFAULT: dict[str, str] = ("Default", Constants.WARNING_STYLE)
+    PHOTO: dict[str, str] = ("Photo", Constants.SUCCESS_STYLE)
+    MERCHANT: dict[str, str] = ("Merchant", Constants.WARNING_STYLE)
+    NONE: dict[str, str] = ("None", Constants.ERROR_STYLE)

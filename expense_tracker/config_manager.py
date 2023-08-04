@@ -6,7 +6,7 @@ from typing import Optional
 
 from configparser import ConfigParser
 
-from expense_tracker.constants import GeneralConstants
+from expense_tracker.constants import Constants
 
 from pathlib import Path
 
@@ -32,10 +32,10 @@ class Config_Manager(ConfigParser):
 
         super().__init__()
 
-        if not os.path.exists(GeneralConstants.SETTINGS_FILE_NAME):
-            self._create_configs(GeneralConstants.SETTINGS_FILE_DEFAULTS)
+        if not os.path.exists(Constants.SETTINGS_FILE_NAME):
+            self._create_configs(Constants.SETTINGS_FILE_DEFAULTS)
 
-        self.read(GeneralConstants.SETTINGS_FILE_NAME)
+        self.read(Constants.SETTINGS_FILE_NAME)
 
     def _create_configs(self, defaults: list) -> None:
         """
@@ -48,7 +48,7 @@ class Config_Manager(ConfigParser):
         ) in defaults:
             self[section_name] = section_defaults
 
-        self.write(open(GeneralConstants.SETTINGS_FILE_NAME, "w"))
+        self.write(open(Constants.SETTINGS_FILE_NAME, "w"))
 
     def get_database_path(self) -> Path:
         return Path(self.get("general", "database_path"))
