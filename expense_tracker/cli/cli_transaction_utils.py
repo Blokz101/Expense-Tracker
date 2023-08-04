@@ -269,6 +269,7 @@ class CLI_Transaction_Utils:
             date_field.field_object,
             amount_field.field_object,
             tag_list_field.field_object,
+            photo_path=photo_path,
         )
         Print_Utils.success_message("Created transaction.")
 
