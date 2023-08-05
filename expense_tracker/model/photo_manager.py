@@ -26,10 +26,7 @@ class Photo_Manager:
         Returns the files in a directory in a generator
         """
         for file in dir_path.iterdir():
-            if (
-                file.is_file()
-                and file.suffix in Constants.SUPPORTED_IMAGE_EXTENSIONS
-            ):
+            if file.is_file() and file.suffix in Constants.SUPPORTED_IMAGE_EXTENSIONS:
                 yield file
 
     @staticmethod
