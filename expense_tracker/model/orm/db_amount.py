@@ -2,8 +2,8 @@
 
 from typing import List
 
-from expense_tracker.orm import Base
-from expense_tracker.orm.branch_table import Branch_Table
+from expense_tracker.model.orm import Base
+from expense_tracker.model.orm.branch_table import Branch_Table
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped
