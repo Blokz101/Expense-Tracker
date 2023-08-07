@@ -2,11 +2,12 @@
 
 from expense_tracker import __app_name__
 
-from expense_tracker.view_controller.exptrack_app import Exptrack_App
+from expense_tracker.view.exptrack_app import Exptrack_App
 
 
 def main() -> None:
-    Exptrack_App().run()
+    app: Exptrack_App = Exptrack_App()
+    app.run()
 
 
 if __name__ == "__main__":

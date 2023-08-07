@@ -15,7 +15,9 @@ class Constants:
 
     DATE_FORMAT: str = "%A, %B %-d %Y"
 
-    SETTINGS_FILE_NAME: str = "settings.ini"
+    SETTINGS_FILE_PATH: str = "settings.ini"
+
+    CSS_FILE_PATH: str = "stylesheet.css"
 
     SUPPORTED_IMAGE_EXTENSIONS: tuple[str, ...] = (".png", ".jpg", ".jpeg")
 
@@ -31,12 +33,3 @@ class Constants:
             },
         ),
     )
-
-
-@dataclass
-class Field_Constant:
-    USER_INPUT: tuple = ("User Input", Constants.SUCCESS_STYLE)
-    DEFAULT: dict[str, str] = ("Default", Constants.WARNING_STYLE)
-    PHOTO: dict[str, str] = ("Photo", Constants.SUCCESS_STYLE)
-    MERCHANT: dict[str, str] = ("Merchant", Constants.WARNING_STYLE)
-    NONE: dict[str, str] = ("None", Constants.ERROR_STYLE)

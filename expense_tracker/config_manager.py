@@ -32,10 +32,10 @@ class Config_Manager(ConfigParser):
 
         super().__init__()
 
-        if not os.path.exists(Constants.SETTINGS_FILE_NAME):
+        if not os.path.exists(Constants.SETTINGS_FILE_PATH):
             self._create_configs(Constants.SETTINGS_FILE_DEFAULTS)
 
-        self.read(Constants.SETTINGS_FILE_NAME)
+        self.read(Constants.SETTINGS_FILE_PATH)
 
     def _create_configs(self, defaults: list) -> None:
         """
@@ -48,7 +48,7 @@ class Config_Manager(ConfigParser):
         ) in defaults:
             self[section_name] = section_defaults
 
-        self.write(open(Constants.SETTINGS_FILE_NAME, "w"))
+        self.write(open(Constants.SETTINGS_FILE_PATH, "w"))
 
     def get_database_path(self) -> Path:
         return Path(self.get("general", "database_path"))
