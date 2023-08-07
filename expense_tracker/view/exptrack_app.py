@@ -68,10 +68,7 @@ class Exptrack_App(App):
     def on_exptrack_data_table_edit_request(
         self, message: Exptrack_Data_Table.Edit_Request
     ) -> None:
-        def check_quit(new_value: str) -> None:
+        def check_input(new_value: str) -> None:
             print(new_value)
 
-        self.push_screen(message.popup, check_quit)
-        print(
-            f"GOT IT!!\nid: {message.id}\ncolumn: {message.column_name}\npopup: {message.popup}"
-        )
+        self.push_screen(message.popup, check_input)
