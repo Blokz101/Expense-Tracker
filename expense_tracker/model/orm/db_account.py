@@ -1,4 +1,4 @@
-# expense_tracker/orm/account.py
+# expense_tracker/orm/db_account.py
 
 from typing import Optional, List
 
@@ -9,7 +9,7 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import relationship, mapped_column
 
 
-class Account(Base):
+class DB_Account(Base):
     """
     SQLAlchemy accounts table
 

@@ -1,4 +1,4 @@
-# expense_tracker/orm/budget.py
+# expense_tracker/orm/db_budget.py
 
 from typing import Optional, List
 
@@ -9,7 +9,7 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import relationship, mapped_column
 
 
-class Budget(Base):
+class DB_Budget(Base):
     """
     SQLAlchemy budgets table
 

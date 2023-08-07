@@ -1,4 +1,4 @@
-# expense_tracker/orm/location.py
+# expense_tracker/orm/db_location.py
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from typing import List, Tuple, Optional
 from geopy.distance import geodesic
 
 
-class Merchant_Location(Base):
+class DB_Merchant_Location(Base):
     """
     SQLAlchemy merchant_locations table
 
@@ -56,9 +56,9 @@ class Merchant_Location(Base):
     @staticmethod
     def possible_location(
         target_coord: Tuple[float, float],
-        locations_list: List[Merchant_Location],
+        locations_list: List[DB_Merchant_Location],
         same_location__mile_radius: float,
-    ) -> Optional[Merchant_Location]:
+    ) -> Optional[DB_Merchant_Location]:
         """
         Check if a location is close enough, to any coordinate in a provided list, to be the same location. If so return the closest location.
         """

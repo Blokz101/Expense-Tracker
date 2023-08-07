@@ -1,4 +1,4 @@
-# expense_tracker/orm/amount.py
+# expense_tracker/orm/db_amount.py
 
 from typing import List
 
@@ -10,7 +10,7 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import relationship, mapped_column
 
 
-class Amount(Base):
+class DB_Amount(Base):
     """
     SQLAlchemy amounts table
 

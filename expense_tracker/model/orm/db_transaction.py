@@ -1,4 +1,4 @@
-# expense_tracker/orm/transaction.py
+# expense_tracker/orm/db_transaction.py
 
 from datetime import datetime
 
@@ -11,7 +11,7 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import relationship, mapped_column
 
 
-class Transaction(Base):
+class DB_Transaction(Base):
     """
     SQLAlchemy transactions table
     """

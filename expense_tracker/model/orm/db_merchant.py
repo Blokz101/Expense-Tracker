@@ -1,4 +1,4 @@
-# expense_tracker/orm/merchant.py
+# expense_tracker/orm/db_merchant.py
 
 from typing import Optional, List
 
@@ -9,7 +9,7 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import relationship, mapped_column
 
 
-class Merchant(Base):
+class DB_Merchant(Base):
     """
     SQLAlchemy merchants table
 

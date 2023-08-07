@@ -1,4 +1,4 @@
-# expense_tracker/orm/tag.py
+# expense_tracker/orm/db_tag.py
 
 from typing import Optional, List
 
@@ -9,7 +9,7 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import relationship, mapped_column
 
 
-class Tag(Base):
+class DB_Tag(Base):
     """
     SQLAlchemy tags table
 
