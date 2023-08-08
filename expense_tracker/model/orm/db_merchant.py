@@ -33,13 +33,13 @@ class DB_Merchant(Base):
     )
 
     # ORM objects
-    transactions: Mapped[List["Transaction"]] = relationship(
+    transactions: Mapped[List["DB_Transaction"]] = relationship(
         back_populates="merchant",
     )
-    merchant_locations: Mapped[List["Merchant_Location"]] = relationship(
+    merchant_locations: Mapped[List["DB_Merchant_Location"]] = relationship(
         back_populates="merchant",
     )
-    default_tags: Mapped[List["Tag"]] = relationship(
+    default_tags: Mapped[List["DB_Tag"]] = relationship(
         secondary=Branch_Table.merchant_tag_default,
         back_populates="default_merchants",
     )

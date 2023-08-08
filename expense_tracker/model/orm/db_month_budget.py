@@ -39,6 +39,6 @@ class DB_Month_Budget(Base):
     )
 
     # ORM objects
-    budget: Mapped["Budget"] = relationship(
+    budget: Mapped["DB_Budget"] = relationship(
         back_populates="month_budgets",
     )

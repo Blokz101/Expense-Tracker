@@ -60,18 +60,18 @@ class DB_Transaction(Base):
     )
 
     # ORM objects
-    merchant: Mapped["Merchant"] = relationship(
+    merchant: Mapped["DB_Merchant"] = relationship(
         back_populates="transactions",
     )
-    amounts: Mapped[List["Amount"]] = relationship(
+    amounts: Mapped[List["DB_Amount"]] = relationship(
         back_populates="transaction",
         cascade="all, delete-orphan",
     )
-    account: Mapped["Account"] = relationship(
+    account: Mapped["DB_Account"] = relationship(
         back_populates="transactions",
         foreign_keys=[account_id],
     )
-    transfer_account: Mapped["Account"] = relationship(
+    transfer_account: Mapped["DB_Account"] = relationship(
         back_populates="transfer_transactions",
         foreign_keys=[transfer_account_id],
     )

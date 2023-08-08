@@ -37,10 +37,10 @@ class DB_Amount(Base):
     )
 
     # ORM objects
-    transaction: Mapped["Transaction"] = relationship(
+    transaction: Mapped["DB_Transaction"] = relationship(
         back_populates="amounts",
     )
-    tags: Mapped[List["Tag"]] = relationship(
+    tags: Mapped[List["DB_Tag"]] = relationship(
         secondary=Branch_Table.amount_tag,
         back_populates="amounts",
     )

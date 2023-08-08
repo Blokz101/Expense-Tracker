@@ -38,15 +38,15 @@ class DB_Account(Base):
     )
 
     # ORM objects
-    transactions: Mapped[List["Transaction"]] = relationship(
+    transactions: Mapped[List["DB_Transaction"]] = relationship(
         back_populates="account",
-        foreign_keys="Transaction.account_id",
+        foreign_keys="DB_Transaction.account_id",
     )
-    transfer_transactions: Mapped[List["Transaction"]] = relationship(
-        foreign_keys="Transaction.transfer_account_id",
+    transfer_transactions: Mapped[List["DB_Transaction"]] = relationship(
+        foreign_keys="DB_Transaction.transfer_account_id",
         back_populates="transfer_account",
     )
-    budgets: Mapped[List["Budget"]] = relationship(
+    budgets: Mapped[List["DB_Budget"]] = relationship(
         secondary=Branch_Table.budget_account,
         back_populates="accounts",
     )

@@ -42,7 +42,7 @@ class DB_Merchant_Location(Base):
     )
 
     # ORM objects
-    merchant: Mapped["Merchant"] = relationship(
+    merchant: Mapped["DB_Merchant"] = relationship(
         back_populates="merchant_locations",
     )
 

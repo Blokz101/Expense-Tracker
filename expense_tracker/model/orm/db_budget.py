@@ -35,14 +35,14 @@ class DB_Budget(Base):
     )
 
     # ORM objects
-    month_budgets: Mapped[List["Month_Budget"]] = relationship(
+    month_budgets: Mapped[List["DB_Month_Budget"]] = relationship(
         back_populates="budget",
     )
-    accounts: Mapped[List["Account"]] = relationship(
+    accounts: Mapped[List["DB_Account"]] = relationship(
         secondary=Branch_Table.budget_account,
         back_populates="budgets",
     )
-    tags: Mapped[List["Tag"]] = relationship(
+    tags: Mapped[List["DB_Tag"]] = relationship(
         secondary=Branch_Table.budget_tag,
         back_populates="budgets",
     )

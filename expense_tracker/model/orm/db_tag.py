@@ -29,15 +29,15 @@ class DB_Tag(Base):
     )
 
     # ORM objects
-    amounts: Mapped[List["Amount"]] = relationship(
+    amounts: Mapped[List["DB_Amount"]] = relationship(
         secondary=Branch_Table.amount_tag,
         back_populates="tags",
     )
-    default_merchants: Mapped[List["Merchant"]] = relationship(
+    default_merchants: Mapped[List["DB_Merchant"]] = relationship(
         secondary=Branch_Table.merchant_tag_default,
         back_populates="default_tags",
     )
-    budgets: Mapped[List["Budget"]] = relationship(
+    budgets: Mapped[List["DB_Budget"]] = relationship(
         secondary=Branch_Table.budget_tag,
         back_populates="tags",
     )
