@@ -9,6 +9,7 @@ from textual.widgets import DataTable
 from textual.widgets._data_table import CellKey
 from textual.events import Click
 from textual.screen import ModalScreen
+from textual.widgets._data_table import RowKey, ColumnKey
 
 
 class Exptrack_Data_Table(DataTable):
@@ -17,44 +18,38 @@ class Exptrack_Data_Table(DataTable):
     """
 
     class Column_Info(NamedTuple):
-        variable_name: str
         display_name: str
+        column_variable: int
         input_popup_factory: Any
-
-    class Table_Info(NamedTuple):
-        table_name: str
-        display_name: str
 
     class Edit_Request(Message):
         """
-        TODO Fill this in
+        Message to request a database edit
         """
 
         def __init__(
-            self, table_name: str, id: int, column_name: str, popup: ModalScreen
+            self,
+            sender: DataTable,
+            row_key: RowKey,
+            column_key: ColumnKey,
+            popup: ModalScreen,
         ) -> None:
-            self.table_name: str = table_name
-            self.id: int = id
-            self.column_name: str = column_name
+            self.sender: str = sender
+            self.row_key: RowKey = row_key
+            self.column_key: ColumnKey = column_key
             self.popup: ModalScreen = popup
             super().__init__()
 
     def __init__(
         self,
         column_info_list: list[Column_Info],
-        table_name: Table_Info,
         detailed_data_popup_factory=None,
     ) -> None:
-        """
-        TODO Fill this out
-        """
-        super().__init__(show_cursor=False, zebra_stripes=True)
-
         # Set the instance variables
         self.detailed_data_popup_factory = detailed_data_popup_factory
-        self.table_name: str = table_name[0]
-        self.display_table_name: str = table_name[1]
         self.column_info_list: list[Exptrack_Data_Table.Column_Info] = column_info_list
+
+        super().__init__(show_cursor=False, zebra_stripes=True)
 
     def on_mount(self) -> None:
         super().on_mount()
@@ -62,7 +57,7 @@ class Exptrack_Data_Table(DataTable):
         # Add an id column
         self.add_column("id", key="id")
         for info in self.column_info_list:
-            self.add_column(info[1], key=info[0])
+            self.add_column(info.display_name, key=info.column_variable)
 
     def on_click(self, event: Click) -> None:
         """
@@ -78,16 +73,24 @@ class Exptrack_Data_Table(DataTable):
         row_index: int = meta["row"]
         column_index: int = meta["column"]
 
+        # If the cell does not exist then return
+        if row_index == -1:
+            return
+
         # Get the data id and database column id
         key: CellKey = self.coordinate_to_cell_key(Coordinate(row_index, column_index))
-        id: int = int(key.row_key.value)
-        column_name: str = key.column_key.value
+        row_key: RowKey = key.row_key
+        column_key: ColumnKey = key.column_key
 
         # Get the popup factory from column info list by id and column name
         popup_factory: Any = None
         try:
             popup_factory = next(
-                (info[2] for info in self.column_info_list if info[0] == column_name)
+                (
+                    info.input_popup_factory
+                    for info in self.column_info_list
+                    if info.column_variable == column_key.value
+                )
             )
         except:
             pass
@@ -95,5 +98,5 @@ class Exptrack_Data_Table(DataTable):
         # If there is a popup factory then mount its popup
         if popup_factory:
             self.post_message(
-                self.Edit_Request(self.table_name, id, column_name, popup_factory())
+                self.Edit_Request(self, row_key, column_key, popup_factory())
             )
