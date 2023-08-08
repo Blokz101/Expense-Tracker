@@ -27,6 +27,10 @@ class DB_Tag(Base):
         unique=True,
         nullable=False,
     )
+    instance_tag: Mapped[bool] = mapped_column(
+        unique=False,
+        nullable=False,
+    )
 
     # ORM objects
     amounts: Mapped[List["DB_Amount"]] = relationship(
