@@ -41,10 +41,10 @@ class Exptrack_App(App):
             """
             TODO Fill this in
             """
-            
+
             if not new_value:
                 return
-            
+
             updated_value: str = Transaction.set_value(
                 int(message.row_key.value), message.column_key.value, new_value
             )

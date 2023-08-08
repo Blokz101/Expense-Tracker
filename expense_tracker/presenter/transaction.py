@@ -64,7 +64,7 @@ class Transaction:
         """
         TODO Fill this in
         """
-        
+
         if new_value == None:
             raise TypeError("new_value must have a value")
 

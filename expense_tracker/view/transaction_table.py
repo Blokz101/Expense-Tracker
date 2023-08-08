@@ -1,11 +1,13 @@
 # expense_tracker/view/transaction_table.py
 
 from enum import Enum
+from typing import Optional
 
 from textual.validation import Number
 
 from expense_tracker.view.exptrack_data_table import Exptrack_Data_Table
 from expense_tracker.view.text_input_popup import Text_Input_Popup
+from expense_tracker.view.options_input_popup import Options_Input_Popup
 
 from expense_tracker.presenter.transaction import Transaction
 
@@ -26,7 +28,9 @@ class Transaction_Table(Exptrack_Data_Table):
                 Text_Input_Popup,
             ),
             Exptrack_Data_Table.Column_Info(
-                "Merchant", Transaction.Column.MERCHANT, None
+                "Merchant",
+                Transaction.Column.MERCHANT,
+                Options_Input_Popup,
             ),
             Exptrack_Data_Table.Column_Info("Date", Transaction.Column.DATE, None),
             Exptrack_Data_Table.Column_Info("Tags", Transaction.Column.TAGS, None),
