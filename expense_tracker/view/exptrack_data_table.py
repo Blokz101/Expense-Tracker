@@ -20,7 +20,7 @@ class Exptrack_Data_Table(DataTable):
     class Column_Info(NamedTuple):
         display_name: str
         column_variable: int
-        input_popup_factory: Any
+        popup: any
 
     class Edit_Request(Message):
         """
@@ -33,22 +33,17 @@ class Exptrack_Data_Table(DataTable):
             row_key: RowKey,
             column_key: ColumnKey,
             popup: ModalScreen,
+            args: Optional[list[any]] = None,
         ) -> None:
             self.sender: str = sender
             self.row_key: RowKey = row_key
             self.column_key: ColumnKey = column_key
             self.popup: ModalScreen = popup
+            self.args: Optional[list[any]] = args
             super().__init__()
 
-    def __init__(
-        self,
-        column_info_list: list[Column_Info],
-        detailed_data_popup_factory=None,
-    ) -> None:
-        # Set the instance variables
-        self.detailed_data_popup_factory = detailed_data_popup_factory
+    def __init__(self, column_info_list: list[Column_Info]) -> None:
         self.column_info_list: list[Exptrack_Data_Table.Column_Info] = column_info_list
-
         super().__init__(show_cursor=False, zebra_stripes=True)
 
     def on_mount(self) -> None:
@@ -83,11 +78,11 @@ class Exptrack_Data_Table(DataTable):
         column_key: ColumnKey = key.column_key
 
         # Get the popup factory from column info list by id and column name
-        popup_factory: Any = None
+        popup: Any = None
         try:
-            popup_factory = next(
+            popup = next(
                 (
-                    info.input_popup_factory
+                    info.popup
                     for info in self.column_info_list
                     if info.column_variable == column_key.value
                 )
@@ -96,7 +91,19 @@ class Exptrack_Data_Table(DataTable):
             pass
 
         # If there is a popup factory then mount its popup
-        if popup_factory:
+        if popup:
             self.post_message(
-                self.Edit_Request(self, row_key, column_key, popup_factory())
+                self.Edit_Request(
+                    self,
+                    row_key,
+                    column_key,
+                    popup,
+                    self.request_popup_args(column_key.value),
+                )
             )
+
+    def request_popup_args(self, popup_type: any) -> Optional[list[any]]:
+        """
+        TODO Fill this in
+        """
+        return None

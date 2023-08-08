@@ -47,7 +47,6 @@ class Text_Input_Popup(ModalScreen[Optional[str]]):
     def __init__(
         self,
         instructions: str = "Enter a value",
-        placeholder: str = "",
         validators: list[Validator] = [],
         default: Optional[str] = None,
         name: Optional[str] = None,
@@ -55,7 +54,6 @@ class Text_Input_Popup(ModalScreen[Optional[str]]):
         classes: Optional[str] = None,
     ) -> None:
         self._instructions_text: str = instructions
-        self._placeholder: str = placeholder
         self._default: Optional[str] = default
         self._validators = validators
         super().__init__(name, id, classes)
@@ -64,9 +62,7 @@ class Text_Input_Popup(ModalScreen[Optional[str]]):
         self._container: Vertical = Vertical()
         self._instructions_widget: Static = Static(self._instructions_text)
         self._validation_status_widget: Static = Static(id="validation_status")
-        self._input_widget: Input = Input(
-            placeholder=self._placeholder, validators=self._validators
-        )
+        self._input_widget: Input = Input(validators=self._validators)
 
         with self._container:
             yield self._instructions_widget

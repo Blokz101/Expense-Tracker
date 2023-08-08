@@ -23,7 +23,7 @@ class Transaction_Table(Exptrack_Data_Table):
             Exptrack_Data_Table.Column_Info(
                 "Description",
                 Transaction.Column.DESCRIPTION,
-                lambda: Text_Input_Popup("Input a description"),
+                Text_Input_Popup,
             ),
             Exptrack_Data_Table.Column_Info(
                 "Merchant", Transaction.Column.MERCHANT, None
@@ -33,10 +33,34 @@ class Transaction_Table(Exptrack_Data_Table):
             Exptrack_Data_Table.Column_Info(
                 "Amount",
                 Transaction.Column.AMOUNT,
-                lambda: Text_Input_Popup(
-                    "Input an expense amount",
-                    validators=Number(failure_description="Input must be a float"),
-                ),
+                Text_Input_Popup,
             ),
         ]
         super().__init__(column_info_list)
+
+    def request_popup_args(self, popup_column: any) -> Optional[list[any]]:
+        """
+        TODO Fill this in
+        """
+
+        if popup_column == Transaction.Column.DESCRIPTION:
+            return ["Input a description"]
+
+        if popup_column == Transaction.Column.AMOUNT:
+            return [
+                "Input an expense amount",
+                Number(failure_description="Input must be a float"),
+            ]
+
+        if popup_column == Transaction.Column.MERCHANT:
+            # !TESTING THING
+            return [
+                [
+                    Options_Input_Popup.Option("testing", 1),
+                    Options_Input_Popup.Option("helloing", 2),
+                    Options_Input_Popup.Option("can you see me", 3),
+                ],
+                "Select a merchant",
+            ]
+
+        return super().request_popup_args(popup_column)

@@ -51,32 +51,37 @@ class Transaction:
                         entry.merchant.name,
                         datetime.strftime(entry.date, Constants.DATE_FORMAT),
                         ", ".join(tag.name for tag in entry.amounts[0].tags),
-                        entry.amounts[0].amount,    # TODO Edit this to support multiple amounts
+                        entry.amounts[
+                            0
+                        ].amount,  # TODO Edit this to support multiple amounts
                     )
                 )
 
         return display_list
 
     @staticmethod
-    def set_value(id: int, column: Column, new_value: any) -> None:
+    def set_value(id: int, column: Column, new_value: any) -> any:
         """
         TODO Fill this in
         """
+        
+        if new_value == None:
+            raise TypeError("new_value must have a value")
 
         with Session(engine) as session:
             transaction: DB_Transaction = (
                 session.query(DB_Transaction).where(DB_Transaction.id == id).first()
             )
-            
+
             if column == Transaction.Column.DESCRIPTION:
                 transaction.description = new_value
                 session.commit()
                 return transaction.description
-            
+
             # TODO Edit this to support multiple amounts
             if column == Transaction.Column.AMOUNT:
                 transaction.amounts[0].amount = new_value
                 session.commit()
                 return transaction.amounts[0].amount
-        
+
         raise ValueError(f"Column '{column}' does not match any database columns")
