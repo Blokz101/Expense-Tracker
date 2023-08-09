@@ -3,12 +3,14 @@
 from enum import Enum
 from typing import Optional
 
-from textual.validation import Number
+from textual.validation import Number, Regex
 
 from expense_tracker.view.exptrack_data_table import Exptrack_Data_Table
 from expense_tracker.view.text_input_popup import Text_Input_Popup
 from expense_tracker.view.options_input_popup import Options_Input_Popup
 from expense_tracker.view.selector import Selector
+
+from expense_tracker.constants import Constants
 
 from expense_tracker.presenter.transaction import Transaction
 from expense_tracker.presenter.merchant import Merchant
@@ -34,7 +36,11 @@ class Transaction_Table(Exptrack_Data_Table):
                 Transaction.Column.MERCHANT,
                 Options_Input_Popup,
             ),
-            Exptrack_Data_Table.Column_Info("Date", Transaction.Column.DATE, None),
+            Exptrack_Data_Table.Column_Info(
+                "Date",
+                Transaction.Column.DATE,
+                Text_Input_Popup,
+            ),
             Exptrack_Data_Table.Column_Info("Tags", Transaction.Column.TAGS, None),
             Exptrack_Data_Table.Column_Info(
                 "Amount",
@@ -51,6 +57,15 @@ class Transaction_Table(Exptrack_Data_Table):
 
         if popup_column == Transaction.Column.DESCRIPTION:
             return ["Input a description"]
+
+        if popup_column == Transaction.Column.DATE:
+            return [
+                "Input a date",
+                Regex(
+                    Constants.DATE_REGEX,
+                    failure_description="Input must match mm/dd/yyyy format",
+                ),
+            ]
 
         if popup_column == Transaction.Column.AMOUNT:
             return [

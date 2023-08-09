@@ -6,6 +6,8 @@ from datetime import datetime
 
 from enum import Enum
 
+from datetime import datetime
+
 from expense_tracker.constants import Constants
 
 from expense_tracker.model.orm import engine
@@ -83,6 +85,15 @@ class Transaction:
                 transaction.merchant = new_merchant
                 session.commit()
                 return transaction.merchant.name
+
+            # new_value will be a str
+            if column == Transaction.Column.DATE:
+                new_date: datetime = datetime.strptime(
+                    new_value, Constants.DATE_STRPTIME
+                )
+                transaction.date = new_date
+                session.commit()
+                return transaction.date.strftime(Constants.DATE_FORMAT)
 
             # new_value will be a str
             if column == Transaction.Column.DESCRIPTION:
