@@ -10,7 +10,7 @@ from expense_tracker.view.selector import Selector
 from typing import Optional, NamedTuple
 
 
-class Options_Input_Popup(ModalScreen[Optional[str]]):
+class Options_Input_Popup(ModalScreen[Optional[int]]):
     """
     Popup that prompts the user to select an option from many
     """
@@ -23,20 +23,16 @@ class Options_Input_Popup(ModalScreen[Optional[str]]):
         ("escape", "exit_popup", "Dismiss popup"),
     ]
 
-    class Option(NamedTuple):
-        display_name: str
-        option_id: int
-
     def __init__(
         self,
-        option_list: list[Option] = [],
+        option_list: list[Selector.Option] = [],
         instructions: str = "Enter a value",
         default: Optional[str] = None,
         name: Optional[str] = None,
         id: Optional[str] = None,
         classes: Optional[str] = None,
     ) -> None:
-        self._option_list: list[Options_Input_Popup.Option] = option_list
+        self._option_list: list[Selector.Option] = option_list
         self._instructions_text: str = instructions
         self._default: Optional[str] = default
         super().__init__(name, id, classes)
@@ -58,3 +54,10 @@ class Options_Input_Popup(ModalScreen[Optional[str]]):
         """
 
         self.dismiss(None)
+
+    def on_selector_submitted(self, event: Selector.Submitted) -> None:
+        """
+        TODO Fill this in
+        """
+
+        self.dismiss(event.option_id)

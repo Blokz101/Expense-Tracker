@@ -39,7 +39,7 @@ class Transaction:
         TODO Fill this in
         """
 
-        display_list: list[tuple[str, ...]] = []
+        display_list: list[tuple[int, ...]] = []
 
         with Session(engine) as session:
             for entry in session.query(DB_Transaction).all():
@@ -73,15 +73,28 @@ class Transaction:
                 session.query(DB_Transaction).where(DB_Transaction.id == id).first()
             )
 
+            # new_value will be an int representing the id of the new merchant
+            if column == Transaction.Column.MERCHANT:
+                new_merchant: DB_Merchant = (
+                    session.query(DB_Merchant)
+                    .where(DB_Merchant.id == new_value)
+                    .first()
+                )
+                transaction.merchant = new_merchant
+                session.commit()
+                return transaction.merchant.name
+
+            # new_value will be a str
             if column == Transaction.Column.DESCRIPTION:
                 transaction.description = new_value
                 session.commit()
                 return transaction.description
 
+            # new_value will be a str
             # TODO Edit this to support multiple amounts
             if column == Transaction.Column.AMOUNT:
-                transaction.amounts[0].amount = new_value
+                transaction.amounts[0].amount = float(new_value)
                 session.commit()
                 return transaction.amounts[0].amount
 
-        raise ValueError(f"Column '{column}' does not match any database columns")
+        raise ValueError(f"Unable to handel an edit of database column '{column}'.")

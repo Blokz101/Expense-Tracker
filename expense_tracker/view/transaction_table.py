@@ -8,8 +8,10 @@ from textual.validation import Number
 from expense_tracker.view.exptrack_data_table import Exptrack_Data_Table
 from expense_tracker.view.text_input_popup import Text_Input_Popup
 from expense_tracker.view.options_input_popup import Options_Input_Popup
+from expense_tracker.view.selector import Selector
 
 from expense_tracker.presenter.transaction import Transaction
+from expense_tracker.presenter.merchant import Merchant
 
 
 class Transaction_Table(Exptrack_Data_Table):
@@ -57,13 +59,11 @@ class Transaction_Table(Exptrack_Data_Table):
             ]
 
         if popup_column == Transaction.Column.MERCHANT:
-            # !TESTING THING
             return [
-                [
-                    Options_Input_Popup.Option("testing", 1),
-                    Options_Input_Popup.Option("helloing", 2),
-                    Options_Input_Popup.Option("can you see me", 3),
-                ],
+                list(
+                    Selector.Option(merchant[1], merchant[0])
+                    for merchant in Merchant.get_display_list()
+                ),
                 "Select a merchant",
             ]
 
