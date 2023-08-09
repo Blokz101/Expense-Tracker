@@ -16,7 +16,20 @@ class Options_Input_Popup(ModalScreen[Optional[int]]):
     """
 
     DEFAULT_CSS: str = """
-        
+        Options_Input_Popup {
+            align: center middle;
+        }
+
+        Options_Input_Popup > Vertical {
+            width: 60;
+            height: auto;
+            background: $surface;
+            padding: 1;
+        }
+
+        Options_Input_Popup > Vertical > Selector {
+            margin-top: 1;
+        }
     """
 
     BINDINGS: list[tuple[str, str, str]] = [
@@ -57,7 +70,8 @@ class Options_Input_Popup(ModalScreen[Optional[int]]):
 
     def on_selector_submitted(self, event: Selector.Submitted) -> None:
         """
-        TODO Fill this in
-        """
+        Called when the selector is submitted.
 
+        Dismisses popup and returns the id of the chosen option.
+        """
         self.dismiss(event.option_id)

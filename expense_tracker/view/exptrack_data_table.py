@@ -102,8 +102,10 @@ class Exptrack_Data_Table(DataTable):
                 )
             )
 
-    def request_popup_args(self, popup_type: any) -> Optional[list[any]]:
+    def request_popup_args(self, popup_column: any) -> Optional[list[any]]:
         """
-        TODO Fill this in
+        To be implemented by classes that extend this one.
+
+        Returns the arguments that are required to deal with different popup columns.
         """
         return None

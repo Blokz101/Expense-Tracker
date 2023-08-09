@@ -39,7 +39,7 @@ class Exptrack_App(App):
 
         def check_input(new_value: Optional[str]) -> None:
             """
-            TODO Fill this in
+            Updates the database and the view with the new value
             """
 
             if not new_value:

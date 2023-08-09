@@ -21,7 +21,7 @@ from expense_tracker.model.orm.db_month_budget import DB_Month_Budget
 
 class Merchant:
     """
-    TODO Fill this in later
+    Merchant presenter
     """
 
     class Column(Enum):
@@ -30,9 +30,9 @@ class Merchant:
         NAMING_RULE: int = 2
 
     @staticmethod
-    def get_display_list() -> list:
+    def get_display_list() -> list[tuple[int, ...]]:
         """
-        TODO Fill this in
+        Returns a list of all merchants as a list of tuples of strings
         """
 
         display_list: list[tuple[int, ...]] = []

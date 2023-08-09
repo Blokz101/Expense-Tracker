@@ -21,7 +21,7 @@ from expense_tracker.model.orm.db_month_budget import DB_Month_Budget
 
 class Transaction:
     """
-    TODO Fill this in later
+    Transaction presenter
     """
 
     class Column(Enum):
@@ -34,9 +34,9 @@ class Transaction:
         TAGS: int = 6
 
     @staticmethod
-    def get_display_list() -> list:
+    def get_display_list() -> list[tuple[int, ...]]:
         """
-        TODO Fill this in
+        Returns a list of all transactions as a list of tuples of strings
         """
 
         display_list: list[tuple[int, ...]] = []
@@ -62,7 +62,7 @@ class Transaction:
     @staticmethod
     def set_value(id: int, column: Column, new_value: any) -> any:
         """
-        TODO Fill this in
+        Updates a cell in the database.
         """
 
         if new_value == None:

@@ -53,12 +53,18 @@ class Text_Input_Popup(ModalScreen[Optional[str]]):
         id: Optional[str] = None,
         classes: Optional[str] = None,
     ) -> None:
+        """
+        Constructor
+        """
         self._instructions_text: str = instructions
         self._default: Optional[str] = default
         self._validators = validators
         super().__init__(name, id, classes)
 
     def compose(self) -> ComposeResult:
+        """
+        Composes the display
+        """
         self._container: Vertical = Vertical()
         self._instructions_widget: Static = Static(self._instructions_text)
         self._validation_status_widget: Static = Static(id="validation_status")

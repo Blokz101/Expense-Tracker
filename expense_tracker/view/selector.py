@@ -5,8 +5,9 @@ from __future__ import annotations
 from textual.app import ComposeResult
 from textual.widget import Widget
 from textual.geometry import Size
-from textual.widgets import Input, ListView, ListItem, Static, OptionList
-from textual.widgets.option_list import Option, Separator
+from textual.widgets import Input, OptionList
+from textual.widgets.option_list import Option as ListOption
+from textual.widgets.option_list import Separator
 from textual.containers import Vertical
 from textual.message import Message
 
@@ -21,7 +22,21 @@ from expense_tracker.config_manager import Config_Manager
 
 class Selector(Widget):
     """
-    TODO Fill this in
+    Select an option from a list of options
+    """
+
+    DEFAULT_CSS: str = """
+        Selector {
+            height: auto;
+        }
+
+        Selector > Vertical {
+            height: auto;
+        }
+
+        Selector > Vertical > OptionList {
+            height: 7;
+        }
     """
 
     class Option(NamedTuple):
@@ -30,91 +45,77 @@ class Selector(Widget):
 
     class Submitted(Message):
         """
-        TODO Fill this in
+        Message to indicate that the selector was submitted and to contain the id of the selected option.
         """
 
-        def __init__(self, option: Selector.Option) -> None:
-            self.display_name = option.display_name
-            self.option_id = option.option_id
+        def __init__(self, option_id: int) -> None:
+            self.option_id = option_id
             super().__init__()
 
     def __init__(
         self,
-        option_list: list[tuple[str, int]] = [],
+        option_list: list[Option] = [],
         name: Optional[str] = None,
         id: Optional[str] = None,
         classes: Optional[str] = None,
     ) -> None:
-        self._option_list: list[tuple[str, int]] = option_list
+        """
+        Constructor
+        """
+        self._option_list: list[Selector.Option] = option_list
         super().__init__(name=name, id=id, classes=classes)
 
     def compose(self) -> ComposeResult:
         """
-        TODO Fill this in
+        Composes the display
         """
 
-        self._option_widget_list: list[Static] = list(
-            Static("") for _ in self._option_list
-        )
-
         self._container: Vertical = Vertical()
-        self._input_widget: Input = Input()
-        self._list_view: ListView = ListView(
-            *(ListItem(static) for static in self._option_widget_list)
-        )
+        self._input_widget: Input = Input(placeholder="Search and select")
+        self._list_view: OptionList = OptionList()
 
         with self._container:
             yield self._input_widget
             yield self._list_view
 
-    def on_mount(self) -> None:
-        """
-        TODO Fill this in
-        """
         self.update_options_list()
-        
-    # def get_content_height(self, container: Size, viewport: Size) -> int:
-    #     """
-    #     TODO Fill this in
-    #     """
-    #     return 5 + Config_Manager().get_number_of_options()
 
     def on_input_changed(self, event: Input.Changed) -> None:
         """
-        TODO Fill this in
-        """
+        Called when the input is changed.
 
+        Updates the options list.
+        """
         self.update_options_list(search_input=event.value)
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
         """
-        TODO Fill this in
-        """
-        self.post_message(self.Submitted(self._option_list[0]))
+        Called when the input is submitted.
 
-    def on_list_view_selected(self, event: ListView.Selected) -> None:
+        Sends the submitted message with the first option id.
         """
-        TODO Fill this in
+        self.post_message(self.Submitted(self._option_list[0].option_id))
+
+    def on_option_list_option_selected(self, event: OptionList.OptionSelected) -> None:
         """
-        self.post_message(
-            self.Submitted(
-                self._option_list[list(self.query(ListItem)).index(event.item)]
-            )
-        )
+        Called when an option is selected.
+
+        Sends the submitted message with the id of the selected option.
+        """
+        self.post_message(self.Submitted(event.option_id))
 
     def update_options_list(self, search_input: Optional[str] = None) -> None:
         """
-        TODO Fill this in
+        Sorts and re draws the option list
         """
-
         if search_input:
             self._search_options_list(search_input)
 
-        for index, widget in enumerate(self._option_widget_list):
-            if len(self._option_list) > index:
-                widget.update(self._option_list[index][0])
-            else:
-                widget.update("")
+        self._list_view.clear_options()
+        self._list_view.add_options(
+            ListOption(option.display_name, id=option.option_id)
+            for option in self._option_list
+        )
 
     def _search_options_list(self, search_input: str) -> list[tuple[str, int]]:
         """

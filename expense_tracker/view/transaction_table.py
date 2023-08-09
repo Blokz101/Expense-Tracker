@@ -16,7 +16,7 @@ from expense_tracker.presenter.merchant import Merchant
 
 class Transaction_Table(Exptrack_Data_Table):
     """
-    TODO Fill this in
+    Table that displays and allows editing of transactions.
     """
 
     def __init__(self) -> None:
@@ -46,7 +46,7 @@ class Transaction_Table(Exptrack_Data_Table):
 
     def request_popup_args(self, popup_column: any) -> Optional[list[any]]:
         """
-        TODO Fill this in
+        Returns the arguments that are required to deal with different popup columns.
         """
 
         if popup_column == Transaction.Column.DESCRIPTION:
