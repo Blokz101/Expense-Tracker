@@ -24,12 +24,6 @@ class Exptrack_App(App):
         yield Transaction_Table()
         yield Footer()
 
-    def on_mount(self) -> None:
-        table = self.query_one(Transaction_Table)
-
-        for row in Transaction.get_all():
-            table.add_row(*row[0:], key=row[0])
-
     def on_exptrack_data_table_edit_request(
         self, message: Transaction_Table.Edit_Request
     ) -> None:

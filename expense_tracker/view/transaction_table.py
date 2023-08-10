@@ -56,7 +56,7 @@ class Transaction_Table(Exptrack_Data_Table):
                 Text_Input_Popup,
             ),
         ]
-        super().__init__(column_info_list)
+        super().__init__(column_info_list, Transaction.get_all())
 
     def request_popup_args(self, popup_column: any, id: int) -> Optional[list[any]]:
         """

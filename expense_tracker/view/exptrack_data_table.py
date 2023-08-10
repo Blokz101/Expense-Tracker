@@ -42,17 +42,26 @@ class Exptrack_Data_Table(DataTable):
             self.args: Optional[list[any]] = args
             super().__init__()
 
-    def __init__(self, column_info_list: list[Column_Info]) -> None:
+    def __init__(self, column_info_list: list[Column_Info], initial_row_list: list[tuple[int, ...]]) -> None:
         self.column_info_list: list[Exptrack_Data_Table.Column_Info] = column_info_list
+        self._initial_row_list: list[tuple[int, ...]] = initial_row_list
         super().__init__(show_cursor=False, zebra_stripes=True)
 
     def on_mount(self) -> None:
-        super().on_mount()
-
-        # Add an id column
+        """
+        Called when the widget is mounted.
+        
+        Adds the columns and initial rows.
+        """
+        
+        # Add an id column and other columns
         self.add_column("id", key="id")
         for info in self.column_info_list:
             self.add_column(info.display_name, key=info.column_variable)
+            
+        # Add initial rows
+        for row in self._initial_row_list:
+            self.add_row(*row[0:], key=row[0])
 
     def on_click(self, event: Click) -> None:
         """
