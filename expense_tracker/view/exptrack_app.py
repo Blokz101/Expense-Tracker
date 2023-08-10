@@ -1,7 +1,7 @@
 # expense_tracker/view/exptrack_app.py
 
 from textual.app import App, ComposeResult
-from textual.widgets import Footer
+from textual.widgets import Footer, Header
 
 from expense_tracker.constants import Constants
 
@@ -20,6 +20,7 @@ class Exptrack_App(App):
     CSS_PATH = Constants.CSS_FILE_PATH
 
     def compose(self) -> ComposeResult:
+        yield Header()
         yield Transaction_Table()
         yield Footer()
 

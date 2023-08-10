@@ -36,29 +36,35 @@ class Transaction:
         TAGS: int = 6
 
     @staticmethod
+    def _format(transaction_list: list[DB_Transaction]) -> list[tuple[int, ...]]:
+        """
+        Formats raw database transaction into a tuple
+        """
+        display_list: list[tuple[int, ...]] = []
+
+        for entry in transaction_list:
+            display_list.append(
+                (
+                    entry.id,
+                    entry.reconciled_status,
+                    entry.description,
+                    entry.merchant.name,
+                    datetime.strftime(entry.date, Constants.DATE_FORMAT),
+                    ", ".join(tag.name for tag in entry.amounts[0].tags),
+                    # TODO Edit this to support multiple amounts
+                    entry.amounts[0].amount,
+                )
+            )
+
+        return display_list
+
+    @staticmethod
     def get_all() -> list[tuple[int, ...]]:
         """
         Returns a list of all transactions as a list of tuples of strings
         """
-
-        display_list: list[tuple[int, ...]] = []
-
         with Session(engine) as session:
-            for entry in session.query(DB_Transaction).all():
-                display_list.append(
-                    (
-                        entry.id,
-                        entry.reconciled_status,
-                        entry.description,
-                        entry.merchant.name,
-                        datetime.strftime(entry.date, Constants.DATE_FORMAT),
-                        ", ".join(tag.name for tag in entry.amounts[0].tags),
-                        # TODO Edit this to support multiple amounts
-                        entry.amounts[0].amount,
-                    )
-                )
-
-        return display_list
+            return Transaction._format(session.query(DB_Transaction).all())
 
     @staticmethod
     def set_value(id: int, column: Column, new_value: any) -> any:

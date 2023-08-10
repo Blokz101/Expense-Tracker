@@ -35,16 +35,28 @@ class Merchant:
         Returns a list of all merchants as a list of tuples of strings
         """
 
+    @staticmethod
+    def _format(merchant_list: list[DB_Merchant]) -> list[tuple[int, ...]]:
+        """
+        Formats raw database transaction into a tuple
+        """
         display_list: list[tuple[int, ...]] = []
 
-        with Session(engine) as session:
-            for entry in session.query(DB_Merchant).all():
-                display_list.append(
-                    (
-                        entry.id,
-                        entry.name,
-                        entry.naming_rule,
-                    )
+        for entry in merchant_list:
+            display_list.append(
+                (
+                    entry.id,
+                    entry.name,
+                    entry.naming_rule,
                 )
+            )
 
         return display_list
+
+    @staticmethod
+    def get_all() -> list[tuple[int, ...]]:
+        """
+        Returns a list of all merchants as a list of tuples of strings
+        """
+        with Session(engine) as session:
+            return Merchant._format(session.query(DB_Merchant).all())
