@@ -36,7 +36,7 @@ class Transaction:
         TAGS: int = 6
 
     @staticmethod
-    def get_display_list() -> list[tuple[int, ...]]:
+    def get_all() -> list[tuple[int, ...]]:
         """
         Returns a list of all transactions as a list of tuples of strings
         """
@@ -53,9 +53,8 @@ class Transaction:
                         entry.merchant.name,
                         datetime.strftime(entry.date, Constants.DATE_FORMAT),
                         ", ".join(tag.name for tag in entry.amounts[0].tags),
-                        entry.amounts[
-                            0
-                        ].amount,  # TODO Edit this to support multiple amounts
+                        # TODO Edit this to support multiple amounts
+                        entry.amounts[0].amount,
                     )
                 )
 
@@ -107,5 +106,15 @@ class Transaction:
                 transaction.amounts[0].amount = float(new_value)
                 session.commit()
                 return transaction.amounts[0].amount
+
+            # new_value will be a list of ints representing the ids of tags
+            # TODO Edit this to support multiple amounts
+            if column == Transaction.Column.TAGS:
+                transaction.amounts[0].tags = []
+                for id in new_value:
+                    tag: DB_Tag = session.query(DB_Tag).where(DB_Tag.id == id).first()
+                    transaction.amounts[0].tags.append(tag)
+                session.commit()
+                return ", ".join(tag.name for tag in transaction.amounts[0].tags)
 
         raise ValueError(f"Unable to handel an edit of database column '{column}'.")

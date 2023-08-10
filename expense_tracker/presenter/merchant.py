@@ -30,7 +30,7 @@ class Merchant:
         NAMING_RULE: int = 2
 
     @staticmethod
-    def get_display_list() -> list[tuple[int, ...]]:
+    def get_all() -> list[tuple[int, ...]]:
         """
         Returns a list of all merchants as a list of tuples of strings
         """

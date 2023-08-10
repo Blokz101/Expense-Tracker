@@ -98,11 +98,11 @@ class Exptrack_Data_Table(DataTable):
                     row_key,
                     column_key,
                     popup,
-                    self.request_popup_args(column_key.value),
+                    self.request_popup_args(column_key.value, int(row_key.value)),
                 )
             )
 
-    def request_popup_args(self, popup_column: any) -> Optional[list[any]]:
+    def request_popup_args(self, popup_column: any, id: int) -> Optional[list[any]]:
         """
         To be implemented by classes that extend this one.
 

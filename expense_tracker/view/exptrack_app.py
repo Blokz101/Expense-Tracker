@@ -1,7 +1,7 @@
 # expense_tracker/view/exptrack_app.py
 
 from textual.app import App, ComposeResult
-from textual.validation import Regex
+from textual.widgets import Footer
 
 from expense_tracker.constants import Constants
 
@@ -21,11 +21,12 @@ class Exptrack_App(App):
 
     def compose(self) -> ComposeResult:
         yield Transaction_Table()
+        yield Footer()
 
     def on_mount(self) -> None:
         table = self.query_one(Transaction_Table)
 
-        for row in Transaction.get_display_list():
+        for row in Transaction.get_all():
             table.add_row(*row[0:], key=row[0])
 
     def on_exptrack_data_table_edit_request(
@@ -42,14 +43,17 @@ class Exptrack_App(App):
             Updates the database and the view with the new value
             """
 
-            if not new_value:
+            if new_value is None:
                 return
 
             updated_value: str = Transaction.set_value(
                 int(message.row_key.value), message.column_key.value, new_value
             )
             message.sender.update_cell(
-                message.row_key, message.column_key, updated_value
+                message.row_key,
+                message.column_key,
+                updated_value,
+                update_width=True,
             )
 
         self.push_screen(message.popup(*message.args), check_input)
