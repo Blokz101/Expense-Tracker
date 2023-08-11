@@ -23,7 +23,7 @@ from expense_tracker.model.orm.db_month_budget import DB_Month_Budget
 
 class Tag(Presenter):
     """
-    Merchant presenter
+    Tag presenter
     """
 
     class Column(Enum):
@@ -44,7 +44,7 @@ class Tag(Presenter):
                 (
                     entry.id,
                     entry.name,
-                    entry.instance_tag,
+                    str(entry.instance_tag),
                 )
             )
 
@@ -53,11 +53,30 @@ class Tag(Presenter):
     @staticmethod
     def get_all() -> list[tuple[int, ...]]:
         """
-        Returns a list of all merchants as a list of tuples of strings
+        Returns a list of all tags as a list of tuples of strings
         """
 
         with Session(engine) as session:
             return Tag._format(session.query(DB_Tag).all())
+            
+    @staticmethod
+    def set_value(id: int, column: Column, new_value: any) -> any:
+        """
+        Updates cell in the database
+        """
+        with Session(engine) as session:
+            tag: DB_Tag = (
+                session.query(DB_Tag).where(DB_Tag.id == id).first()
+            )
+
+            # new_value will be an str
+            if column == Tag.Column.NAME:
+                tag.name = new_value
+                session.commit()
+                return tag.name
+
+        Presenter.set_value(id, column, new_value)
+
 
     # TODO Edit this entire method to work with multiple amounts
     @staticmethod

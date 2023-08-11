@@ -9,11 +9,14 @@ from textual.containers import Horizontal
 from textual.widgets.option_list import Option
 
 from expense_tracker.view.merchant_table import Merchant_Table
+from expense_tracker.view.account_table import Account_Table
+from expense_tracker.view.location_table import Location_Table
+from expense_tracker.view.tag_table import Tag_Table
 
 
 class Field_Switcher(Widget):
     """
-    TODO Fill this in
+    Switches field tables based on what the user selects
     """
 
     CSS: str = """
@@ -36,18 +39,14 @@ class Field_Switcher(Widget):
     ]
 
     _TABLE_WIDGETS: list[Widget] = [
-        Placeholder("Account", id="account"),
+        Account_Table(id="account"),
         Placeholder("Budget", id="budget"),
-        Placeholder("Location", id="location"),
+        Location_Table(id="location"),
         Merchant_Table(id="merchant"),
-        Placeholder("Tag", id="tag"),
+        Tag_Table(id="tag"),
     ]
 
     def compose(self) -> ComposeResult:
-        """
-        TODO Fill this in
-        """
-
         self._container: Horizontal = Horizontal()
         self._field_list_widget: OptionList = OptionList(
             *Field_Switcher._OPTION_LIST_OPTIONS
@@ -62,6 +61,8 @@ class Field_Switcher(Widget):
 
     def on_option_list_option_selected(self, event: OptionList.OptionSelected) -> None:
         """
-        TODO Fill this in
+        Called when a new option is selected.
+        
+        Switches the content switcher.
         """
         self._content_switcher.current = event.option_id
