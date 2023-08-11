@@ -58,16 +58,14 @@ class Tag(Presenter):
 
         with Session(engine) as session:
             return Tag._format(session.query(DB_Tag).all())
-            
+
     @staticmethod
     def set_value(id: int, column: Column, new_value: any) -> any:
         """
         Updates cell in the database
         """
         with Session(engine) as session:
-            tag: DB_Tag = (
-                session.query(DB_Tag).where(DB_Tag.id == id).first()
-            )
+            tag: DB_Tag = session.query(DB_Tag).where(DB_Tag.id == id).first()
 
             # new_value will be an str
             if column == Tag.Column.NAME:
@@ -76,7 +74,6 @@ class Tag(Presenter):
                 return tag.name
 
         Presenter.set_value(id, column, new_value)
-
 
     # TODO Edit this entire method to work with multiple amounts
     @staticmethod

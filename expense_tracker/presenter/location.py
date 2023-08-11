@@ -74,7 +74,7 @@ class Location(Presenter):
                 location.name = new_value
                 session.commit()
                 return location.name
-            
+
             # new_value will be an int representing the id of the new merchant
             if column == Location.Column.MERCHANT:
                 new_merchant: DB_Merchant = (
@@ -85,13 +85,13 @@ class Location(Presenter):
                 Location.merchant = new_merchant
                 session.commit()
                 return Location.merchant.name
-            
+
             # new_value will be an str
             if column == Location.Column.XCOORD:
                 location.x_coord = float(new_value)
                 session.commit()
                 return location.x_coord
-            
+
             # new_value will be an str
             if column == Location.Column.YCOORD:
                 location.y_coord = float(new_value)

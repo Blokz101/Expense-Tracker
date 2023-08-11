@@ -1,9 +1,8 @@
 # expense_tracker/view/table_constants.py
 
-from typing import Optional
-from typing import NamedTuple
+from __future__ import annotations
 
-from enum import Enum
+from dataclasses import dataclass
 
 from textual.validation import Number, Regex
 from textual.widgets.selection_list import Selection
@@ -15,255 +14,220 @@ from expense_tracker.view.options_input_popup import Options_Input_Popup
 from expense_tracker.view.toggle_input_popup import Toggle_Input_Popup
 from expense_tracker.view.selector import Selector
 
+from expense_tracker.presenter.presenter import Presenter
 from expense_tracker.presenter.transaction import Transaction
 from expense_tracker.presenter.merchant import Merchant
 from expense_tracker.presenter.account import Account
 from expense_tracker.presenter.location import Location
 from expense_tracker.presenter.tag import Tag
 
-class Table_Constants:
+
+@dataclass
+class Table_Info:
     """
-    Constants class that contains all the table info for each table
+    Dataclass that holds all the info needed for a table
+    """
+
+    name: str
+    presenter: Presenter
+    detailed_data_popup_factory: any
+    column_list: list[Column_Info]
+
+
+@dataclass
+class Column_Info:
+    """
+    Dataclass that hold all the info needed to create each column
+    """
+
+    display_name: str
+    column_variable: int
+    popup_factory: any
+    hidden: bool = True
+
+
+def _get_tag_selections(transaction_id: int) -> list[any]:
+    """
+    Get the tag selections for a transaction
     """
     
-    class Column(NamedTuple):
-        display_name: str
-        column_variable: int
-        popup: any
-    
-    class Tables(str, Enum):
-        TRANSACTION: str = "transaction"
-        MERCHANT: str = "merchant"
-        TAG: str = "tag"
-        LOCATION: str = "location"
-        ACCOUNT: str = "account"
-    
-    transaction_column_list: list[Column] = [
-        Column(
-            "Status", Transaction.Column.RECONCILED_STATUS, None
-        ),
-        Column(
+    selected_tag_list: list[tuple[int, ...]] = Tag.get_tags_from_transaction(transaction_id)
+    selected_tag_id_list: list[int] = list(tag[0] for tag in selected_tag_list)
+
+    tag_list: list[tuple[int, ...]] = []
+
+    for tag in Tag.get_all():
+        tag_list.append(Selection(tag[1], tag[0], tag[0] in selected_tag_id_list))
+
+    return tag_list
+
+
+TRANSACTION: Table_Info = Table_Info(
+    "transaction",
+    Transaction,
+    None,
+    [
+        Column_Info("Status", Transaction.Column.RECONCILED_STATUS, None),
+        Column_Info(
             "Description",
             Transaction.Column.DESCRIPTION,
-            Text_Input_Popup,
+            lambda id: Text_Input_Popup(instructions="Input a description"),
         ),
-        Column(
+        Column_Info(
             "Merchant",
             Transaction.Column.MERCHANT,
-            Options_Input_Popup,
+            lambda id: Options_Input_Popup(
+                list(
+                    Selector.Option(merchant[1], merchant[0])
+                    for merchant in Merchant.get_all()
+                ),
+                instructions="Select a merchant",
+            ),
         ),
-        Column(
+        Column_Info(
             "Date",
             Transaction.Column.DATE,
-            Text_Input_Popup,
+            lambda id: Text_Input_Popup(
+                instructions="Input a date",
+                validators=[
+                    Regex(
+                        Constants.DATE_REGEX,
+                        failure_description="Input must match mm/dd/yyyy format",
+                    )
+                ],
+            ),
         ),
-        Column(
+        Column_Info(
             "Tags",
             Transaction.Column.TAGS,
-            Toggle_Input_Popup,
+            lambda id: Toggle_Input_Popup(_get_tag_selections(id), instructions="Select tags"),
         ),
-        Column(
+        Column_Info(
             "Amount",
             Transaction.Column.AMOUNT,
-            Text_Input_Popup,
+            lambda id: Text_Input_Popup(
+                instructions="Input an expense amount",
+                validators=[Number(failure_description="Input must be a float")],
+            ),
         ),
-    ]
-    
-    @staticmethod
-    def transaction_popup_args(popup_column: any, id: int) -> Optional[list[any]]:
-        """
-        Returns the arguments that are required to deal with different popup columns.
-        """
+    ],
+)
 
-        if popup_column == Transaction.Column.DESCRIPTION:
-            return ["Input a description"]
-
-        if popup_column == Transaction.Column.DATE:
-            return [
-                "Input a date",
-                Regex(
-                    Constants.DATE_REGEX,
-                    failure_description="Input must match mm/dd/yyyy format",
-                ),
-            ]
-
-        if popup_column == Transaction.Column.AMOUNT:
-            return [
-                "Input an expense amount",
-                Number(failure_description="Input must be a float"),
-            ]
-
-        if popup_column == Transaction.Column.MERCHANT:
-            return [
-                list(
-                    Selector.Option(merchant[1], merchant[0])
-                    for merchant in Merchant.get_all()
-                ),
-                "Select a merchant",
-            ]
-
-        if popup_column == Transaction.Column.TAGS:
-            selected_tag_list: list[tuple[int, ...]] = Tag.get_tags_from_transaction(id)
-            selected_tag_id_list: list[int] = list(tag[0] for tag in selected_tag_list)
-
-            tag_list: list[tuple[int, ...]] = []
-
-            for tag in Tag.get_all():
-                tag_list.append(
-                    Selection(tag[1], tag[0], tag[0] in selected_tag_id_list)
-                )
-
-            return [
-                tag_list,
-                "Select tags",
-            ]
-            
-    account_column_list: list[Column] = [
-        Column(
+ACCOUNT: Table_Info = Table_Info(
+    "account",
+    Account,
+    None,
+    [
+        Column_Info(
             "Name",
             Account.Column.NAME,
-            Text_Input_Popup,
+            lambda id: Text_Input_Popup(instructions="Input a name"),
         ),
-        Column(
+        Column_Info(
             "Description Index",
             Account.Column.DESCRIPTION_COLUMN_INDEX,
-            Text_Input_Popup,
+            lambda id: Text_Input_Popup(
+                instructions="Input an index for the description column on statement",
+                validators=[
+                    Regex("\d+", failure_description="Input must be a positive integer")
+                ],
+            ),
         ),
-        Column(
+        Column_Info(
             "Amount Index",
             Account.Column.AMOUNT_COLUMN_INDEX,
-            Text_Input_Popup,
+            lambda id: Text_Input_Popup(
+                instructions="Input an index for the amount column on statement",
+                validators=[
+                    Regex("\d+", failure_description="Input must be a positive integer")
+                ],
+            ),
         ),
-        Column(
+        Column_Info(
             "Date Index",
             Account.Column.DATE_COLUMN_INDEX,
-            Text_Input_Popup,
+            lambda id: Text_Input_Popup(
+                instructions="Input an index for the date column on statement",
+                validators=[
+                    Regex("\d+", failure_description="Input must be a positive integer")
+                ],
+            ),
         ),
-    ]
-    
-    @staticmethod
-    def account_popup_args(popup_column: any, id: int) -> Optional[list[any]]:
-        """
-        Returns the arguments that are required to deal with different popup columns.
-        """
+    ],
+)
 
-        if popup_column == Account.Column.NAME:
-            return ["Input a name"]
-
-        if popup_column == Account.Column.DESCRIPTION_COLUMN_INDEX:
-            return [
-                "Input an index for the description column on statement",
-                Regex("\d+", failure_description="Input must be a positive integer"),
-            ]
-
-        if popup_column == Account.Column.AMOUNT_COLUMN_INDEX:
-            return [
-                "Input an index for the amount column on statement",
-                Regex("\d+", failure_description="Input must be a positive integer"),
-            ]
-
-        if popup_column == Account.Column.DATE_COLUMN_INDEX:
-            return [
-                "Input an index for the date column on statement",
-                Regex("\d+", failure_description="Input must be a positive integer"),
-            ]
-            
-    location_column_list: list[Column] = [
-            Column(
-                "Merchant",
-                Location.Column.MERCHANT,
-                Options_Input_Popup,
-            ),
-            Column(
-                "Name",
-                Location.Column.NAME,
-                Text_Input_Popup,
-            ),
-            Column(
-                "Latitude",
-                Location.Column.XCOORD,
-                Text_Input_Popup,
-            ),
-            Column(
-                "Longitude",
-                Location.Column.YCOORD,
-                Text_Input_Popup,
-            ),
-        ]
-    
-    @staticmethod
-    def location_popup_args(popup_column: any, id: int) -> Optional[list[any]]:
-        """
-        Returns the arguments that are required to deal with different popup columns.
-        """
-
-        if popup_column == Location.Column.MERCHANT:
-            return [
+LOCATION: Table_Info = Table_Info(
+    "location",
+    Location,
+    None,
+    [
+        Column_Info(
+            "Merchant",
+            Location.Column.MERCHANT,
+            lambda id: Options_Input_Popup(
                 list(
                     Selector.Option(merchant[1], merchant[0])
                     for merchant in Merchant.get_all()
                 ),
-                "Select a merchant",
-            ]
-
-        if popup_column == Location.Column.NAME:
-            return ["Input a name"]
-
-        if popup_column == Location.Column.XCOORD:
-            return [
-                "Input a latitude",
-                Number(failure_description="Input must be a float"),
-            ]
-
-        if popup_column == Location.Column.YCOORD:
-            return [
-                "Input a longitude",
-                Number(failure_description="Input must be a float"),
-            ]
-            
-    merchant_column_list: list[Column] = [
-            Column(
-                "Name",
-                Merchant.Column.NAME,
-                Text_Input_Popup,
+                instructions="Select a merchant",
             ),
-            Column(
-                "Rule",
-                Merchant.Column.NAMING_RULE,
-                Text_Input_Popup,
+        ),
+        Column_Info(
+            "Name",
+            Location.Column.NAME,
+            lambda id: Text_Input_Popup(instructions="Input a name"),
+        ),
+        Column_Info(
+            "Latitude",
+            Location.Column.XCOORD,
+            lambda id: Text_Input_Popup(
+                instructions="Input a latitude",
+                validators=[Number(failure_description="Input must be a float")],
             ),
-        ]
-    
-    @staticmethod
-    def merchant_popup_args(popup_column: any, id: int) -> Optional[list[any]]:
-        """
-        Returns the arguments that are required to deal with different popup columns.
-        """
-
-        if popup_column == Merchant.Column.NAME:
-            return ["Input a name"]
-
-        if popup_column == Merchant.Column.NAMING_RULE:
-            return ["Input a regular expression"]
-        
-    tag_column_list: list[Column] = [
-            Column(
-                "Name",
-                Tag.Column.NAME,
-                Text_Input_Popup,
+        ),
+        Column_Info(
+            "Longitude",
+            Location.Column.YCOORD,
+            lambda id: Text_Input_Popup(
+                instructions="Input a longitude",
+                validators=[Number(failure_description="Input must be a float")],
             ),
-            Column(
-                "Instance Tag",
-                Tag.Column.INSTANCE_TAG,
-                None,
-            ),
-        ]
-    
-    @staticmethod
-    def tag_popup_args(popup_column: any, id: int) -> Optional[list[any]]:
-        """
-        Returns the arguments that are required to deal with different popup columns.
-        """
+        ),
+    ],
+)
 
-        if popup_column == Tag.Column.NAME:
-            return ["Input a name"]
+MERCHANT: Table_Info = Table_Info(
+    "merchant",
+    Merchant,
+    None,
+    [
+        Column_Info(
+            "Name",
+            Merchant.Column.NAME,
+            lambda id: Text_Input_Popup(instructions="Input a name"),
+        ),
+        Column_Info(
+            "Rule",
+            Merchant.Column.NAMING_RULE,
+            lambda id: Text_Input_Popup(instructions="Input a regular expression"),
+        ),
+    ],
+)
+
+TAG: Table_Info = Table_Info(
+    "tag",
+    Tag,
+    None,
+    [
+        Column_Info(
+            "Name",
+            Tag.Column.NAME,
+            lambda id: Text_Input_Popup(instructions="Input a name"),
+        ),
+        Column_Info(
+            "Instance Tag",
+            Tag.Column.INSTANCE_TAG,
+            None,
+        ),
+    ],
+)

@@ -13,46 +13,44 @@ from textual.events import Click
 from textual.screen import ModalScreen
 from textual.widgets._data_table import RowKey, ColumnKey
 
+from expense_tracker.view.table_constants import Table_Info, Column_Info
+
+from expense_tracker.presenter.presenter import Presenter
+from expense_tracker.presenter.transaction import Transaction
+from expense_tracker.presenter.merchant import Merchant
+from expense_tracker.presenter.account import Account
+from expense_tracker.presenter.location import Location
+from expense_tracker.presenter.tag import Tag
+
 
 class Exptrack_Data_Table(DataTable):
     """
     Generates data tables from each of the data types.
     """
 
-    class Edit_Request(Message):
-        """
-        Message to request a database edit
-        """
-
-        def __init__(
-            self,
-            sender: Exptrack_Data_Table,
-            row_key: RowKey,
-            column_key: ColumnKey,
-            popup: ModalScreen,
-            args: Optional[list[any]] = None,
-        ) -> None:
-            self.sender: str = sender
-            self.row_key: RowKey = row_key
-            self.column_key: ColumnKey = column_key
-            self.popup: ModalScreen = popup
-            self.args: Optional[list[any]] = args
-            super().__init__()
-
     def __init__(
         self,
-        column_info_list: list[tuple[int, ...]],
-        initial_row_list: list[tuple[int, ...]],
-        get_popup_args: Callable[[int, int], Optional[list[any]]],
+        table_info_list: Table_Info,
+        initial_row_list: list[tuple[int, ...]] = None,
         name: Optional[str] = None,
-        id: Optional[str] = None,
         classes: Optional[str] = None,
     ) -> None:
-        self._column_info_list: list[tuple[int, ...]] = column_info_list
-        self._initial_row_list: list[tuple[int, ...]] = initial_row_list
-        self._get_popup_args: Callable[[int, int], Optional[list[any]]] = get_popup_args
+        self._presenter: Presenter = table_info_list.presenter
+        self._column_info_list: list[Column_Info] = table_info_list.column_list
+
+        # Set the initial row list
+        self._initial_row_list: list[tuple[int, ...]]
+        if not initial_row_list:
+            self._initial_row_list = self._presenter.get_all()
+        else:
+            self._initial_row_list = initial_row_list
+
         super().__init__(
-            show_cursor=False, zebra_stripes=True, name=name, id=id, classes=classes
+            show_cursor=False,
+            zebra_stripes=True,
+            name=name,
+            id=table_info_list.name,
+            classes=classes,
         )
 
     def on_mount(self) -> None:
@@ -98,26 +96,37 @@ class Exptrack_Data_Table(DataTable):
         column_key: ColumnKey = key.column_key
 
         # Get the popup factory from column info list by id and column name
-        popup: Any = None
+        column: Column_Info
         try:
-            popup = next(
+            column = next(
                 (
-                    info.popup
+                    info
                     for info in self._column_info_list
                     if info.column_variable == column_key.value
                 )
             )
         except:
-            pass
+            return
 
-        # If there is a popup factory then mount its popup
-        if popup:
-            self.post_message(
-                self.Edit_Request(
-                    self,
-                    row_key,
-                    column_key,
-                    popup,
-                    self._get_popup_args(column_key.value, int(row_key.value)),
-                )
+        if column.popup_factory is None:
+            return
+
+        def update_view_and_model(new_value: Optional[str]) -> None:
+            """
+            Updates the database and the view with the new value
+            """
+
+            if new_value is None:
+                return
+
+            updated_value: str = self._presenter.set_value(
+                int(row_key.value), column_key.value, new_value
             )
+            self.update_cell(
+                row_key,
+                column_key,
+                updated_value,
+                update_width=True,
+            )
+
+        self.app.push_screen(column.popup_factory(row_key.value), update_view_and_model)
