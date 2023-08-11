@@ -57,22 +57,21 @@ class Merchant(Presenter):
         """
         with Session(engine) as session:
             return Merchant._format(session.query(DB_Merchant).all())
-        
-        
+
     @staticmethod
     def set_value(id: int, column: Column, new_value: any) -> any:
         """
         Updates cell in the database
         """
         with Session(engine) as session:
-            merchant: DB_Merchant = session.query(DB_Merchant).where(DB_Merchant.id == id).first()
-            
+            merchant: DB_Merchant = (
+                session.query(DB_Merchant).where(DB_Merchant.id == id).first()
+            )
+
             # new_value will be an str
             if column == Merchant.Column.NAME or column == Merchant.Column.NAMING_RULE:
                 merchant.name = new_value
                 session.commit()
                 return merchant.name
-        
+
         Presenter.set_value(id, column, new_value)
-        
-        

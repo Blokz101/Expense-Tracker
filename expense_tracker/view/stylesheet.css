@@ -1,8 +1,12 @@
-/* TabPane {
-    height: 100%
-} */
+DataTable, Placeholder, Transaction_Table, Merchant_Table, Field_Switcher, TabbedContent ContentSwitcher {
+    height: 1fr;
+}
 
-Transaction_Table {
-    height: 10;
-    border: red;
+Field_Switcher OptionList, Field_Switcher ContentSwitcher {
+    height: 1fr;
+}
+
+Field_Switcher > Horizontal > OptionList {
+    width: 20;
+    dock: left;
 }

@@ -46,10 +46,15 @@ class Exptrack_Data_Table(DataTable):
         self,
         column_info_list: list[Column_Info],
         initial_row_list: list[tuple[int, ...]],
+        name: Optional[str] = None,
+        id: Optional[str] = None,
+        classes: Optional[str] = None,
     ) -> None:
         self.column_info_list: list[Exptrack_Data_Table.Column_Info] = column_info_list
         self._initial_row_list: list[tuple[int, ...]] = initial_row_list
-        super().__init__(show_cursor=False, zebra_stripes=True)
+        super().__init__(
+            show_cursor=False, zebra_stripes=True, name=name, id=id, classes=classes
+        )
 
     def on_mount(self) -> None:
         """

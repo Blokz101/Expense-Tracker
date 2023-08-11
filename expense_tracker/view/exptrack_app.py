@@ -7,6 +7,7 @@ from expense_tracker.constants import Constants
 from expense_tracker.view.exptrack_data_table import Exptrack_Data_Table
 from expense_tracker.view.transaction_table import Transaction_Table
 from expense_tracker.view.merchant_table import Merchant_Table
+from expense_tracker.view.field_switcher import Field_Switcher
 
 from expense_tracker.presenter.presenter import Presenter
 from expense_tracker.presenter.transaction import Transaction
@@ -24,7 +25,13 @@ class Exptrack_App(App):
 
     def compose(self) -> ComposeResult:
         yield Header()
-        yield Transaction_Table()
+        with TabbedContent():
+            with TabPane("Accounts"):
+                yield Transaction_Table()
+            with TabPane("Budgets"):
+                yield Placeholder("Budgets coming soon")
+            with TabPane("Fields"):
+                yield Field_Switcher()
         yield Footer()
 
     def on_transaction_table_edit_request(
@@ -36,7 +43,7 @@ class Exptrack_App(App):
         Signals what presenter should be used
         """
         self._edit_value(message, Transaction)
-        
+
     def on_merchant_table_edit_request(
         self, message: Merchant_Table.Edit_Request
     ) -> None:
@@ -47,11 +54,13 @@ class Exptrack_App(App):
         """
         self._edit_value(message, Merchant)
 
-    def _edit_value(self, message: Exptrack_Data_Table.Edit_Request, presenter: Presenter) -> None:
+    def _edit_value(
+        self, message: Exptrack_Data_Table.Edit_Request, presenter: Presenter
+    ) -> None:
         """
         Mounts a popup to get input from the user and attempts to edit the database.
         """
-        
+
         def check_input(new_value: Optional[str]) -> None:
             """
             Updates the database and the view with the new value

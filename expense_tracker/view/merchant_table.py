@@ -21,11 +21,16 @@ class Merchant_Table(Exptrack_Data_Table):
     """
     Table that displays and allows editing of transactions.
     """
-    
+
     class Edit_Request(Exptrack_Data_Table.Edit_Request):
         pass
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        name: Optional[str] = None,
+        id: Optional[str] = None,
+        classes: Optional[str] = None,
+    ) -> None:
         column_info_list: list[Exptrack_Data_Table.Column_Info] = [
             Exptrack_Data_Table.Column_Info(
                 "Name",
@@ -38,7 +43,9 @@ class Merchant_Table(Exptrack_Data_Table):
                 Text_Input_Popup,
             ),
         ]
-        super().__init__(column_info_list, Merchant.get_all())
+        super().__init__(
+            column_info_list, Merchant.get_all(), name=name, id=id, classes=classes
+        )
 
     def request_popup_args(self, popup_column: any, id: int) -> Optional[list[any]]:
         """
