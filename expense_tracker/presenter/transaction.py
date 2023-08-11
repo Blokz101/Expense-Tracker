@@ -10,6 +10,8 @@ from datetime import datetime
 
 from expense_tracker.constants import Constants
 
+from expense_tracker.presenter.presenter import Presenter
+
 from expense_tracker.model.orm import engine
 from expense_tracker.model.orm.db_transaction import DB_Transaction
 from expense_tracker.model.orm.db_merchant import DB_Merchant
@@ -21,7 +23,7 @@ from expense_tracker.model.orm.db_budget import DB_Budget
 from expense_tracker.model.orm.db_month_budget import DB_Month_Budget
 
 
-class Transaction:
+class Transaction(Presenter):
     """
     Transaction presenter
     """
@@ -71,10 +73,6 @@ class Transaction:
         """
         Updates a cell in the database.
         """
-
-        if new_value == None:
-            raise TypeError("new_value must have a value")
-
         with Session(engine) as session:
             transaction: DB_Transaction = (
                 session.query(DB_Transaction).where(DB_Transaction.id == id).first()
@@ -123,4 +121,4 @@ class Transaction:
                 session.commit()
                 return ", ".join(tag.name for tag in transaction.amounts[0].tags)
 
-        raise ValueError(f"Unable to handel an edit of database column '{column}'.")
+        Presenter.set_value(id, column, new_value)

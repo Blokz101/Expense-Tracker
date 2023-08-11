@@ -24,6 +24,9 @@ class Transaction_Table(Exptrack_Data_Table):
     """
     Table that displays and allows editing of transactions.
     """
+    
+    class Edit_Request(Exptrack_Data_Table.Edit_Request):
+        pass
 
     def __init__(self) -> None:
         column_info_list: list[Exptrack_Data_Table.Column_Info] = [

@@ -8,6 +8,8 @@ from enum import Enum
 
 from expense_tracker.constants import Constants
 
+from expense_tracker.presenter.presenter import Presenter
+
 from expense_tracker.model.orm import engine
 from expense_tracker.model.orm.db_transaction import DB_Transaction
 from expense_tracker.model.orm.db_merchant import DB_Merchant
@@ -19,7 +21,7 @@ from expense_tracker.model.orm.db_budget import DB_Budget
 from expense_tracker.model.orm.db_month_budget import DB_Month_Budget
 
 
-class Tag:
+class Tag(Presenter):
     """
     Merchant presenter
     """
