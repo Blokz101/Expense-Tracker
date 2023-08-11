@@ -1,6 +1,7 @@
 # expense_tracker/view/table_constants.py
 
 from typing import Optional
+from typing import NamedTuple
 
 from enum import Enum
 
@@ -9,7 +10,6 @@ from textual.widgets.selection_list import Selection
 
 from expense_tracker.constants import Constants
 
-from expense_tracker.view.exptrack_data_table import Exptrack_Data_Table
 from expense_tracker.view.text_input_popup import Text_Input_Popup
 from expense_tracker.view.options_input_popup import Options_Input_Popup
 from expense_tracker.view.toggle_input_popup import Toggle_Input_Popup
@@ -26,6 +26,11 @@ class Table_Constants:
     Constants class that contains all the table info for each table
     """
     
+    class Column(NamedTuple):
+        display_name: str
+        column_variable: int
+        popup: any
+    
     class Tables(str, Enum):
         TRANSACTION: str = "transaction"
         MERCHANT: str = "merchant"
@@ -33,31 +38,31 @@ class Table_Constants:
         LOCATION: str = "location"
         ACCOUNT: str = "account"
     
-    transaction_column_list: list[Exptrack_Data_Table.Column_Info] = [
-        Exptrack_Data_Table.Column_Info(
+    transaction_column_list: list[Column] = [
+        Column(
             "Status", Transaction.Column.RECONCILED_STATUS, None
         ),
-        Exptrack_Data_Table.Column_Info(
+        Column(
             "Description",
             Transaction.Column.DESCRIPTION,
             Text_Input_Popup,
         ),
-        Exptrack_Data_Table.Column_Info(
+        Column(
             "Merchant",
             Transaction.Column.MERCHANT,
             Options_Input_Popup,
         ),
-        Exptrack_Data_Table.Column_Info(
+        Column(
             "Date",
             Transaction.Column.DATE,
             Text_Input_Popup,
         ),
-        Exptrack_Data_Table.Column_Info(
+        Column(
             "Tags",
             Transaction.Column.TAGS,
             Toggle_Input_Popup,
         ),
-        Exptrack_Data_Table.Column_Info(
+        Column(
             "Amount",
             Transaction.Column.AMOUNT,
             Text_Input_Popup,
@@ -113,23 +118,23 @@ class Table_Constants:
                 "Select tags",
             ]
             
-    account_column_list: list[Exptrack_Data_Table.Column_Info] = [
-        Exptrack_Data_Table.Column_Info(
+    account_column_list: list[Column] = [
+        Column(
             "Name",
             Account.Column.NAME,
             Text_Input_Popup,
         ),
-        Exptrack_Data_Table.Column_Info(
+        Column(
             "Description Index",
             Account.Column.DESCRIPTION_COLUMN_INDEX,
             Text_Input_Popup,
         ),
-        Exptrack_Data_Table.Column_Info(
+        Column(
             "Amount Index",
             Account.Column.AMOUNT_COLUMN_INDEX,
             Text_Input_Popup,
         ),
-        Exptrack_Data_Table.Column_Info(
+        Column(
             "Date Index",
             Account.Column.DATE_COLUMN_INDEX,
             Text_Input_Popup,
@@ -163,23 +168,23 @@ class Table_Constants:
                 Regex("\d+", failure_description="Input must be a positive integer"),
             ]
             
-    location_column_list: list[Exptrack_Data_Table.Column_Info] = [
-            Exptrack_Data_Table.Column_Info(
+    location_column_list: list[Column] = [
+            Column(
                 "Merchant",
                 Location.Column.MERCHANT,
                 Options_Input_Popup,
             ),
-            Exptrack_Data_Table.Column_Info(
+            Column(
                 "Name",
                 Location.Column.NAME,
                 Text_Input_Popup,
             ),
-            Exptrack_Data_Table.Column_Info(
+            Column(
                 "Latitude",
                 Location.Column.XCOORD,
                 Text_Input_Popup,
             ),
-            Exptrack_Data_Table.Column_Info(
+            Column(
                 "Longitude",
                 Location.Column.YCOORD,
                 Text_Input_Popup,
@@ -216,13 +221,13 @@ class Table_Constants:
                 Number(failure_description="Input must be a float"),
             ]
             
-    merchant_column_list: list[Exptrack_Data_Table.Column_Info] = [
-            Exptrack_Data_Table.Column_Info(
+    merchant_column_list: list[Column] = [
+            Column(
                 "Name",
                 Merchant.Column.NAME,
                 Text_Input_Popup,
             ),
-            Exptrack_Data_Table.Column_Info(
+            Column(
                 "Rule",
                 Merchant.Column.NAMING_RULE,
                 Text_Input_Popup,
@@ -241,13 +246,13 @@ class Table_Constants:
         if popup_column == Merchant.Column.NAMING_RULE:
             return ["Input a regular expression"]
         
-    tag_column_list: list[Exptrack_Data_Table.Column_Info] = [
-            Exptrack_Data_Table.Column_Info(
+    tag_column_list: list[Column] = [
+            Column(
                 "Name",
                 Tag.Column.NAME,
                 Text_Input_Popup,
             ),
-            Exptrack_Data_Table.Column_Info(
+            Column(
                 "Instance Tag",
                 Tag.Column.INSTANCE_TAG,
                 None,

@@ -52,6 +52,10 @@ class Exptrack_App(App):
             """
             Updates the database and the view with the new value
             """
+            
+            if new_value is None:
+                return
+            
             presenter: Presenter = self._get_presenter(message.sender.id)
             updated_value: str = presenter.set_value(
                 int(message.row_key.value), message.column_key.value, new_value

@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import NamedTuple
-
 from collections import Callable
 
 from typing import Any, Optional
@@ -20,11 +18,6 @@ class Exptrack_Data_Table(DataTable):
     """
     Generates data tables from each of the data types.
     """
-
-    class Column_Info(NamedTuple):
-        display_name: str
-        column_variable: int
-        popup: any
 
     class Edit_Request(Message):
         """
@@ -48,14 +41,14 @@ class Exptrack_Data_Table(DataTable):
 
     def __init__(
         self,
-        column_info_list: list[Column_Info],
+        column_info_list: list[tuple[int, ...]],
         initial_row_list: list[tuple[int, ...]],
         get_popup_args: Callable[[int, int], Optional[list[any]]],
         name: Optional[str] = None,
         id: Optional[str] = None,
         classes: Optional[str] = None,
     ) -> None:
-        self._column_info_list: list[Exptrack_Data_Table.Column_Info] = column_info_list
+        self._column_info_list: list[tuple[int, ...]] = column_info_list
         self._initial_row_list: list[tuple[int, ...]] = initial_row_list
         self._get_popup_args: Callable[[int, int], Optional[list[any]]] = get_popup_args
         super().__init__(
