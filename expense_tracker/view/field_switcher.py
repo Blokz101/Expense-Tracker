@@ -8,11 +8,14 @@ from textual.widgets import ContentSwitcher, OptionList, Placeholder
 from textual.containers import Horizontal
 from textual.widgets.option_list import Option
 
-from expense_tracker.view.merchant_table import Merchant_Table
-from expense_tracker.view.account_table import Account_Table
-from expense_tracker.view.location_table import Location_Table
-from expense_tracker.view.tag_table import Tag_Table
+from expense_tracker.view.exptrack_data_table import Exptrack_Data_Table
+from expense_tracker.view.table_constants import Table_Constants
 
+from expense_tracker.presenter.transaction import Transaction
+from expense_tracker.presenter.merchant import Merchant
+from expense_tracker.presenter.account import Account
+from expense_tracker.presenter.location import Location
+from expense_tracker.presenter.tag import Tag
 
 class Field_Switcher(Widget):
     """
@@ -39,11 +42,31 @@ class Field_Switcher(Widget):
     ]
 
     _TABLE_WIDGETS: list[Widget] = [
-        Account_Table(id="account"),
+        Exptrack_Data_Table(
+            Table_Constants.account_column_list,
+            Account.get_all(),
+            Table_Constants.account_popup_args,
+            id=Table_Constants.Tables.ACCOUNT,
+        ),
         Placeholder("Budget", id="budget"),
-        Location_Table(id="location"),
-        Merchant_Table(id="merchant"),
-        Tag_Table(id="tag"),
+        Exptrack_Data_Table(
+            Table_Constants.location_column_list,
+            Location.get_all(),
+            Table_Constants.location_popup_args,
+            id=Table_Constants.Tables.LOCATION,
+        ),
+        Exptrack_Data_Table(
+            Table_Constants.merchant_column_list,
+            Merchant.get_all(),
+            Table_Constants.merchant_popup_args,
+            id=Table_Constants.Tables.MERCHANT,
+        ),
+        Exptrack_Data_Table(
+            Table_Constants.tag_column_list,
+            Tag.get_all(),
+            Table_Constants.tag_popup_args,
+            id=Table_Constants.Tables.TAG,
+        ),
     ]
 
     def compose(self) -> ComposeResult:

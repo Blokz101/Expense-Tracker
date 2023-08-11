@@ -1,6 +1,10 @@
 # expense_tracker/view/exptrack_data_table.py
 
+from __future__ import annotations
+
 from typing import NamedTuple
+
+from collections import Callable
 
 from typing import Any, Optional
 from textual.coordinate import Coordinate
@@ -29,7 +33,7 @@ class Exptrack_Data_Table(DataTable):
 
         def __init__(
             self,
-            sender: DataTable,
+            sender: Exptrack_Data_Table,
             row_key: RowKey,
             column_key: ColumnKey,
             popup: ModalScreen,
@@ -46,12 +50,14 @@ class Exptrack_Data_Table(DataTable):
         self,
         column_info_list: list[Column_Info],
         initial_row_list: list[tuple[int, ...]],
+        get_popup_args: Callable[[int, int], Optional[list[any]]],
         name: Optional[str] = None,
         id: Optional[str] = None,
         classes: Optional[str] = None,
     ) -> None:
-        self.column_info_list: list[Exptrack_Data_Table.Column_Info] = column_info_list
+        self._column_info_list: list[Exptrack_Data_Table.Column_Info] = column_info_list
         self._initial_row_list: list[tuple[int, ...]] = initial_row_list
+        self._get_popup_args: Callable[[int, int], Optional[list[any]]] = get_popup_args
         super().__init__(
             show_cursor=False, zebra_stripes=True, name=name, id=id, classes=classes
         )
@@ -64,7 +70,7 @@ class Exptrack_Data_Table(DataTable):
         """
         # Add an id column and other columns
         self.add_column("id", key="id")
-        for info in self.column_info_list:
+        for info in self._column_info_list:
             self.add_column(info.display_name, key=info.column_variable)
 
         # Add initial rows
@@ -104,7 +110,7 @@ class Exptrack_Data_Table(DataTable):
             popup = next(
                 (
                     info.popup
-                    for info in self.column_info_list
+                    for info in self._column_info_list
                     if info.column_variable == column_key.value
                 )
             )
@@ -119,14 +125,6 @@ class Exptrack_Data_Table(DataTable):
                     row_key,
                     column_key,
                     popup,
-                    self.request_popup_args(column_key.value, int(row_key.value)),
+                    self._get_popup_args(column_key.value, int(row_key.value)),
                 )
             )
-
-    def request_popup_args(self, popup_column: any, id: int) -> Optional[list[any]]:
-        """
-        To be implemented by classes that extend this one.
-
-        Returns the arguments that are required to deal with different popup columns.
-        """
-        return None
