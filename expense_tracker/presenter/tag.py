@@ -38,11 +38,10 @@ class Tag(Presenter):
         """
 
         return (
-                    tag.id,
-                    tag.name,
-                    str(tag.instance_tag),
-                )
-
+            tag.id,
+            tag.name,
+            str(tag.instance_tag),
+        )
 
     @staticmethod
     def get_all() -> list[tuple[int, ...]]:
@@ -87,4 +86,4 @@ class Tag(Presenter):
                 session.query(DB_Tag).where(DB_Tag.amounts.contains(amount)).all()
             )
 
-            return Tag._format(tag_list)
+            return list(Tag._format(tag) for tag in tag_list)

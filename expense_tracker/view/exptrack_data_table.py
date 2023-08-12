@@ -6,11 +6,9 @@ from collections import Callable
 
 from typing import Any, Optional
 from textual.coordinate import Coordinate
-from textual.message import Message
 from textual.widgets import DataTable
 from textual.widgets._data_table import CellKey
 from textual.events import Click
-from textual.screen import ModalScreen
 from textual.widgets._data_table import RowKey, ColumnKey
 
 from expense_tracker.view.table_constants import Table_Info, Column_Info
@@ -76,23 +74,29 @@ class Exptrack_Data_Table(DataTable):
     def action_create(self) -> None:
         """
         Called when c is pressed.
-        
+
         Mounts the create popup.
         """
 
         print("Create")
 
-        if not self._table_info.popup_factories.create:
+        if (
+            not self._table_info.popup_factories
+            or not self._table_info.popup_factories.create
+        ):
             return
 
     def action_expand(self) -> None:
         """
         Called when e is pressed.
-        
+
         Mounts the expand popup.
         """
 
-        if not self._table_info.popup_factories.detailed_data:
+        if (
+            not self._table_info.popup_factories
+            or not self._table_info.popup_factories.detailed_data
+        ):
             return
 
         self.app.push_screen(
@@ -104,11 +108,14 @@ class Exptrack_Data_Table(DataTable):
     def action_delete(self) -> None:
         """
         Called when d is pressed.
-        
+
         Mounts the delete popup.
         """
 
-        if not self._table_info.popup_factories.delete:
+        if (
+            not self._table_info.popup_factories
+            or not self._table_info.popup_factories.delete
+        ):
             return
 
         print("Delete")

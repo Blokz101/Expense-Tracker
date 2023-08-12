@@ -30,17 +30,17 @@ class Location(Presenter):
         YCOORD: int = 4
 
     @staticmethod
-    def _format(location: DB_Merchant_Location)-> tuple[int, ...]:
+    def _format(location: DB_Merchant_Location) -> tuple[int, ...]:
         """
         Formats raw database transaction into a tuple
         """
         return (
-                    location.id,
-                    location.merchant.name,
-                    location.name,
-                    float(location.x_coord),
-                    float(location.y_coord),
-                )
+            location.id,
+            location.merchant.name,
+            location.name,
+            float(location.x_coord),
+            float(location.y_coord),
+        )
 
     @staticmethod
     def get_all() -> list[tuple[int, ...]]:
@@ -48,7 +48,10 @@ class Location(Presenter):
         Returns a list of all merchants as a list of tuples of strings
         """
         with Session(engine) as session:
-            return list(Location._format(location) for location in session.query(DB_Merchant_Location).all())
+            return list(
+                Location._format(location)
+                for location in session.query(DB_Merchant_Location).all()
+            )
 
     @staticmethod
     def set_value(id: int, column: Column, new_value: any) -> any:

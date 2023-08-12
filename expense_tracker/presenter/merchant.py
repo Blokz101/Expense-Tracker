@@ -34,10 +34,10 @@ class Merchant(Presenter):
         Formats raw database transaction into a tuple
         """
         return (
-                    merchant.id,
-                    merchant.name,
-                    merchant.naming_rule,
-                )
+            merchant.id,
+            merchant.name,
+            merchant.naming_rule,
+        )
 
     @staticmethod
     def get_all() -> list[tuple[int, ...]]:
@@ -45,7 +45,10 @@ class Merchant(Presenter):
         Returns a list of all merchants as a list of tuples of strings
         """
         with Session(engine) as session:
-            return list(Merchant._format(merchant) for merchant in session.query(DB_Merchant).all())
+            return list(
+                Merchant._format(merchant)
+                for merchant in session.query(DB_Merchant).all()
+            )
 
     @staticmethod
     def set_value(id: int, column: Column, new_value: any) -> any:

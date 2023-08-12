@@ -53,7 +53,9 @@ class Account(Presenter):
         Returns a list of all merchants as a list of tuples of strings
         """
         with Session(engine) as session:
-            return list(Account._format(account) for account in session.query(DB_Account).all())
+            return list(
+                Account._format(account) for account in session.query(DB_Account).all()
+            )
 
     @staticmethod
     def set_value(id: int, column: Column, new_value: any) -> any:
