@@ -1,3 +1,19 @@
 DataTable, Placeholder, Transaction_Table, Merchant_Table, Field_Switcher, TabbedContent ContentSwitcher {
     height: 1fr;
 }
+
+
+Detailed_Data_Popup {
+    align: center middle;
+}
+
+Detailed_Data_Popup > VerticalScroll {
+    width: 60;
+    height: auto;
+    background: $surface;
+    padding: 1;
+}
+
+Detailed_Data_Popup > VerticalScroll > DataTable {
+    margin-top: 1;
+}

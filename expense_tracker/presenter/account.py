@@ -35,24 +35,17 @@ class Account(Presenter):
         DATE_COLUMN_INDEX: int = 5
 
     @staticmethod
-    def _format(amount_list: list[DB_Account]) -> list[tuple[int, ...]]:
+    def _format(amount: DB_Account) -> tuple[int, ...]:
         """
         Formats raw database transaction into a tuple
         """
-        display_list: list[tuple[int, ...]] = []
-
-        for entry in amount_list:
-            display_list.append(
-                (
-                    entry.id,
-                    entry.name,
-                    str(entry.statement_description_column_index),
-                    str(entry.statement_amount_column_index),
-                    str(entry.statement_date_column_index),
-                )
-            )
-
-        return display_list
+        return (
+            amount.id,
+            amount.name,
+            str(amount.statement_description_column_index),
+            str(amount.statement_amount_column_index),
+            str(amount.statement_date_column_index),
+        )
 
     @staticmethod
     def get_all() -> list[tuple[int, ...]]:
@@ -60,7 +53,7 @@ class Account(Presenter):
         Returns a list of all merchants as a list of tuples of strings
         """
         with Session(engine) as session:
-            return Account._format(session.query(DB_Account).all())
+            return list(Account._format(account) for account in session.query(DB_Account).all())
 
     @staticmethod
     def set_value(id: int, column: Column, new_value: any) -> any:

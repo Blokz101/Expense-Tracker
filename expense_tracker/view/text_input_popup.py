@@ -56,10 +56,10 @@ class Text_Input_Popup(ModalScreen[Optional[str]]):
         """
         Constructor
         """
+        super().__init__(name, id, classes)
         self._instructions_text: str = instructions
         self._default: Optional[str] = default
         self._validators = validators
-        super().__init__(name, id, classes)
 
     def compose(self) -> ComposeResult:
         """

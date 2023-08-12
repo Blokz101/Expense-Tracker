@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-
 from textual.validation import Number, Regex
 from textual.widgets.selection_list import Selection
 
@@ -13,8 +11,9 @@ from expense_tracker.view.text_input_popup import Text_Input_Popup
 from expense_tracker.view.options_input_popup import Options_Input_Popup
 from expense_tracker.view.toggle_input_popup import Toggle_Input_Popup
 from expense_tracker.view.selector import Selector
+from expense_tracker.view.detailed_data_popup import Detailed_Data_Popup
+from expense_tracker.view.table_info import Table_Info, Column_Info, Popup_Factories
 
-from expense_tracker.presenter.presenter import Presenter
 from expense_tracker.presenter.transaction import Transaction
 from expense_tracker.presenter.merchant import Merchant
 from expense_tracker.presenter.account import Account
@@ -22,36 +21,12 @@ from expense_tracker.presenter.location import Location
 from expense_tracker.presenter.tag import Tag
 
 
-@dataclass
-class Table_Info:
-    """
-    Dataclass that holds all the info needed for a table
-    """
-
-    name: str
-    presenter: Presenter
-    detailed_data_popup_factory: any
-    column_list: list[Column_Info]
-
-
-@dataclass
-class Column_Info:
-    """
-    Dataclass that hold all the info needed to create each column
-    """
-
-    display_name: str
-    column_variable: int
-    popup_factory: any
-    hidden: bool = True
-
-
-def _get_tag_selections(transaction_id: int) -> list[any]:
+def _get_tag_selections(row_id: int) -> list[any]:
     """
     Get the tag selections for a transaction
     """
-    
-    selected_tag_list: list[tuple[int, ...]] = Tag.get_tags_from_transaction(transaction_id)
+
+    selected_tag_list: list[tuple[int, ...]] = Tag.get_tags_from_transaction(row_id)
     selected_tag_id_list: list[int] = list(tag[0] for tag in selected_tag_list)
 
     tag_list: list[tuple[int, ...]] = []
@@ -65,8 +40,9 @@ def _get_tag_selections(transaction_id: int) -> list[any]:
 TRANSACTION: Table_Info = Table_Info(
     "transaction",
     Transaction,
-    None,
+    Popup_Factories(None, lambda id: Detailed_Data_Popup(id, TRANSACTION), None),
     [
+        Column_Info("ID", Transaction.Column.ID, None),
         Column_Info("Status", Transaction.Column.RECONCILED_STATUS, None),
         Column_Info(
             "Description",
@@ -100,7 +76,9 @@ TRANSACTION: Table_Info = Table_Info(
         Column_Info(
             "Tags",
             Transaction.Column.TAGS,
-            lambda id: Toggle_Input_Popup(_get_tag_selections(id), instructions="Select tags"),
+            lambda id: Toggle_Input_Popup(
+                _get_tag_selections(id), instructions="Select tags"
+            ),
         ),
         Column_Info(
             "Amount",
@@ -118,6 +96,7 @@ ACCOUNT: Table_Info = Table_Info(
     Account,
     None,
     [
+        Column_Info("ID", Transaction.Column.ID, None),
         Column_Info(
             "Name",
             Account.Column.NAME,
@@ -161,6 +140,7 @@ LOCATION: Table_Info = Table_Info(
     Location,
     None,
     [
+        Column_Info("ID", Transaction.Column.ID, None),
         Column_Info(
             "Merchant",
             Location.Column.MERCHANT,
@@ -201,6 +181,7 @@ MERCHANT: Table_Info = Table_Info(
     Merchant,
     None,
     [
+        Column_Info("ID", Transaction.Column.ID, None),
         Column_Info(
             "Name",
             Merchant.Column.NAME,
@@ -219,6 +200,7 @@ TAG: Table_Info = Table_Info(
     Tag,
     None,
     [
+        Column_Info("ID", Transaction.Column.ID, None),
         Column_Info(
             "Name",
             Tag.Column.NAME,

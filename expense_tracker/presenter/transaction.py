@@ -38,35 +38,42 @@ class Transaction(Presenter):
         TAGS: int = 6
 
     @staticmethod
-    def _format(transaction_list: list[DB_Transaction]) -> list[tuple[int, ...]]:
+    def _format(transaction: DB_Transaction) -> tuple[int, ...]:
         """
         Formats raw database transaction into a tuple
         """
-        display_list: list[tuple[int, ...]] = []
-
-        for entry in transaction_list:
-            display_list.append(
-                (
-                    entry.id,
-                    entry.reconciled_status,
-                    entry.description,
-                    entry.merchant.name,
-                    datetime.strftime(entry.date, Constants.DATE_FORMAT),
-                    ", ".join(tag.name for tag in entry.amounts[0].tags),
-                    # TODO Edit this to support multiple amounts
-                    entry.amounts[0].amount,
-                )
-            )
-
-        return display_list
+        return (
+            transaction.id,
+            transaction.reconciled_status,
+            transaction.description,
+            transaction.merchant.name,
+            datetime.strftime(transaction.date, Constants.DATE_FORMAT),
+            ", ".join(tag.name for tag in transaction.amounts[0].tags),
+            # TODO Edit this to support multiple amounts
+            transaction.amounts[0].amount,
+        )
 
     @staticmethod
     def get_all() -> list[tuple[int, ...]]:
         """
         Returns a list of all transactions as a list of tuples of strings
         """
+
         with Session(engine) as session:
-            return Transaction._format(session.query(DB_Transaction).all())
+            return list(
+                Transaction._format(transaction)
+                for transaction in session.query(DB_Transaction).all()
+            )
+
+    @staticmethod
+    def get_by_id(id: int) -> list[tuple[int, ...]]:
+        """
+        Returns a single object with the requested id
+        """
+        with Session(engine) as session:
+            return Transaction._format(
+                session.query(DB_Transaction).where(DB_Transaction.id == id).first()
+            )
 
     @staticmethod
     def set_value(id: int, column: Column, new_value: any) -> any:

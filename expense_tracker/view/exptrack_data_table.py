@@ -16,11 +16,6 @@ from textual.widgets._data_table import RowKey, ColumnKey
 from expense_tracker.view.table_constants import Table_Info, Column_Info
 
 from expense_tracker.presenter.presenter import Presenter
-from expense_tracker.presenter.transaction import Transaction
-from expense_tracker.presenter.merchant import Merchant
-from expense_tracker.presenter.account import Account
-from expense_tracker.presenter.location import Location
-from expense_tracker.presenter.tag import Tag
 
 
 class Exptrack_Data_Table(DataTable):
@@ -28,28 +23,32 @@ class Exptrack_Data_Table(DataTable):
     Generates data tables from each of the data types.
     """
 
+    BINDINGS: list[tuple[str, str, str]] = [
+        ("c", "create", "Create"),
+        ("d", "delete", "Delete"),
+        ("e", "expand", "Expand"),
+    ]
+
     def __init__(
         self,
-        table_info_list: Table_Info,
+        table_info: Table_Info,
         initial_row_list: list[tuple[int, ...]] = None,
         name: Optional[str] = None,
         classes: Optional[str] = None,
     ) -> None:
-        self._presenter: Presenter = table_info_list.presenter
-        self._column_info_list: list[Column_Info] = table_info_list.column_list
+        self._table_info: Table_Info = table_info
 
         # Set the initial row list
         self._initial_row_list: list[tuple[int, ...]]
         if not initial_row_list:
-            self._initial_row_list = self._presenter.get_all()
+            self._initial_row_list = self._table_info.presenter.get_all()
         else:
             self._initial_row_list = initial_row_list
 
         super().__init__(
-            show_cursor=False,
             zebra_stripes=True,
             name=name,
-            id=table_info_list.name,
+            id=table_info.name,
             classes=classes,
         )
 
@@ -59,9 +58,11 @@ class Exptrack_Data_Table(DataTable):
 
         Adds the columns and initial rows.
         """
+        # Set the cursor type
+        self.cursor_type = "row"
+
         # Add an id column and other columns
-        self.add_column("id", key="id")
-        for info in self._column_info_list:
+        for info in self._table_info.column_list:
             self.add_column(info.display_name, key=info.column_variable)
 
         # Add initial rows
@@ -72,12 +73,56 @@ class Exptrack_Data_Table(DataTable):
                 )
             self.add_row(*row[0:], key=row[0])
 
+    def action_create(self) -> None:
+        """
+        Called when c is pressed.
+        
+        Mounts the create popup.
+        """
+
+        print("Create")
+
+        if not self._table_info.popup_factories.create:
+            return
+
+    def action_expand(self) -> None:
+        """
+        Called when e is pressed.
+        
+        Mounts the expand popup.
+        """
+
+        if not self._table_info.popup_factories.detailed_data:
+            return
+
+        self.app.push_screen(
+            self._table_info.popup_factories.detailed_data(
+                int(self.coordinate_to_cell_key(self.cursor_coordinate).row_key.value)
+            )
+        )
+
+    def action_delete(self) -> None:
+        """
+        Called when d is pressed.
+        
+        Mounts the delete popup.
+        """
+
+        if not self._table_info.popup_factories.delete:
+            return
+
+        print("Delete")
+
     def on_click(self, event: Click) -> None:
         """
         Called when the user clicks a cell.
 
         Gets the details of the cell clicked and mounts a popup.
         """
+
+        # If the shift key was not held down then return
+        if not event.shift:
+            return
 
         # Get the row and column index from event
         meta: dict[str, Any] = event.style.meta
@@ -101,7 +146,7 @@ class Exptrack_Data_Table(DataTable):
             column = next(
                 (
                     info
-                    for info in self._column_info_list
+                    for info in self._table_info.column_list
                     if info.column_variable == column_key.value
                 )
             )
@@ -119,7 +164,7 @@ class Exptrack_Data_Table(DataTable):
             if new_value is None:
                 return
 
-            updated_value: str = self._presenter.set_value(
+            updated_value: str = self._table_info.presenter.set_value(
                 int(row_key.value), column_key.value, new_value
             )
             self.update_cell(

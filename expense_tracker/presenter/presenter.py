@@ -8,7 +8,7 @@ class Presenter:
         ID: int = 0
 
     @staticmethod
-    def _format(object_list: list[any]) -> list[tuple[int, ...]]:
+    def _format(object_list: any) -> tuple[int, ...]:
         """
         Formats the raw database objects into a tuple
         """
@@ -22,6 +22,14 @@ class Presenter:
         """
 
         raise RuntimeError("Presenter class does not extend get_all.")
+
+    @staticmethod
+    def get_by_id(id: int) -> tuple[int, ...]:
+        """
+        Returns a single object with the requested id
+        """
+
+        raise RuntimeError("Presenter class does not extend get_by_id.")
 
     @staticmethod
     def set_value(id: int, column: Column, new_value: any) -> any:

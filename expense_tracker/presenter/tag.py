@@ -32,23 +32,17 @@ class Tag(Presenter):
         INSTANCE_TAG: int = 2
 
     @staticmethod
-    def _format(tag_list: list[DB_Tag]) -> list[tuple[int, ...]]:
+    def _format(tag: DB_Tag) -> tuple[int, ...]:
         """
         Formats raw database tags into a tuple
         """
 
-        display_list: list[tuple[int, ...]] = []
-
-        for entry in tag_list:
-            display_list.append(
-                (
-                    entry.id,
-                    entry.name,
-                    str(entry.instance_tag),
+        return (
+                    tag.id,
+                    tag.name,
+                    str(tag.instance_tag),
                 )
-            )
 
-        return display_list
 
     @staticmethod
     def get_all() -> list[tuple[int, ...]]:
@@ -57,7 +51,7 @@ class Tag(Presenter):
         """
 
         with Session(engine) as session:
-            return Tag._format(session.query(DB_Tag).all())
+            return list(Tag._format(tag) for tag in session.query(DB_Tag).all())
 
     @staticmethod
     def set_value(id: int, column: Column, new_value: any) -> any:
