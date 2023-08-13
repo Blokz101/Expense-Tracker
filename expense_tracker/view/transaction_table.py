@@ -55,7 +55,7 @@ class Transaction_Table(Exptrack_Data_Table):
 
     def action_expand(self) -> None:
         """
-        TODO Fill in later
+        Show a detailed data popup
         """
 
         self.app.push_screen(

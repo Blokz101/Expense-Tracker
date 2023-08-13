@@ -29,10 +29,9 @@ class Account(Presenter):
     class Column(Enum):
         ID: int = 0
         NAME: int = 1
-        NAMING_RULE: int = 2
-        DESCRIPTION_COLUMN_INDEX: int = 3
-        AMOUNT_COLUMN_INDEX: int = 4
-        DATE_COLUMN_INDEX: int = 5
+        DESCRIPTION_COLUMN_INDEX: int = 2
+        AMOUNT_COLUMN_INDEX: int = 3
+        DATE_COLUMN_INDEX: int = 4
 
     @staticmethod
     def _format(amount: DB_Account) -> tuple[int, ...]:
@@ -56,6 +55,22 @@ class Account(Presenter):
             return list(
                 Account._format(account) for account in session.query(DB_Account).all()
             )
+            
+    @staticmethod
+    def create(values: dict[Enum, any]) -> tuple[int, ...]:
+        """
+        Create a merchant
+        """
+        with Session(engine) as session:
+            new_account: DB_Account = DB_Account(
+                name=values[Account.Column.NAME],
+                statement_description_column_index=values[Account.Column.DESCRIPTION_COLUMN_INDEX],
+                statement_amount_column_index=values[Account.Column.AMOUNT_COLUMN_INDEX],
+                statement_date_column_index=values[Account.Column.DATE_COLUMN_INDEX]
+            )
+            session.add(new_account)
+            session.commit()
+            return Account._format(new_account)
 
     @staticmethod
     def set_value(id: int, column: Column, new_value: any) -> any:
@@ -92,3 +107,20 @@ class Account(Presenter):
                 return account.statement_date_column_index
 
         Presenter.set_value(id, column, new_value)
+        
+    @staticmethod
+    def get_value(value: any, column: Column) -> any:
+        """
+        Format or get a value based on the column it was requested for
+        """
+
+        # value will be a str
+        if (
+            column == Account.Column.NAME
+            or column == Account.Column.DESCRIPTION_COLUMN_INDEX
+            or column == Account.Column.AMOUNT_COLUMN_INDEX
+            or column == Account.Column.DATE_COLUMN_INDEX
+        ):
+            return str(value)
+
+        return Presenter.get_value(id, column)

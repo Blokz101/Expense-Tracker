@@ -84,7 +84,6 @@ class Transaction(Presenter):
         """
 
         with Session(engine) as session:
-            # Create the new transaction
             new_transaction: DB_Transaction = DB_Transaction(
                 account_id=values[Transaction.Column.ACCOUNT],
                 description=values[Transaction.Column.DESCRIPTION],
