@@ -1,4 +1,4 @@
-# expense_tracker/view/transaction_create_popup.py
+# expense_tracker/view/popup/transaction_create_popup.py
 
 
 from enum import Enum
@@ -12,9 +12,9 @@ from textual.widgets.selection_list import Selection
 from expense_tracker.presenter.transaction import Transaction
 from expense_tracker.presenter.tag import Tag
 
-from expense_tracker.view.toggle_input_popup import Toggle_Input_Popup
-from expense_tracker.view.create_popup import Create_Popup
-from expense_tracker.view.exptrack_data_table import Exptrack_Data_Table
+from expense_tracker.view.popup.toggle_input_popup import Toggle_Input_Popup
+from expense_tracker.view.popup.create_popup import Create_Popup
+from expense_tracker.view.table.exptrack_data_table import Exptrack_Data_Table
 
 from typing import Optional
 

@@ -1,27 +1,28 @@
-# expense_tracker/view/merchant_table.py
+# expense_tracker/view/table/tag_table.py
 
 
 from enum import Enum
 from typing import Any, Optional
 from textual.screen import ModalScreen
 
-from expense_tracker.presenter.merchant import Merchant
+from expense_tracker.presenter.tag import Tag
 
-from expense_tracker.view.exptrack_data_table import Exptrack_Data_Table
-from expense_tracker.view.text_input_popup import Text_Input_Popup
-from expense_tracker.view.detailed_data_popup import Detailed_Data_Popup
-from expense_tracker.view.create_popup import Create_Popup
+from expense_tracker.view.table.exptrack_data_table import Exptrack_Data_Table
+from expense_tracker.view.popup.text_input_popup import Text_Input_Popup
+from expense_tracker.view.popup.detailed_data_popup import Detailed_Data_Popup
+from expense_tracker.view.popup.switch_input_popup import Switch_Input_Popup
+from expense_tracker.view.popup.create_popup import Create_Popup
 
 
-class Merchant_Table(Exptrack_Data_Table):
+class Tag_Table(Exptrack_Data_Table):
     """
-    Table of merchants
+    Table of tags
     """
 
     COLUMN_LIST: list[tuple[str, Enum]] = [
-        ("ID", Merchant.Column.ID),
-        ("Name", Merchant.Column.NAME),
-        ("Rule", Merchant.Column.NAMING_RULE),
+        ("ID", Tag.Column.ID),
+        ("Name", Tag.Column.NAME),
+        ("Instance", Tag.Column.INSTANCE_TAG),
     ]
 
     def __init__(
@@ -30,9 +31,7 @@ class Merchant_Table(Exptrack_Data_Table):
         id: Optional[str] = None,
         classes: Optional[str] = None,
     ) -> None:
-        super().__init__(
-            Merchant, Merchant_Table.COLUMN_LIST, name=name, id=id, classes=classes
-        )
+        super().__init__(Tag, Tag_Table.COLUMN_LIST, name=name, id=id, classes=classes)
 
     def action_create(self) -> None:
         """
@@ -64,10 +63,10 @@ class Merchant_Table(Exptrack_Data_Table):
         Get the input popup based on the column
         """
 
-        if column == Merchant.Column.NAME:
+        if column == Tag.Column.NAME:
             return Text_Input_Popup(instructions="Input a name")
 
-        if column == Merchant.Column.NAMING_RULE:
-            return Text_Input_Popup(instructions="Input a regular expression")
+        if column == Tag.Column.INSTANCE_TAG:
+            return Switch_Input_Popup(instructions="Is this tag an instance tag")
 
         return super().get_input_popup(column, id)

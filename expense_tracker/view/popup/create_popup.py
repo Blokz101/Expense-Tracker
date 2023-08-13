@@ -1,4 +1,4 @@
-# expense_tracker/view/create_popup.py
+# expense_tracker/view/popup/create_popup.py
 
 from enum import Enum
 
@@ -11,7 +11,7 @@ from textual.screen import ModalScreen
 from textual.events import Click
 from textual.binding import Binding
 
-from expense_tracker.view.exptrack_data_table import Exptrack_Data_Table
+from expense_tracker.view.table.exptrack_data_table import Exptrack_Data_Table
 
 from typing import Optional
 

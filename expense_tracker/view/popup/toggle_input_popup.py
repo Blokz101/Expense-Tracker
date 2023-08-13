@@ -1,75 +1,70 @@
-# expense_tracker/view/switch_input_popup.py
+# expense_tracker/view/popup/toggle_input_popup.py
 
 from textual.app import ComposeResult
-from textual.widgets import Input, Static, Switch
+from textual.widgets import Static, SelectionList
+from textual.widgets.selection_list import Selection
 from textual.containers import Vertical
 from textual.screen import ModalScreen
-from textual.validation import Validator
-from textual.css.query import NoMatches
 from textual.binding import Binding
 
-from typing import Optional
+from typing import Optional, NamedTuple
 
 
-class Switch_Input_Popup(ModalScreen[Optional[bool]]):
+class Toggle_Input_Popup(ModalScreen[Optional[int]]):
     """
-    TODO Fill this in
+    Popup that prompts the user to select an option from many
     """
 
     DEFAULT_CSS: str = """
-        Switch_Input_Popup {
+        Toggle_Input_Popup {
             align: center middle;
         }
 
-        Switch_Input_Popup > Vertical {
+        Toggle_Input_Popup > Vertical {
             width: 60;
             height: auto;
             background: $surface;
             padding: 1;
         }
 
-        Switch_Input_Popup > Vertical > Switch {
-            margin: 1 0 0 0;
+        Toggle_Input_Popup > Vertical > SelectionList {
+            margin-top: 1;
         }
     """
 
-    BINDINGS: list[tuple[str, str, str]] = [
+    BINDINGS: list[Binding] = [
         Binding("escape", "exit_popup", "Dismiss popup"),
         Binding("enter", "submit", "Submit", priority=True),
     ]
 
     def __init__(
         self,
-        instructions: str = "Select true or false",
-        default: Optional[bool] = None,
+        option_list: list[Selection] = [],
+        instructions: str = "Enter a value",
         name: Optional[str] = None,
         id: Optional[str] = None,
         classes: Optional[str] = None,
     ) -> None:
-        """
-        Constructor
-        """
-        super().__init__(name, id, classes)
+        self._option_list: list[Selection] = sorted(
+            option_list, key=lambda x: str(x.prompt)
+        )
         self._instructions_text: str = instructions
-        self._default: Optional[bool] = default
+        super().__init__(name, id, classes)
 
     def compose(self) -> ComposeResult:
-        """
-        Composes the display
-        """
         self._container: Vertical = Vertical()
         self._instructions_widget: Static = Static(self._instructions_text)
-        self._switch_widget: Switch = Switch()
+        self._selector_widget: SelectionList = SelectionList(*self._option_list)
 
         with self._container:
             yield self._instructions_widget
-            yield self._switch_widget
+            yield self._selector_widget
 
     def action_submit(self) -> None:
         """
         Called when the popup is submitted
         """
-        self.dismiss(self._switch_widget.value)
+        self.dismiss(self._selector_widget.selected)
 
     def action_exit_popup(self) -> None:
         """
@@ -77,5 +72,4 @@ class Switch_Input_Popup(ModalScreen[Optional[bool]]):
 
         Returns none and dismisses.
         """
-
         self.dismiss(None)

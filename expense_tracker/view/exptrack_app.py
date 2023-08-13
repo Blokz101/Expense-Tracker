@@ -5,7 +5,7 @@ from textual.widgets import Footer, Header, TabbedContent, TabPane, Placeholder
 from expense_tracker.constants import Constants
 
 from expense_tracker.view.field_switcher import Field_Switcher
-from expense_tracker.view.transaction_table import Transaction_Table
+from expense_tracker.view.table.transaction_table import Transaction_Table
 
 from typing import Optional
 

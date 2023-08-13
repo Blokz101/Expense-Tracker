@@ -8,10 +8,10 @@ from textual.widgets import ContentSwitcher, OptionList, Placeholder
 from textual.containers import Horizontal
 from textual.widgets.option_list import Option
 
-from expense_tracker.view.account_table import Account_Table
-from expense_tracker.view.location_table import Location_Table
-from expense_tracker.view.merchant_table import Merchant_Table
-from expense_tracker.view.tag_table import Tag_Table
+from expense_tracker.view.table.account_table import Account_Table
+from expense_tracker.view.table.location_table import Location_Table
+from expense_tracker.view.table.merchant_table import Merchant_Table
+from expense_tracker.view.table.tag_table import Tag_Table
 
 
 class Field_Switcher(Widget):

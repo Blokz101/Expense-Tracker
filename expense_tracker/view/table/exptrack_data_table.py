@@ -1,4 +1,4 @@
-# expense_tracker/view/exptrack_data_table.py
+# expense_tracker/view/table/exptrack_data_table.py
 
 from __future__ import annotations
 

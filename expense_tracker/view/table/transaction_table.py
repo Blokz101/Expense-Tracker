@@ -1,4 +1,4 @@
-# expense_tracker/view/transaction_table.py
+# expense_tracker/view/table/transaction_table.py
 
 from enum import Enum
 from typing import Any, Optional
@@ -13,19 +13,21 @@ from expense_tracker.presenter.merchant import Merchant
 from expense_tracker.presenter.tag import Tag
 from expense_tracker.presenter.account import Account
 
-from expense_tracker.view.exptrack_data_table import Exptrack_Data_Table
-from expense_tracker.view.text_input_popup import Text_Input_Popup
-from expense_tracker.view.options_input_popup import Options_Input_Popup
-from expense_tracker.view.toggle_input_popup import Toggle_Input_Popup
-from expense_tracker.view.detailed_data_popup import Detailed_Data_Popup
+from expense_tracker.view.table.exptrack_data_table import Exptrack_Data_Table
+from expense_tracker.view.popup.text_input_popup import Text_Input_Popup
+from expense_tracker.view.popup.options_input_popup import Options_Input_Popup
+from expense_tracker.view.popup.toggle_input_popup import Toggle_Input_Popup
+from expense_tracker.view.popup.detailed_data_popup import Detailed_Data_Popup
 from expense_tracker.view.selector import Selector
-from expense_tracker.view.transaction_create_popup import Transaction_Create_Popup
+from expense_tracker.view.popup.transaction_create_popup import Transaction_Create_Popup
 
 
 class Transaction_Table(Exptrack_Data_Table):
     """
     Table of transactions
     """
+
+    BINDINGS: list[tuple[str, str, str]] = [("i", "import", "Import")]
 
     COLUMN_LIST: list[tuple[str, Enum, bool]] = [
         ("ID", Transaction.Column.ID),

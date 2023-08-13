@@ -1,4 +1,4 @@
-# expense_tracker/view/detailed_data_popup
+# expense_tracker/view/popup/detailed_data_popup
 
 from textual.app import ComposeResult
 from textual.widgets import Static, DataTable
@@ -8,7 +8,7 @@ from textual.coordinate import Coordinate
 from textual.screen import ModalScreen
 from textual.events import Click
 
-from expense_tracker.view.exptrack_data_table import Exptrack_Data_Table
+from expense_tracker.view.table.exptrack_data_table import Exptrack_Data_Table
 
 from typing import Optional
 

@@ -1,4 +1,4 @@
-# expense_tracker/view/location_table.py
+# expense_tracker/view/table/location_table.py
 
 from enum import Enum
 from typing import Optional
@@ -8,12 +8,12 @@ from textual.validation import Number
 from expense_tracker.presenter.location import Location
 from expense_tracker.presenter.merchant import Merchant
 
-from expense_tracker.view.exptrack_data_table import Exptrack_Data_Table
-from expense_tracker.view.text_input_popup import Text_Input_Popup
-from expense_tracker.view.options_input_popup import Options_Input_Popup
-from expense_tracker.view.detailed_data_popup import Detailed_Data_Popup
+from expense_tracker.view.table.exptrack_data_table import Exptrack_Data_Table
+from expense_tracker.view.popup.text_input_popup import Text_Input_Popup
+from expense_tracker.view.popup.options_input_popup import Options_Input_Popup
+from expense_tracker.view.popup.detailed_data_popup import Detailed_Data_Popup
 from expense_tracker.view.selector import Selector
-from expense_tracker.view.create_popup import Create_Popup
+from expense_tracker.view.popup.create_popup import Create_Popup
 
 
 class Location_Table(Exptrack_Data_Table):

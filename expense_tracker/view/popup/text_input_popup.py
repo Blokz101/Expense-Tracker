@@ -1,4 +1,4 @@
-# expense_tracker/view/text_input_popup.py
+# expense_tracker/view/popup/text_input_popup.py
 
 from textual.app import ComposeResult
 from textual.widgets import Input, Static
