@@ -35,7 +35,7 @@ class Account_Table(Exptrack_Data_Table):
         super().__init__(
             Account, Account_Table.COLUMN_LIST, name=name, id=id, classes=classes
         )
-        
+
     def action_create(self) -> None:
         """
         Called when c is pressed.

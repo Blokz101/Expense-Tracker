@@ -47,6 +47,16 @@ class Account(Presenter):
         )
 
     @staticmethod
+    def get_by_id(id: int) -> list[tuple[int, ...]]:
+        """
+        Returns a single object with the requested id
+        """
+        with Session(engine) as session:
+            return Account._format(
+                session.query(DB_Account).where(DB_Account.id == id).first()
+            )
+
+    @staticmethod
     def get_all() -> list[tuple[int, ...]]:
         """
         Returns a list of all merchants as a list of tuples of strings
@@ -55,7 +65,7 @@ class Account(Presenter):
             return list(
                 Account._format(account) for account in session.query(DB_Account).all()
             )
-            
+
     @staticmethod
     def create(values: dict[Enum, any]) -> tuple[int, ...]:
         """
@@ -64,9 +74,13 @@ class Account(Presenter):
         with Session(engine) as session:
             new_account: DB_Account = DB_Account(
                 name=values[Account.Column.NAME],
-                statement_description_column_index=values[Account.Column.DESCRIPTION_COLUMN_INDEX],
-                statement_amount_column_index=values[Account.Column.AMOUNT_COLUMN_INDEX],
-                statement_date_column_index=values[Account.Column.DATE_COLUMN_INDEX]
+                statement_description_column_index=values[
+                    Account.Column.DESCRIPTION_COLUMN_INDEX
+                ],
+                statement_amount_column_index=values[
+                    Account.Column.AMOUNT_COLUMN_INDEX
+                ],
+                statement_date_column_index=values[Account.Column.DATE_COLUMN_INDEX],
             )
             session.add(new_account)
             session.commit()
@@ -107,7 +121,7 @@ class Account(Presenter):
                 return account.statement_date_column_index
 
         Presenter.set_value(id, column, new_value)
-        
+
     @staticmethod
     def get_value(value: any, column: Column) -> any:
         """
