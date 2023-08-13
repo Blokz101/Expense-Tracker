@@ -3,17 +3,29 @@ DataTable, Placeholder, Transaction_Table, Merchant_Table, Field_Switcher, Tabbe
 }
 
 
-Detailed_Data_Popup {
+Create_Popup {
     align: center middle;
 }
 
-Detailed_Data_Popup > VerticalScroll {
+Create_Popup > Vertical {
     width: 60;
     height: auto;
     background: $surface;
     padding: 1;
 }
 
-Detailed_Data_Popup > VerticalScroll > DataTable {
-    margin-top: 1;
+Create_Popup > Vertical > DataTable {
+    border: $error;
+}
+
+Create_Popup #validation_status {
+    color: $error;
+}
+
+.submittable #validation_status {
+    color: $accent;
+}
+
+.submittable > Vertical > DataTable {
+    border: $accent;
 }

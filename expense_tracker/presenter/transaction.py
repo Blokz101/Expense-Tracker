@@ -128,4 +128,42 @@ class Transaction(Presenter):
                 session.commit()
                 return ", ".join(tag.name for tag in transaction.amounts[0].tags)
 
-        Presenter.set_value(id, column, new_value)
+        return Presenter.set_value(id, column, new_value)
+
+    @staticmethod
+    def get_value(value: any, column: Column) -> any:
+        """
+        TODO Fill this in
+        """
+
+        # value will be a str
+        if (
+            column == Transaction.Column.DESCRIPTION
+            or column == Transaction.Column.AMOUNT
+        ):
+            return str(value)
+
+        # value will be a date time object
+        if column == Transaction.Column.DATE:
+            return datetime.strptime(value, Constants.DATE_STRPTIME).strftime(
+                Constants.DATE_FORMAT
+            )
+
+        with Session(engine) as session:
+            # value will be an int
+            if column == Transaction.Column.MERCHANT:
+                merchant: DB_Merchant = (
+                    session.query(DB_Merchant).where(DB_Merchant.id == value).first()
+                )
+                return merchant.name
+
+            # value will be a list of ints
+            # TODO Edit this to support multiple amounts
+            if column == Transaction.Column.TAGS:
+                tag_list: list[DB_Tag] = list(
+                    session.query(DB_Tag).where(DB_Tag.id == tag_id).first()
+                    for tag_id in value
+                )
+                return ", ".join(tag.name for tag in tag_list)
+
+        return Presenter.get_value(id, column)

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections import Callable
+from enum import Enum
 
 from typing import Any, Optional
 from textual.coordinate import Coordinate
@@ -10,8 +10,7 @@ from textual.widgets import DataTable
 from textual.widgets._data_table import CellKey
 from textual.events import Click
 from textual.widgets._data_table import RowKey, ColumnKey
-
-from expense_tracker.view.table_constants import Table_Info, Column_Info
+from textual.screen import ModalScreen
 
 from expense_tracker.presenter.presenter import Presenter
 
@@ -29,24 +28,26 @@ class Exptrack_Data_Table(DataTable):
 
     def __init__(
         self,
-        table_info: Table_Info,
-        initial_row_list: list[tuple[int, ...]] = None,
+        presenter: Presenter,
+        column_list: list[tuple[str, Enum]],
+        initial_row_list: Optional[list[tuple[int, ...]]] = None,
         name: Optional[str] = None,
+        id: Optional[str] = None,
         classes: Optional[str] = None,
     ) -> None:
-        self._table_info: Table_Info = table_info
+        self.presenter: Presenter = presenter
+        self.column_list: list[tuple[str, Enum]] = column_list
 
-        # Set the initial row list
         self._initial_row_list: list[tuple[int, ...]]
-        if not initial_row_list:
-            self._initial_row_list = self._table_info.presenter.get_all()
-        else:
+        if initial_row_list:
             self._initial_row_list = initial_row_list
+        else:
+            self._initial_row_list = self.presenter.get_all()
 
         super().__init__(
             zebra_stripes=True,
             name=name,
-            id=table_info.name,
+            id=id,
             classes=classes,
         )
 
@@ -60,8 +61,8 @@ class Exptrack_Data_Table(DataTable):
         self.cursor_type = "row"
 
         # Add an id column and other columns
-        for info in self._table_info.column_list:
-            self.add_column(info.display_name, key=info.column_variable)
+        for column in self.column_list:
+            self.add_column(column[0], key=column[1])
 
         # Add initial rows
         for row in self._initial_row_list:
@@ -74,57 +75,27 @@ class Exptrack_Data_Table(DataTable):
     def action_create(self) -> None:
         """
         Called when c is pressed.
-
-        Mounts the create popup.
         """
 
-        print("Create")
-
-        if (
-            not self._table_info.popup_factories
-            or not self._table_info.popup_factories.create
-        ):
-            return
+        return
 
     def action_expand(self) -> None:
         """
         Called when e is pressed.
-
-        Mounts the expand popup.
         """
 
-        if (
-            not self._table_info.popup_factories
-            or not self._table_info.popup_factories.detailed_data
-        ):
-            return
-
-        self.app.push_screen(
-            self._table_info.popup_factories.detailed_data(
-                int(self.coordinate_to_cell_key(self.cursor_coordinate).row_key.value)
-            )
-        )
+        return
 
     def action_delete(self) -> None:
         """
         Called when d is pressed.
-
-        Mounts the delete popup.
         """
 
-        if (
-            not self._table_info.popup_factories
-            or not self._table_info.popup_factories.delete
-        ):
-            return
-
-        print("Delete")
+        return
 
     def on_click(self, event: Click) -> None:
         """
         Called when the user clicks a cell.
-
-        Gets the details of the cell clicked and mounts a popup.
         """
 
         # If the shift key was not held down then return
@@ -144,41 +115,43 @@ class Exptrack_Data_Table(DataTable):
 
         # Get the data id and database column id
         key: CellKey = self.coordinate_to_cell_key(Coordinate(row_index, column_index))
-        row_key: RowKey = key.row_key
-        column_key: ColumnKey = key.column_key
+        row_key: str = key.row_key.value
+        column_key: str = key.column_key.value
 
-        # Get the popup factory from column info list by id and column name
-        column: Column_Info
-        try:
-            column = next(
-                (
-                    info
-                    for info in self._table_info.column_list
-                    if info.column_variable == column_key.value
-                )
-            )
-        except:
+        # Get the popup if it exists
+        popup: ModalScreen = self.get_input_popup(column_key, int(row_key))
+
+        # If there is no popup then return
+        if not popup:
             return
 
-        if column.popup_factory is None:
-            return
-
-        def update_view_and_model(new_value: Optional[str]) -> None:
+        def callback(new_value: Optional[any]) -> None:
             """
             Updates the database and the view with the new value
             """
 
+            # If there is no new value then return
             if new_value is None:
                 return
 
-            updated_value: str = self._table_info.presenter.set_value(
-                int(row_key.value), column_key.value, new_value
+            # Update the database
+            updated_value: str = self.presenter.set_value(
+                int(row_key), column_key, new_value
             )
+
+            # Update self
             self.update_cell(
-                row_key,
-                column_key,
+                RowKey(row_key),
+                ColumnKey(column_key),
                 updated_value,
                 update_width=True,
             )
 
-        self.app.push_screen(column.popup_factory(row_key.value), update_view_and_model)
+        self.app.push_screen(popup, callback)
+
+    def get_input_popup(self, column: str, id: int) -> Optional[ModalScreen]:
+        """
+        To be extended
+        """
+
+        return None

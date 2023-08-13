@@ -8,8 +8,10 @@ from textual.widgets import ContentSwitcher, OptionList, Placeholder
 from textual.containers import Horizontal
 from textual.widgets.option_list import Option
 
-from expense_tracker.view.exptrack_data_table import Exptrack_Data_Table
-from expense_tracker.view.table_constants import ACCOUNT, LOCATION, MERCHANT, TAG
+from expense_tracker.view.account_table import Account_Table
+from expense_tracker.view.location_table import Location_Table
+from expense_tracker.view.merchant_table import Merchant_Table
+from expense_tracker.view.tag_table import Tag_Table
 
 
 class Field_Switcher(Widget):
@@ -28,13 +30,6 @@ class Field_Switcher(Widget):
         }
     """
 
-    class Fields(Enum):
-        ACCOUNT: int = 0
-        BUDGET: int = 1
-        LOCATION: int = 2
-        MERCHANT: int = 3
-        TAG: int = 4
-
     _OPTION_LIST_OPTIONS: list[Option] = [
         Option("Account", id="account"),
         Option("Budget", id="budget"),
@@ -44,11 +39,11 @@ class Field_Switcher(Widget):
     ]
 
     _TABLE_WIDGETS: list[Widget] = [
-        Exptrack_Data_Table(ACCOUNT),
+        Account_Table(id="account"),
         Placeholder("Budget", id="budget"),
-        Exptrack_Data_Table(LOCATION),
-        Exptrack_Data_Table(MERCHANT),
-        Exptrack_Data_Table(TAG),
+        Location_Table(id="location"),
+        Merchant_Table(id="merchant"),
+        Tag_Table(id="tag"),
     ]
 
     def compose(self) -> ComposeResult:

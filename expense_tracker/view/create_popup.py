@@ -1,4 +1,6 @@
-# expense_tracker/view/detailed_data_popup
+# expense_tracker/view/create_popup.py
+
+from enum import Enum
 
 from textual.app import ComposeResult
 from textual.widgets import Static, DataTable
@@ -13,44 +15,35 @@ from expense_tracker.view.exptrack_data_table import Exptrack_Data_Table
 from typing import Optional
 
 
-class Detailed_Data_Popup(ModalScreen):
-    """
-    Popup that displays a detailed table row
-    """
-
-    DEFAULT_CSS: str = """
-        Detailed_Data_Popup {
-            align: center middle;
-        }
-
-        Detailed_Data_Popup > Vertical {
-            width: 60;
-            height: auto;
-            background: $surface;
-            padding: 1;
-        }
-
-        Detailed_Data_Popup > Vertical > DataTable {
-            margin-top: 1;
-        }
-    """
+class Create_Popup(ModalScreen):
+    """ """
 
     def __init__(
         self,
-        object_id: int,
         parent_table: Exptrack_Data_Table,
-        title: str = "Details",
+        instructions: str = "Create",
+        modified_column_list: Optional[list[tuple[Enum, any]]] = None,
         name: Optional[str] = None,
         id: Optional[str] = None,
         classes: Optional[str] = None,
     ) -> None:
         super().__init__(name=name, id=id, classes=classes)
-        self.title: str = title
-        self.object_id: int = object_id
+        self.instruction_text: str = instructions
         self.parent_table: Exptrack_Data_Table = parent_table
+
+        # Generate the colum list if unless a modified one is provided
+        self.column_list: list[tuple[Enum, any]] = self.parent_table.column_list
+        if modified_column_list:
+            self.column_list = modified_column_list
+
+        # Generate a blank list of values for each column in the parent table, excluding the first or id column
+        self.values: dict[Enum, any] = dict.fromkeys(
+            (column[1] for column in self.column_list[1:]), None
+        )
 
     BINDINGS: list[tuple[str, str, str]] = [
         ("escape", "exit_popup", "Dismiss popup"),
+        ("s", "submit", "Submit"),
     ]
 
     def compose(self) -> ComposeResult:
@@ -58,12 +51,14 @@ class Detailed_Data_Popup(ModalScreen):
         Composes the display
         """
         self._container: Vertical = Vertical()
-        self._title_widget: Static = Static(self.title)
+        self._instructions_widget: Static = Static(self.instruction_text)
         self._data_table_widget: DataTable = DataTable(show_cursor=False)
+        self._validation_status_widget: Static = Static(id="validation_status")
 
         with self._container:
-            yield self._title_widget
+            yield self._instructions_widget
             yield self._data_table_widget
+            yield self._validation_status_widget
 
     def on_mount(self) -> None:
         """
@@ -71,18 +66,66 @@ class Detailed_Data_Popup(ModalScreen):
 
         Adds the rows and columns.
         """
+
+        # Set the validation widget
+        self._validation_status_widget.update(f"Missing {self.empty_values()} values.")
+
         # Add columns
         self._data_table_widget.add_column("Detail", key="detail")
         self._data_table_widget.add_column("Value", key="value")
-
-        # Get the data list form the specified presenter
-        data_list: list[tuple[int, ...]] = self.parent_table.presenter.get_by_id(
-            self.object_id
-        )
+        self._data_table_widget.add_column("Entry", key="entry")
 
         # Add rows, the rows and columns are flipped so be careful with naming
-        for index, column in enumerate(self.parent_table.column_list):
-            self._data_table_widget.add_row(column[0], data_list[index], key=column[1])
+        for column in self.column_list[1:]:
+            self._data_table_widget.add_row(
+                column[0],
+                "None",
+                "None",
+                key=column[1],
+            )
+
+    def set_value(self, key: str, new_value: any) -> None:
+        """
+        TODO Fill this in
+        """
+        old_submittable: bool = self.submittable()
+
+        self.values[key] = new_value
+
+        # Update the validation widget's text and self's class
+        if old_submittable == False and self.submittable() == True:
+            self.add_class("submittable")
+            self._validation_status_widget.update("Submittable")
+
+        if old_submittable == True and self.submittable() == False:
+            self.remove_class("submittable")
+
+        if self.submittable() == False:
+            self._validation_status_widget.update(
+                f"Missing {self.empty_values()} values."
+            )
+
+    def submittable(self) -> bool:
+        """
+        TODO Fill this in
+        """
+        for value in self.values.values():
+            if value is None:
+                return False
+        return True
+
+    def empty_values(self) -> int:
+        """
+        TODO Fill this in
+        """
+        return len(list(value for value in self.values.values() if value is None))
+
+    def action_submit(self) -> None:
+        """
+        TODO Fill this in
+        """
+
+        print(list(value for value in self.values.values()))
 
     def action_exit_popup(self) -> None:
         """
@@ -90,7 +133,6 @@ class Detailed_Data_Popup(ModalScreen):
 
         Returns none and dismisses.
         """
-
         self.dismiss(None)
 
     def on_click(self, event: Click) -> None:
@@ -119,13 +161,13 @@ class Detailed_Data_Popup(ModalScreen):
         column_key: str = key.column_key.value
 
         # Get the popup for the column
-        popup: ModalScreen = self.get_input_popup(row_key, self.object_id)
+        popup: ModalScreen = self.get_input_popup(row_key, None)
 
         # If there is no popup then return
         if not popup:
             return
 
-        def callback(new_value: Optional[str]) -> None:
+        def callback(new_value: Optional[any]) -> None:
             """
             Updates the database and the view with the new value
             """
@@ -134,24 +176,26 @@ class Detailed_Data_Popup(ModalScreen):
             if new_value is None:
                 return
 
-            # Update the database
-            updated_value: str = self.parent_table.presenter.set_value(
-                int(self.object_id), row_key, new_value
+            # Update values
+            self.set_value(row_key, new_value)
+
+            # Get the value
+            updated_value: str = self.parent_table.presenter.get_value(
+                new_value,
+                row_key,
             )
 
             # Update self
             self._data_table_widget.update_cell(
                 RowKey(row_key),
-                ColumnKey(column_key),
+                ColumnKey("value"),
                 updated_value,
                 update_width=True,
             )
-
-            # Update parent table
-            self.parent_table.update_cell(
-                RowKey(self.object_id),
-                ColumnKey(row_key),
-                updated_value,
+            self._data_table_widget.update_cell(
+                RowKey(row_key),
+                ColumnKey("entry"),
+                "Manual",
                 update_width=True,
             )
 

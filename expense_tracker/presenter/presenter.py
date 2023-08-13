@@ -41,3 +41,11 @@ class Presenter:
             raise TypeError("new_value must have a value")
 
         raise ValueError(f"Unable to handel an edit of database column '{column}'.")
+
+    @staticmethod
+    def get_value(value: any, column: Column) -> any:
+        """
+        TODO Fill this in
+        """
+
+        return value
