@@ -2,8 +2,11 @@
 
 
 from enum import Enum
-from typing import Any, Optional
+from typing import Optional
 from textual.screen import ModalScreen
+from textual.validation import Function
+
+import re
 
 from expense_tracker.presenter.merchant import Merchant
 
@@ -68,6 +71,25 @@ class Merchant_Table(Exptrack_Data_Table):
             return Text_Input_Popup(instructions="Input a name")
 
         if column == Merchant.Column.NAMING_RULE:
-            return Text_Input_Popup(instructions="Input a regular expression")
+            return Text_Input_Popup(
+                instructions="Input a regular expression",
+                validators=[
+                    Function(
+                        Merchant_Table._check_regex,
+                        failure_description="Regular expression is not valid",
+                    )
+                ],
+            )
 
         return super().get_input_popup(column, id)
+
+    @staticmethod
+    def _check_regex(regex: str) -> bool:
+        """
+        Checks if a regular expression is valid
+        """
+        try:
+            re.compile(regex)
+            return True
+        except re.error:
+            return False
