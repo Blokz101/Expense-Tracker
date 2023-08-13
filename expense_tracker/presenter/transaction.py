@@ -31,11 +31,12 @@ class Transaction(Presenter):
     class Column(Enum):
         ID: int = 0
         RECONCILED_STATUS: int = 1
-        DESCRIPTION: int = 2
-        MERCHANT: int = 3
-        DATE: int = 4
-        AMOUNT: int = 5
+        ACCOUNT: int = 2
+        DESCRIPTION: int = 3
+        MERCHANT: int = 4
+        DATE: int = 5
         TAGS: int = 6
+        AMOUNT: int = 7
 
     @staticmethod
     def _format(transaction: DB_Transaction) -> tuple[int, ...]:
@@ -45,6 +46,7 @@ class Transaction(Presenter):
         return (
             transaction.id,
             transaction.reconciled_status,
+            transaction.account.name,
             transaction.description,
             transaction.merchant.name,
             datetime.strftime(transaction.date, Constants.DATE_FORMAT),
@@ -76,6 +78,38 @@ class Transaction(Presenter):
             )
 
     @staticmethod
+    def create(values: dict[Enum, any]) -> tuple[int, ...]:
+        """
+        Create a transaction
+        """
+
+        with Session(engine) as session:
+            # Create the new transaction
+            new_transaction: DB_Transaction = DB_Transaction(
+                account_id=values[Transaction.Column.ACCOUNT],
+                description=values[Transaction.Column.DESCRIPTION],
+                merchant_id=values[Transaction.Column.MERCHANT],
+                date=datetime.strptime(
+                    values[Transaction.Column.DATE], Constants.DATE_STRPTIME
+                ),
+                reconciled_status=False,
+            )
+            session.add(new_transaction)
+            session.flush()
+
+            # Add the new amount and its tags
+            new_amount: DB_Amount = DB_Amount(
+                transaction_id=new_transaction.id,
+                amount=float(values[Transaction.Column.AMOUNT]),
+            )
+            new_amount.tags = Transaction._get_tag_list(values[Transaction.Column.TAGS])
+            session.add(new_amount)
+
+            # Commit and return
+            session.commit()
+            return Transaction._format(new_transaction)
+
+    @staticmethod
     def set_value(id: int, column: Column, new_value: any) -> any:
         """
         Updates a cell in the database.
@@ -84,6 +118,15 @@ class Transaction(Presenter):
             transaction: DB_Transaction = (
                 session.query(DB_Transaction).where(DB_Transaction.id == id).first()
             )
+
+            # new_value will be an int representing the id of the new account
+            if column == Transaction.Column.ACCOUNT:
+                new_account: DB_Account = (
+                    session.query(DB_Account).where(DB_Account.id == new_value).first()
+                )
+                transaction.account = new_account
+                session.commit()
+                return transaction.account.name
 
             # new_value will be an int representing the id of the new merchant
             if column == Transaction.Column.MERCHANT:
@@ -133,7 +176,7 @@ class Transaction(Presenter):
     @staticmethod
     def get_value(value: any, column: Column) -> any:
         """
-        TODO Fill this in
+        Format or get a value based on the column it was requested for
         """
 
         # value will be a str
@@ -150,20 +193,35 @@ class Transaction(Presenter):
             )
 
         with Session(engine) as session:
-            # value will be an int
+            # value will be an int representing a merchant id
             if column == Transaction.Column.MERCHANT:
                 merchant: DB_Merchant = (
                     session.query(DB_Merchant).where(DB_Merchant.id == value).first()
                 )
                 return merchant.name
 
+            # value will be an int representing an account id
+            if column == Transaction.Column.ACCOUNT:
+                account: DB_Account = (
+                    session.query(DB_Account).where(DB_Account.id == value).first()
+                )
+                return account.name
+
             # value will be a list of ints
             # TODO Edit this to support multiple amounts
             if column == Transaction.Column.TAGS:
-                tag_list: list[DB_Tag] = list(
-                    session.query(DB_Tag).where(DB_Tag.id == tag_id).first()
-                    for tag_id in value
-                )
-                return ", ".join(tag.name for tag in tag_list)
+                return ", ".join(tag.name for tag in Transaction._get_tag_list(value))
 
         return Presenter.get_value(id, column)
+
+    @staticmethod
+    def _get_tag_list(tag_id_list: list[int]) -> list[DB_Tag]:
+        """
+        Convert a list of tag ids to a list of tags
+        """
+
+        with Session(engine) as session:
+            return list(
+                session.query(DB_Tag).where(DB_Tag.id == tag_id).first()
+                for tag_id in tag_id_list
+            )

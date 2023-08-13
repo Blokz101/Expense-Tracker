@@ -13,7 +13,7 @@ from expense_tracker.view.text_input_popup import Text_Input_Popup
 
 class Account_Table(Exptrack_Data_Table):
     """
-    TODO Fill this in
+    Table of accounts
     """
 
     COLUMN_LIST: list[tuple[str, Enum]] = [
@@ -36,7 +36,7 @@ class Account_Table(Exptrack_Data_Table):
 
     def get_input_popup(self, column: str, id: int) -> Optional[ModalScreen]:
         """
-        TODO Fill this in
+        Return a popup to get the required info type based on the column
         """
 
         if column == Account.Column.NAME:

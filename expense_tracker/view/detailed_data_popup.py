@@ -159,7 +159,7 @@ class Detailed_Data_Popup(ModalScreen):
 
     def get_input_popup(self, column: str, id: int) -> Optional[ModalScreen]:
         """
-        TODO Fill this in
+        Get the input popup based on the column
         """
 
         return self.parent_table.get_input_popup(column, id)

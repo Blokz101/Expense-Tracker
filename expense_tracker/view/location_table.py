@@ -16,7 +16,7 @@ from expense_tracker.view.selector import Selector
 
 class Location_Table(Exptrack_Data_Table):
     """
-    TODO Fill this in later
+    Table of locations
     """
 
     COLUMN_LIST: list[tuple[str, Enum]] = [
@@ -39,7 +39,7 @@ class Location_Table(Exptrack_Data_Table):
 
     def get_input_popup(self, column: str, id: int) -> Optional[ModalScreen]:
         """
-        TODO Fill this in
+        Get the input popup based on the column
         """
 
         if column == Location.Column.MERCHANT:

@@ -16,7 +16,9 @@ from typing import Optional
 
 
 class Create_Popup(ModalScreen):
-    """ """
+    """
+    Prompt the user for the info required to create a new object.
+    """
 
     def __init__(
         self,
@@ -86,7 +88,7 @@ class Create_Popup(ModalScreen):
 
     def set_value(self, key: str, new_value: any) -> None:
         """
-        TODO Fill this in
+        Sets a value in the value dict and updates the validation widget
         """
         old_submittable: bool = self.submittable()
 
@@ -107,7 +109,7 @@ class Create_Popup(ModalScreen):
 
     def submittable(self) -> bool:
         """
-        TODO Fill this in
+        If all the values are filled and the create popup can be submitted
         """
         for value in self.values.values():
             if value is None:
@@ -116,16 +118,31 @@ class Create_Popup(ModalScreen):
 
     def empty_values(self) -> int:
         """
-        TODO Fill this in
+        The number of empty values
         """
         return len(list(value for value in self.values.values() if value is None))
 
     def action_submit(self) -> None:
         """
-        TODO Fill this in
+        Called when the user attempts to submit the values.
+
+        If there are any blank values then automatically directs the user to fill them out, if not then create the new transaction.
         """
 
-        print(list(value for value in self.values.values()))
+        # If there are still blank values then automatically mount a popup to prompt the user to fill it in
+        for key in self.values.keys():
+            if not self.values[key]:
+                self._mount_popup(key)
+                return
+
+        # Add the new row to the database
+        new_row: list = self.parent_table.presenter.create(self.values)
+
+        # Update parent table
+        self.parent_table.add_row(*new_row[0:], key=new_row[0])
+
+        # Dismiss self
+        self.dismiss()
 
     def action_exit_popup(self) -> None:
         """
@@ -158,16 +175,23 @@ class Create_Popup(ModalScreen):
             Coordinate(row_index, column_index)
         )
         row_key: str = key.row_key.value
-        column_key: str = key.column_key.value
+
+        # Mount the popup
+        self._mount_popup(row_key)
+
+    def _mount_popup(self, column_key: str) -> None:
+        """
+        Mount the input popup, and update self with the return value
+        """
 
         # Get the popup for the column
-        popup: ModalScreen = self.get_input_popup(row_key, None)
+        popup: ModalScreen = self.get_input_popup(column_key, None)
 
         # If there is no popup then return
         if not popup:
             return
 
-        def callback(new_value: Optional[any]) -> None:
+        def input_popup_callback(new_value: Optional[any]) -> None:
             """
             Updates the database and the view with the new value
             """
@@ -177,33 +201,33 @@ class Create_Popup(ModalScreen):
                 return
 
             # Update values
-            self.set_value(row_key, new_value)
+            self.set_value(column_key, new_value)
 
             # Get the value
             updated_value: str = self.parent_table.presenter.get_value(
                 new_value,
-                row_key,
+                column_key,
             )
 
             # Update self
             self._data_table_widget.update_cell(
-                RowKey(row_key),
+                RowKey(column_key),
                 ColumnKey("value"),
                 updated_value,
                 update_width=True,
             )
             self._data_table_widget.update_cell(
-                RowKey(row_key),
+                RowKey(column_key),
                 ColumnKey("entry"),
                 "Manual",
                 update_width=True,
             )
 
-        self.app.push_screen(popup, callback)
+        self.app.push_screen(popup, input_popup_callback)
 
     def get_input_popup(self, column: str, id: int) -> Optional[ModalScreen]:
         """
-        TODO Fill this in
+        Get the input popup based on the column
         """
 
         return self.parent_table.get_input_popup(column, id)

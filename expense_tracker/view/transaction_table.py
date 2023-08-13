@@ -11,6 +11,7 @@ from expense_tracker.constants import Constants
 from expense_tracker.presenter.transaction import Transaction
 from expense_tracker.presenter.merchant import Merchant
 from expense_tracker.presenter.tag import Tag
+from expense_tracker.presenter.account import Account
 
 from expense_tracker.view.exptrack_data_table import Exptrack_Data_Table
 from expense_tracker.view.text_input_popup import Text_Input_Popup
@@ -23,12 +24,13 @@ from expense_tracker.view.transaction_create_popup import Transaction_Create_Pop
 
 class Transaction_Table(Exptrack_Data_Table):
     """
-    TODO Fill this in
+    Table of transactions
     """
 
-    COLUMN_LIST: list[tuple[str, Enum]] = [
+    COLUMN_LIST: list[tuple[str, Enum, bool]] = [
         ("ID", Transaction.Column.ID),
         ("Status", Transaction.Column.RECONCILED_STATUS),
+        ("Account", Transaction.Column.ACCOUNT),
         ("Description", Transaction.Column.DESCRIPTION),
         ("Merchant", Transaction.Column.MERCHANT),
         ("Date", Transaction.Column.DATE),
@@ -71,8 +73,16 @@ class Transaction_Table(Exptrack_Data_Table):
 
     def get_input_popup(self, column: str, id: int) -> Optional[ModalScreen]:
         """
-        TODO Fill this in
+        Get the input popup based on the column
         """
+
+        if column == Transaction.Column.ACCOUNT:
+            return Options_Input_Popup(
+                list(
+                    Selector.Option(account[1], account[0])
+                    for account in Account.get_all()
+                )
+            )
 
         if column == Transaction.Column.DESCRIPTION:
             return Text_Input_Popup(instructions="Input a description")

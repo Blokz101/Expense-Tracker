@@ -6,12 +6,7 @@ from enum import Enum
 from copy import copy
 
 from textual.app import ComposeResult
-from textual.widgets import Static, DataTable
-from textual.widgets._data_table import RowKey, ColumnKey, CellKey
-from textual.containers import Vertical
-from textual.coordinate import Coordinate
 from textual.screen import ModalScreen
-from textual.events import Click
 from textual.widgets.selection_list import Selection
 
 from expense_tracker.presenter.transaction import Transaction
@@ -26,7 +21,7 @@ from typing import Optional
 
 class Transaction_Create_Popup(Create_Popup):
     """
-    TODO Fill this in
+    Transaction specific create popup
     """
 
     def __init__(
