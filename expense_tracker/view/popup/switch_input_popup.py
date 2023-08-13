@@ -13,7 +13,7 @@ from typing import Optional
 
 class Switch_Input_Popup(ModalScreen[Optional[bool]]):
     """
-    TODO Fill this in
+    Popup that prompts the user to select true or false
     """
 
     DEFAULT_CSS: str = """

@@ -137,7 +137,7 @@ class Create_Popup(ModalScreen):
 
     def _update_validation_widget(self) -> None:
         """
-        TODO Fill this in
+        Update the validation widget based on if its submittable
         """
 
         # Update the validation widget's text and self's class
