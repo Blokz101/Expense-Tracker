@@ -51,6 +51,31 @@ class Merchant(Presenter):
             )
 
     @staticmethod
+    def get_by_id(id: int) -> list[tuple[int, ...]]:
+        """
+        Returns a single object with the requested id
+        """
+        with Session(engine) as session:
+            return Merchant._format(
+                session.query(DB_Merchant).where(DB_Merchant.id == id).first()
+            )
+
+    @staticmethod
+    def create(values: dict[Enum, any]) -> tuple[int, ...]:
+        """
+        Create a merchant
+        """
+
+        with Session(engine) as session:
+            new_merchant: DB_Merchant = DB_Merchant(
+                name=values[Merchant.Column.NAME],
+                naming_rule=values[Merchant.Column.NAMING_RULE],
+            )
+            session.add(new_merchant)
+            session.commit()
+            return Merchant._format(new_merchant)
+
+    @staticmethod
     def set_value(id: int, column: Column, new_value: any) -> any:
         """
         Updates cell in the database
@@ -73,3 +98,15 @@ class Merchant(Presenter):
                 return merchant.naming_rule
 
         Presenter.set_value(id, column, new_value)
+
+    @staticmethod
+    def get_value(value: any, column: Column) -> any:
+        """
+        Format or get a value based on the column it was requested for
+        """
+
+        # value will be a str
+        if column == Merchant.Column.NAME or column == Merchant.Column.NAMING_RULE:
+            return str(value)
+
+        return Presenter.get_value(id, column)

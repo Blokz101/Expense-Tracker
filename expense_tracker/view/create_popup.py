@@ -131,7 +131,7 @@ class Create_Popup(ModalScreen):
 
         # If there are still blank values then automatically mount a popup to prompt the user to fill it in
         for key in self.values.keys():
-            if not self.values[key]:
+            if self.values[key] is None:
                 self._mount_popup(key)
                 return
 
