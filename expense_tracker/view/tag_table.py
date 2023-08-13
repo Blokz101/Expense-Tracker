@@ -32,7 +32,7 @@ class Tag_Table(Exptrack_Data_Table):
         classes: Optional[str] = None,
     ) -> None:
         super().__init__(Tag, Tag_Table.COLUMN_LIST, name=name, id=id, classes=classes)
-        
+
     def action_create(self) -> None:
         """
         Called when c is pressed.
@@ -65,7 +65,7 @@ class Tag_Table(Exptrack_Data_Table):
 
         if column == Tag.Column.NAME:
             return Text_Input_Popup(instructions="Input a name")
-        
+
         if column == Tag.Column.INSTANCE_TAG:
             return Switch_Input_Popup(instructions="Is this tag an instance tag")
 

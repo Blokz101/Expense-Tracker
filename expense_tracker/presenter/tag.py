@@ -51,17 +51,15 @@ class Tag(Presenter):
 
         with Session(engine) as session:
             return list(Tag._format(tag) for tag in session.query(DB_Tag).all())
-        
+
     @staticmethod
     def get_by_id(id: int) -> list[tuple[int, ...]]:
         """
         Returns a single object with the requested id
         """
         with Session(engine) as session:
-            return Tag._format(
-                session.query(DB_Tag).where(DB_Tag.id == id).first()
-            )
-            
+            return Tag._format(session.query(DB_Tag).where(DB_Tag.id == id).first())
+
     @staticmethod
     def create(values: dict[Enum, any]) -> tuple[int, ...]:
         """
@@ -71,7 +69,7 @@ class Tag(Presenter):
         with Session(engine) as session:
             new_tag: DB_Tag = DB_Tag(
                 name=values[Tag.Column.NAME],
-                instance_tag=values[Tag.Column.INSTANCE_TAG]
+                instance_tag=values[Tag.Column.INSTANCE_TAG],
             )
             session.add(new_tag)
             session.commit()
@@ -90,7 +88,7 @@ class Tag(Presenter):
                 tag.name = new_value
                 session.commit()
                 return tag.name
-            
+
             # new_value will be a bool
             if column == Tag.Column.INSTANCE_TAG:
                 tag.instance_tag = new_value
@@ -118,7 +116,7 @@ class Tag(Presenter):
             )
 
             return list(Tag._format(tag) for tag in tag_list)
-        
+
     @staticmethod
     def get_value(value: any, column: Column) -> any:
         """
@@ -126,10 +124,7 @@ class Tag(Presenter):
         """
 
         # value will be a str
-        if (
-            column == Tag.Column.NAME
-            or column == Tag.Column.INSTANCE_TAG
-        ):
+        if column == Tag.Column.NAME or column == Tag.Column.INSTANCE_TAG:
             return str(value)
 
         return Presenter.get_value(id, column)

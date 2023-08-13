@@ -10,11 +10,12 @@ from textual.binding import Binding
 
 from typing import Optional
 
+
 class Switch_Input_Popup(ModalScreen[Optional[bool]]):
     """
     TODO Fill this in
     """
-    
+
     DEFAULT_CSS: str = """
         Switch_Input_Popup {
             align: center middle;
@@ -36,7 +37,7 @@ class Switch_Input_Popup(ModalScreen[Optional[bool]]):
         Binding("escape", "exit_popup", "Dismiss popup"),
         Binding("enter", "submit", "Submit", priority=True),
     ]
-    
+
     def __init__(
         self,
         instructions: str = "Select true or false",
@@ -51,7 +52,7 @@ class Switch_Input_Popup(ModalScreen[Optional[bool]]):
         super().__init__(name, id, classes)
         self._instructions_text: str = instructions
         self._default: Optional[bool] = default
-        
+
     def compose(self) -> ComposeResult:
         """
         Composes the display
@@ -63,7 +64,7 @@ class Switch_Input_Popup(ModalScreen[Optional[bool]]):
         with self._container:
             yield self._instructions_widget
             yield self._switch_widget
-            
+
     def action_submit(self) -> None:
         """
         Called when the popup is submitted

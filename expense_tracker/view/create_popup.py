@@ -9,6 +9,7 @@ from textual.containers import Vertical
 from textual.coordinate import Coordinate
 from textual.screen import ModalScreen
 from textual.events import Click
+from textual.binding import Binding
 
 from expense_tracker.view.exptrack_data_table import Exptrack_Data_Table
 
@@ -44,8 +45,8 @@ class Create_Popup(ModalScreen):
         )
 
     BINDINGS: list[tuple[str, str, str]] = [
-        ("escape", "exit_popup", "Dismiss popup"),
-        ("s", "submit", "Submit"),
+        Binding("escape", "exit_popup", "Dismiss popup"),
+        Binding("enter", "submit", "Submit", priority=True),
     ]
 
     def compose(self) -> ComposeResult:
