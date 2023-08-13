@@ -7,7 +7,6 @@ from enum import Enum
 from expense_tracker.presenter.presenter import Presenter
 
 from expense_tracker.model.orm import engine
-from expense_tracker.model.orm.db_transaction import DB_Transaction
 from expense_tracker.model.orm.db_merchant import DB_Merchant
 from expense_tracker.model.orm.db_amount import DB_Amount
 from expense_tracker.model.orm.db_account import DB_Account
@@ -41,6 +40,35 @@ class Location(Presenter):
             float(location.x_coord),
             float(location.y_coord),
         )
+
+    @staticmethod
+    def get_by_id(id: int) -> list[tuple[int, ...]]:
+        """
+        Returns a single object with the requested id
+        """
+        with Session(engine) as session:
+            return Location._format(
+                session.query(DB_Merchant_Location)
+                .where(DB_Merchant_Location.id == id)
+                .first()
+            )
+
+    @staticmethod
+    def create(values: dict[Enum, any]) -> tuple[int, ...]:
+        """
+        Create a transaction
+        """
+
+        with Session(engine) as session:
+            new_location: DB_Merchant_Location = DB_Merchant_Location(
+                merchant_id=values[Location.Column.MERCHANT],
+                name=values[Location.Column.NAME],
+                x_coord=values[Location.Column.XCOORD],
+                y_coord=values[Location.Column.YCOORD],
+            )
+            session.add(new_location)
+            session.commit()
+            return Location._format(new_location)
 
     @staticmethod
     def get_all() -> list[tuple[int, ...]]:
@@ -95,3 +123,27 @@ class Location(Presenter):
                 return location.y_coord
 
         Presenter.set_value(id, column, new_value)
+
+    @staticmethod
+    def get_value(value: any, column: Column) -> any:
+        """
+        Format or get a value based on the column it was requested for
+        """
+
+        # value will be a str
+        if column == Location.Column.NAME:
+            return str(value)
+
+        # value will be a date time object
+        if column == Location.Column.XCOORD or column == Location.Column.YCOORD:
+            return float(value)
+
+        with Session(engine) as session:
+            # value will be an int representing a merchant id
+            if column == Location.Column.MERCHANT:
+                merchant: DB_Merchant = (
+                    session.query(DB_Merchant).where(DB_Merchant.id == value).first()
+                )
+                return merchant.name
+
+        return Presenter.get_value(id, column)
