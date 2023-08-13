@@ -1,6 +1,10 @@
 # expense_tracker/view/popup/create_popup.py
 
+from __future__ import annotations
+
 from enum import Enum
+
+from dataclasses import dataclass
 
 from textual.app import ComposeResult
 from textual.widgets import Static, DataTable
@@ -16,10 +20,22 @@ from expense_tracker.view.table.exptrack_data_table import Exptrack_Data_Table
 from typing import Optional
 
 
+class Input_Method(str, Enum):
+    NONE: str = "None"
+    MANUAL: str = "Manual"
+    DEFAULT: str = "Default"
+    PHOTO: str = "Photo"
+
+
 class Create_Popup(ModalScreen):
     """
     Prompt the user for the info required to create a new object.
     """
+
+    @dataclass
+    class Field:
+        value: any = None
+        input_method: Input_Method = Input_Method.NONE
 
     def __init__(
         self,
@@ -40,9 +56,9 @@ class Create_Popup(ModalScreen):
             self.column_list = modified_column_list
 
         # Generate a blank list of values for each column in the parent table, excluding the first or id column
-        self.values: dict[Enum, any] = dict.fromkeys(
-            (column[1] for column in self.column_list[1:]), None
-        )
+        self.values: dict[Enum, Create_Popup.Field] = {}
+        for column in self.column_list[1:]:
+            self.values[column[1]] = Create_Popup.Field()
 
     BINDINGS: list[tuple[str, str, str]] = [
         Binding("escape", "exit_popup", "Dismiss popup"),
@@ -83,25 +99,51 @@ class Create_Popup(ModalScreen):
             self._data_table_widget.add_row(
                 column[0],
                 "None",
-                "None",
+                Input_Method.NONE.value,
                 key=column[1],
             )
 
-    def set_value(self, key: str, new_value: any) -> None:
+    def set_value(self, key: str, new_value: any, input_method: Input_Method) -> None:
         """
         Sets a value in the value dict and updates the validation widget
         """
-        old_submittable: bool = self.submittable()
 
-        self.values[key] = new_value
+        # Get the value
+        updated_value: str = self.parent_table.presenter.get_value(
+            new_value,
+            key,
+        )
+
+        # Update stored values
+        self.values[key].value = new_value
+        self.values[key].input_method = input_method
+
+        # Update self
+        self._data_table_widget.update_cell(
+            RowKey(key),
+            ColumnKey("value"),
+            updated_value,
+            update_width=True,
+        )
+        self._data_table_widget.update_cell(
+            RowKey(key),
+            ColumnKey("entry"),
+            self.values[key].input_method.value,
+            update_width=True,
+        )
+
+        # update validation widget
+        self._update_validation_widget()
+
+    def _update_validation_widget(self) -> None:
+        """
+        TODO Fill this in
+        """
 
         # Update the validation widget's text and self's class
-        if old_submittable == False and self.submittable() == True:
+        if self.submittable() == True and not "submittable" in self.classes:
             self.add_class("submittable")
             self._validation_status_widget.update("Submittable")
-
-        if old_submittable == True and self.submittable() == False:
-            self.remove_class("submittable")
 
         if self.submittable() == False:
             self._validation_status_widget.update(
@@ -113,7 +155,7 @@ class Create_Popup(ModalScreen):
         If all the values are filled and the create popup can be submitted
         """
         for value in self.values.values():
-            if value is None:
+            if value.value is None:
                 return False
         return True
 
@@ -121,7 +163,7 @@ class Create_Popup(ModalScreen):
         """
         The number of empty values
         """
-        return len(list(value for value in self.values.values() if value is None))
+        return len(list(value for value in self.values.values() if value.value is None))
 
     def action_submit(self) -> None:
         """
@@ -130,14 +172,26 @@ class Create_Popup(ModalScreen):
         If there are any blank values then automatically directs the user to fill them out, if not then create the new transaction.
         """
 
+        print(
+            "\n".join(
+                f"{key}: {value.value}, {value.input_method}"
+                for key, value in self.values.items()
+            )
+        )
+
         # If there are still blank values then automatically mount a popup to prompt the user to fill it in
-        for key in self.values.keys():
-            if self.values[key] is None:
+        for key, value in self.values.items():
+            if value.value is None:
                 self._mount_popup(key)
                 return
 
+        # Strip the entry method from the values dict to create a submittable dict
+        submittable_dict: dict[Enum, any] = {}
+        for key, value in self.values.items():
+            submittable_dict[key] = value.value
+
         # Add the new row to the database
-        new_row: list = self.parent_table.presenter.create(self.values)
+        new_row: list = self.parent_table.presenter.create(submittable_dict)
 
         # Update parent table
         self.parent_table.add_row(*new_row[0:], key=new_row[0])
@@ -202,27 +256,7 @@ class Create_Popup(ModalScreen):
                 return
 
             # Update values
-            self.set_value(column_key, new_value)
-
-            # Get the value
-            updated_value: str = self.parent_table.presenter.get_value(
-                new_value,
-                column_key,
-            )
-
-            # Update self
-            self._data_table_widget.update_cell(
-                RowKey(column_key),
-                ColumnKey("value"),
-                updated_value,
-                update_width=True,
-            )
-            self._data_table_widget.update_cell(
-                RowKey(column_key),
-                ColumnKey("entry"),
-                "Manual",
-                update_width=True,
-            )
+            self.set_value(column_key, new_value, Input_Method.MANUAL)
 
         self.app.push_screen(popup, input_popup_callback)
 

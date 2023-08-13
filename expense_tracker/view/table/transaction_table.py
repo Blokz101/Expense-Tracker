@@ -55,6 +55,13 @@ class Transaction_Table(Exptrack_Data_Table):
 
         self.app.push_screen(Transaction_Create_Popup(self))
 
+    def action_import(self) -> None:
+        """
+        TODO Fill this in
+        """
+
+        return
+
     def action_expand(self) -> None:
         """
         Show a detailed data popup
