@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from enum import Enum
 
 from expense_tracker.presenter.presenter import Presenter
+from expense_tracker.presenter.tag import Tag
 
 from expense_tracker.model.orm import engine
 from expense_tracker.model.orm.db_transaction import DB_Transaction
@@ -37,6 +38,7 @@ class Merchant(Presenter):
             merchant.id,
             merchant.name,
             merchant.naming_rule,
+            ", ".join(tag.name for tag in merchant.default_tags),
         )
 
     @staticmethod
@@ -97,6 +99,15 @@ class Merchant(Presenter):
                 session.commit()
                 return merchant.naming_rule
 
+            # new_value will be a list of ints representing ids of tags
+            if column == Merchant.Column.DEFAULT_TAGS:
+                merchant.default_tags = []
+                for id in new_value:
+                    tag: DB_Tag = session.query(DB_Tag).where(DB_Tag.id == id).first()
+                    merchant.default_tags.append(tag)
+                session.commit()
+                return ", ".join(tag.name for tag in merchant.default_tags)
+
         Presenter.set_value(id, column, new_value)
 
     @staticmethod
@@ -108,5 +119,11 @@ class Merchant(Presenter):
         # value will be a str
         if column == Merchant.Column.NAME or column == Merchant.Column.NAMING_RULE:
             return str(value)
+
+        with Session(engine) as session:
+            # value will be a list of ints
+            # TODO Edit this to support multiple amounts
+            if column == Merchant.Column.DEFAULT_TAGS:
+                return ", ".join(tag.name for tag in Tag.get_tag_list(value))
 
         return Presenter.get_value(id, column)

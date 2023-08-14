@@ -4,16 +4,19 @@
 from enum import Enum
 from typing import Optional
 from textual.screen import ModalScreen
+from textual.widgets.selection_list import Selection
 from textual.validation import Function
 
 import re
 
 from expense_tracker.presenter.merchant import Merchant
+from expense_tracker.presenter.tag import Tag
 
 from expense_tracker.view.table.exptrack_data_table import Exptrack_Data_Table
 from expense_tracker.view.popup.text_input_popup import Text_Input_Popup
 from expense_tracker.view.popup.detailed_data_popup import Detailed_Data_Popup
 from expense_tracker.view.popup.create_popup import Create_Popup
+from expense_tracker.view.popup.toggle_input_popup import Toggle_Input_Popup
 
 
 class Merchant_Table(Exptrack_Data_Table):
@@ -25,6 +28,7 @@ class Merchant_Table(Exptrack_Data_Table):
         ("ID", Merchant.Column.ID),
         ("Name", Merchant.Column.NAME),
         ("Rule", Merchant.Column.NAMING_RULE),
+        ("Default Tags", Merchant.Column.DEFAULT_TAGS),
     ]
 
     def __init__(
@@ -80,6 +84,21 @@ class Merchant_Table(Exptrack_Data_Table):
                     )
                 ],
             )
+
+        if column == Merchant.Column.DEFAULT_TAGS:
+            default_tag_list: list[tuple[int, ...]] = (
+                Tag.get_tags_for_merchant_default(id) if id else Tag.get_all()
+            )
+            selected_tag_id_list: list[int] = list(tag[0] for tag in default_tag_list)
+
+            tag_list: list[tuple[int, ...]] = []
+
+            for tag in Tag.get_all():
+                tag_list.append(
+                    Selection(tag[1], tag[0], tag[0] in selected_tag_id_list)
+                )
+
+            return Toggle_Input_Popup(tag_list, instructions="Select tags")
 
         return super().get_input_popup(column, id)
 

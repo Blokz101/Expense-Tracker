@@ -95,12 +95,22 @@ class Create_Popup(ModalScreen):
         self._data_table_widget.add_column("Entry", key="entry")
 
         # Add rows, the rows and columns are flipped so be careful with naming
-        for column in self.column_list[1:]:
+        for row_key, value in zip(self.column_list[1:], self.values.values()):
+            display_value: str = "None"
+            input_method: Input_Method = Input_Method.NONE
+            if value.value:
+                print(row_key[1])
+                display_value = self.parent_table.presenter.get_value(
+                    value.value,
+                    row_key[1],
+                )
+                input_method = value.input_method
+
             self._data_table_widget.add_row(
-                column[0],
-                "None",
-                Input_Method.NONE.value,
-                key=column[1],
+                row_key[0],
+                display_value,
+                input_method.value,
+                key=row_key[1],
             )
 
     def set_value(self, key: str, new_value: any, input_method: Input_Method) -> None:
@@ -165,25 +175,18 @@ class Create_Popup(ModalScreen):
         """
         return len(list(value for value in self.values.values() if value.value is None))
 
-    def action_submit(self) -> None:
+    def action_submit(self) -> bool:
         """
         Called when the user attempts to submit the values.
 
         If there are any blank values then automatically directs the user to fill them out, if not then create the new transaction.
         """
 
-        print(
-            "\n".join(
-                f"{key}: {value.value}, {value.input_method}"
-                for key, value in self.values.items()
-            )
-        )
-
         # If there are still blank values then automatically mount a popup to prompt the user to fill it in
         for key, value in self.values.items():
             if value.value is None:
                 self._mount_popup(key)
-                return
+                return False
 
         # Strip the entry method from the values dict to create a submittable dict
         submittable_dict: dict[Enum, any] = {}
@@ -198,6 +201,7 @@ class Create_Popup(ModalScreen):
 
         # Dismiss self
         self.dismiss()
+        return True
 
     def action_exit_popup(self) -> None:
         """

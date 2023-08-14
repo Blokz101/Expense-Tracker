@@ -3,10 +3,8 @@
 from enum import Enum
 from typing import Any, Optional
 from textual.screen import ModalScreen
-from textual.validation import Number, Regex
+from textual.validation import Number
 from textual.widgets.selection_list import Selection
-
-from expense_tracker.constants import Constants
 
 from expense_tracker.presenter.transaction import Transaction
 from expense_tracker.presenter.merchant import Merchant
@@ -20,6 +18,8 @@ from expense_tracker.view.popup.toggle_input_popup import Toggle_Input_Popup
 from expense_tracker.view.popup.detailed_data_popup import Detailed_Data_Popup
 from expense_tracker.view.selector import Selector
 from expense_tracker.view.popup.transaction_create_popup import Transaction_Create_Popup
+from expense_tracker.view.popup.photo_import_popup import Photo_Import_Popup
+from expense_tracker.view.popup.date_input_popup import Date_Input_Popup
 
 
 class Transaction_Table(Exptrack_Data_Table):
@@ -57,10 +57,10 @@ class Transaction_Table(Exptrack_Data_Table):
 
     def action_import(self) -> None:
         """
-        TODO Fill this in
+        Mount an import popup
         """
 
-        return
+        self.app.push_screen(Photo_Import_Popup(self))
 
     def action_expand(self) -> None:
         """
@@ -106,19 +106,11 @@ class Transaction_Table(Exptrack_Data_Table):
             )
 
         if column == Transaction.Column.DATE:
-            return Text_Input_Popup(
-                instructions="Input a date",
-                validators=[
-                    Regex(
-                        Constants.DATE_REGEX,
-                        failure_description="Input must match mm/dd/yyyy format",
-                    )
-                ],
-            )
+            return Date_Input_Popup()
 
         if column == Transaction.Column.TAGS:
             selected_tag_list: list[tuple[int, ...]] = (
-                Tag.get_tags_from_transaction(id) if id else Tag.get_all()
+                Tag.get_tags_for_transaction(id) if id else Tag.get_all()
             )
             selected_tag_id_list: list[int] = list(tag[0] for tag in selected_tag_list)
 

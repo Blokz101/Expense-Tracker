@@ -2,13 +2,13 @@
 
 from exif import Image
 
-from typing import Iterable
-
 import re
 
 from pathlib import Path
 
 from datetime import datetime
+
+from typing import Optional
 
 from expense_tracker.constants import Constants
 
@@ -21,13 +21,27 @@ class Photo_Manager:
     """
 
     @staticmethod
-    def files_in_directory(dir_path: Path) -> Iterable:
+    def directory_exists(dir_path: Path) -> bool:
+        """
+        Check if the path exists and if it is a directory
+        """
+
+        return dir_path.exists() and dir_path.is_dir()
+
+    @staticmethod
+    def photos_in_directory(dir_path: Path) -> list[Path]:
         """
         Returns the files in a directory in a generator
         """
-        for file in dir_path.iterdir():
-            if file.is_file() and file.suffix in Constants.SUPPORTED_IMAGE_EXTENSIONS:
-                yield file
+
+        if not Photo_Manager.directory_exists(dir_path):
+            return []
+
+        return list(
+            file
+            for file in dir_path.iterdir()
+            if file.is_file() and file.suffix in Constants.SUPPORTED_IMAGE_EXTENSIONS
+        )
 
     @staticmethod
     def photo_exists_in_archive(photo_name: str, archive_dir: Path) -> bool:
@@ -62,7 +76,7 @@ class Photo_Manager:
         shutil.move(current_path, new_path)
 
     @staticmethod
-    def get_coords(path: Path) -> tuple[float, float]:
+    def get_coords(path: Path) -> Optional[tuple[float, float]]:
         """
         Gets coords from photo and returns them as a tuple
         """
@@ -70,17 +84,17 @@ class Photo_Manager:
         with open(path, "rb") as src:
             image: Image = Image(src)
 
-            if not image.has_exif:
-                AttributeError("Image does not have exif data.")
-
-            return (
-                Photo_Manager._to_decimal_coords(
-                    image.gps_latitude, image.gps_latitude_ref
-                ),
-                Photo_Manager._to_decimal_coords(
-                    image.gps_longitude, image.gps_longitude_ref
-                ),
-            )
+            try:
+                return (
+                    Photo_Manager._to_decimal_coords(
+                        image.gps_latitude, image.gps_latitude_ref
+                    ),
+                    Photo_Manager._to_decimal_coords(
+                        image.gps_longitude, image.gps_longitude_ref
+                    ),
+                )
+            except AttributeError:
+                return None
 
     @staticmethod
     def _to_decimal_coords(coords: tuple[float, float], ref: str):
@@ -95,7 +109,7 @@ class Photo_Manager:
         return decimal_degrees
 
     @staticmethod
-    def get_description(path: Path) -> str:
+    def get_description(path: Path) -> Optional[str]:
         """
         Get the description from the photo
         """
@@ -103,12 +117,11 @@ class Photo_Manager:
         with open(path, "rb") as src:
             image: Image = Image(src)
 
-            # Check if the image has any exif data at all
-            if not image.has_exif:
-                raise AttributeError("Image does not have exif data.")
-
             # Return the image description if there is one
-            return re.sub("\n", " ", image.image_description)
+            try:
+                return re.sub("\n", " ", image.image_description)
+            except AttributeError:
+                return None
 
     @staticmethod
     def get_date(path: Path) -> datetime:
@@ -119,9 +132,8 @@ class Photo_Manager:
         with open(path, "rb") as src:
             image: Image = Image(src)
 
-            # Check if the image has any exif data at all
-            if not image.has_exif:
-                raise AttributeError("Image does not have exif data.")
-
-            # Return the image description if there is one
-            return datetime.strptime(image.datetime, "%Y:%m:%d %H:%M:%S")
+            # Return the image date if there is one
+            try:
+                return datetime.strptime(image.datetime, "%Y:%m:%d %H:%M:%S")
+            except AttributeError:
+                return None

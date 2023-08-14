@@ -11,6 +11,7 @@ from datetime import datetime
 from expense_tracker.constants import Constants
 
 from expense_tracker.presenter.presenter import Presenter
+from expense_tracker.presenter.tag import Tag
 
 from expense_tracker.model.orm import engine
 from expense_tracker.model.orm.db_transaction import DB_Transaction
@@ -88,9 +89,7 @@ class Transaction(Presenter):
                 account_id=values[Transaction.Column.ACCOUNT],
                 description=values[Transaction.Column.DESCRIPTION],
                 merchant_id=values[Transaction.Column.MERCHANT],
-                date=datetime.strptime(
-                    values[Transaction.Column.DATE], Constants.DATE_STRPTIME
-                ),
+                date=values[Transaction.Column.DATE],
                 reconciled_status=False,
             )
             session.add(new_transaction)
@@ -138,12 +137,9 @@ class Transaction(Presenter):
                 session.commit()
                 return transaction.merchant.name
 
-            # new_value will be a str
+            # new_value will be a datetime object
             if column == Transaction.Column.DATE:
-                new_date: datetime = datetime.strptime(
-                    new_value, Constants.DATE_STRPTIME
-                )
-                transaction.date = new_date
+                transaction.date = new_value
                 session.commit()
                 return transaction.date.strftime(Constants.DATE_FORMAT)
 
@@ -187,9 +183,7 @@ class Transaction(Presenter):
 
         # value will be a date time object
         if column == Transaction.Column.DATE:
-            return datetime.strptime(value, Constants.DATE_STRPTIME).strftime(
-                Constants.DATE_FORMAT
-            )
+            return value.strftime(Constants.DATE_FORMAT)
 
         with Session(engine) as session:
             # value will be an int representing a merchant id
@@ -209,18 +203,6 @@ class Transaction(Presenter):
             # value will be a list of ints
             # TODO Edit this to support multiple amounts
             if column == Transaction.Column.TAGS:
-                return ", ".join(tag.name for tag in Transaction._get_tag_list(value))
+                return ", ".join(tag.name for tag in Tag.get_tag_list(value))
 
         return Presenter.get_value(id, column)
-
-    @staticmethod
-    def _get_tag_list(tag_id_list: list[int]) -> list[DB_Tag]:
-        """
-        Convert a list of tag ids to a list of tags
-        """
-
-        with Session(engine) as session:
-            return list(
-                session.query(DB_Tag).where(DB_Tag.id == tag_id).first()
-                for tag_id in tag_id_list
-            )

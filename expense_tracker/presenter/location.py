@@ -6,6 +6,10 @@ from enum import Enum
 
 from expense_tracker.presenter.presenter import Presenter
 
+from typing import Optional
+
+from geopy.distance import geodesic
+
 from expense_tracker.model.orm import engine
 from expense_tracker.model.orm.db_merchant import DB_Merchant
 from expense_tracker.model.orm.db_amount import DB_Amount
@@ -147,3 +151,27 @@ class Location(Presenter):
                 return merchant.name
 
         return Presenter.get_value(id, column)
+
+    @staticmethod
+    def possible_location(
+        target_coord: tuple[float, float],
+        same_location__mile_radius: float,
+    ) -> Optional[int]:
+        """
+        Check if a location is close enough, to any coordinate in a provided list, to be the same location. If so return the closest location.
+        """
+        with Session(engine) as session:
+            # If the coords are within the specified radius, add it to the result list along with its distance.
+            compared_coords_list: list[tuple[DB_Merchant_Location, float]] = []
+            for location in session.query(DB_Merchant_Location).all():
+                distance: float = geodesic(location.get_coords(), target_coord).miles
+                if distance <= same_location__mile_radius:
+                    compared_coords_list.append((location, distance))
+
+            # If there are no matches, return none
+            if len(compared_coords_list) == 0:
+                return None
+
+            # If there are matches, sort the list by distance and return the closest coords
+            compared_coords_list.sort(key=lambda x: x[1])
+            return compared_coords_list[0][0].id

@@ -99,7 +99,7 @@ class Tag(Presenter):
 
     # TODO Edit this entire method to work with multiple amounts
     @staticmethod
-    def get_tags_from_transaction(id: int) -> list[tuple[int, str]]:
+    def get_tags_for_transaction(id: int) -> list[tuple[int, ...]]:
         """
         Gets the tags from the first amount that a transaction has
         """
@@ -118,6 +118,18 @@ class Tag(Presenter):
             return list(Tag._format(tag) for tag in tag_list)
 
     @staticmethod
+    def get_tags_for_merchant_default(merchant_id: int) -> list[tuple[int, ...]]:
+        """
+        Get a list of tag ids that are the defaults for a merchant
+        """
+
+        with Session(engine) as session:
+            merchant: DB_Merchant = (
+                session.query(DB_Merchant).where(DB_Merchant.id == merchant_id).first()
+            )
+            return list(Tag._format(tag) for tag in merchant.default_tags)
+
+    @staticmethod
     def get_value(value: any, column: Column) -> any:
         """
         Format or get a value based on the column it was requested for
@@ -128,3 +140,15 @@ class Tag(Presenter):
             return str(value)
 
         return Presenter.get_value(id, column)
+
+    @staticmethod
+    def get_tag_list(tag_id_list: list[int]) -> list[DB_Tag]:
+        """
+        Convert a list of tag ids to a list of tags
+        """
+
+        with Session(engine) as session:
+            return list(
+                session.query(DB_Tag).where(DB_Tag.id == tag_id).first()
+                for tag_id in tag_id_list
+            )

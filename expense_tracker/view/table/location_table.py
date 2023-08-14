@@ -84,13 +84,25 @@ class Location_Table(Exptrack_Data_Table):
         if column == Location.Column.XCOORD:
             return Text_Input_Popup(
                 instructions="Input a latitude",
-                validators=[Number(failure_description="Input must be a float")],
+                validators=[
+                    Number(
+                        minimum=-90,
+                        maximum=90,
+                        failure_description="Input must be a float between -90 and 90",
+                    )
+                ],
             )
 
         if column == Location.Column.YCOORD:
             return Text_Input_Popup(
                 instructions="Input a longitude",
-                validators=[Number(failure_description="Input must be a float")],
+                validators=[
+                    Number(
+                        minimum=-180,
+                        maximum=180,
+                        failure_description="Input must be a float between -180 and 180",
+                    )
+                ],
             )
 
         return super().get_input_popup(column, id)
