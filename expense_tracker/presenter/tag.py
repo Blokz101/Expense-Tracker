@@ -6,6 +6,8 @@ from datetime import datetime
 
 from enum import Enum
 
+from typing import Union
+
 from expense_tracker.constants import Constants
 
 from expense_tracker.presenter.presenter import Presenter
@@ -61,7 +63,7 @@ class Tag(Presenter):
             return Tag._format(session.query(DB_Tag).where(DB_Tag.id == id).first())
 
     @staticmethod
-    def create(values: dict[Enum, any]) -> tuple[int, ...]:
+    def create(values: dict[Enum, Union[int, str, datetime]]) -> tuple[int, ...]:
         """
         Create a transaction
         """
@@ -76,7 +78,7 @@ class Tag(Presenter):
             return Tag._format(new_tag)
 
     @staticmethod
-    def set_value(id: int, column: Column, new_value: any) -> any:
+    def set_value(id: int, column: Column, new_value: Union[int, str, datetime]) -> str:
         """
         Updates cell in the database
         """
@@ -130,7 +132,7 @@ class Tag(Presenter):
             return list(Tag._format(tag) for tag in merchant.default_tags)
 
     @staticmethod
-    def get_value(value: any, column: Column) -> any:
+    def get_value(value: Union[int, str, datetime], column: Column) -> str:
         """
         Format or get a value based on the column it was requested for
         """

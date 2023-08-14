@@ -60,14 +60,22 @@ class Selector(Widget):
         classes: Optional[str] = None,
     ) -> None:
         """
-        Constructor
+        Initializes the Widget.
+
+        Args:
+            option_list: List of options the user she be provided with.
+            name: The name of the widget.
+            id: The ID of the widget in the DOM.
+            classes: The CSS classes for the widget.
         """
         self._option_list: list[Selector.Option] = option_list
         super().__init__(name=name, id=id, classes=classes)
 
     def compose(self) -> ComposeResult:
         """
-        Composes the display
+        Composes the display.
+
+        Returns: Compose result.
         """
 
         self._container: Vertical = Vertical()
@@ -82,31 +90,39 @@ class Selector(Widget):
 
     def on_input_changed(self, event: Input.Changed) -> None:
         """
-        Called when the input is changed.
+        Called when the input is changed and updates the options list.
 
-        Updates the options list.
+        Args:
+            event: The event that this function is called in response to.
         """
         self.update_options_list(search_input=event.value)
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
         """
-        Called when the input is submitted.
+        Called when the input is submitted and posts submitted message.
 
-        Sends the submitted message with the first option id.
+        Args:
+            event: The event that this function is called in response to.
         """
         self.post_message(self.Submitted(self._option_list[0].option_id))
 
     def on_option_list_option_selected(self, event: OptionList.OptionSelected) -> None:
         """
-        Called when an option is selected.
+        Called when an option is selected and posts submitted message.
 
-        Sends the submitted message with the id of the selected option.
+        Args:
+            event: The event that this function is called in response to.
         """
         self.post_message(self.Submitted(event.option_id))
 
     def update_options_list(self, search_input: Optional[str] = None) -> None:
         """
-        Sorts and re draws the option list
+        Sorts and re-creates the option list.
+
+        Sorts the option list based on how close search_input is to each option and redraws the list in the new order.
+
+        Args:
+            search_input: Input compared against the option list for similarity.
         """
         if search_input:
             self._search_options_list(search_input)
@@ -117,9 +133,12 @@ class Selector(Widget):
             for option in self._option_list
         )
 
-    def _search_options_list(self, search_input: str) -> list[tuple[str, int]]:
+    def _search_options_list(self, search_input: str) -> None:
         """
-        Sort a list of options based on how close it is to a given search_input.
+        Sort a list of options based on how similar each option it is to search_input.
+
+        Args:
+            search_input: Input compared against the option list for similarity.
         """
 
         # Create a list with each option and a value that relates the similarity of the option key to the search_input

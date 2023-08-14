@@ -4,6 +4,10 @@ from __future__ import annotations
 
 from enum import Enum
 
+from typing import Union
+
+from datetime import datetime
+
 from typing import Any, Optional
 from textual.coordinate import Coordinate
 from textual.widgets import DataTable
@@ -17,7 +21,9 @@ from expense_tracker.presenter.presenter import Presenter
 
 class Exptrack_Data_Table(DataTable):
     """
-    Generates data tables from each of the data types.
+    Generates interactive data tables from each of the data types.
+
+    Should be extended to create specific table classes.
     """
 
     BINDINGS: list[tuple[str, str, str]] = [
@@ -35,6 +41,17 @@ class Exptrack_Data_Table(DataTable):
         id: Optional[str] = None,
         classes: Optional[str] = None,
     ) -> None:
+        """
+        Initializes the widget.
+
+        Args:
+            presenter: The presenter that is used to get data for the table.
+            column_list: List of columns for the table containing the column display name and an presenter Column.
+            initial_row_list: List of rows to draw initials, if non are provided the presenter gets all data.
+            name: The name of the widget.
+            id: The ID of the widget in the DOM.
+            classes: The CSS classes for the widget.
+        """
         self.presenter: Presenter = presenter
         self.column_list: list[tuple[str, Enum]] = column_list
 
@@ -53,9 +70,7 @@ class Exptrack_Data_Table(DataTable):
 
     def on_mount(self) -> None:
         """
-        Called when the widget is mounted.
-
-        Adds the columns and initial rows.
+        Called when the widget is mounted, adds the columns and initial rows.
         """
         # Set the cursor type
         self.cursor_type = "row"
@@ -74,28 +89,28 @@ class Exptrack_Data_Table(DataTable):
 
     def action_create(self) -> None:
         """
-        Called when c is pressed.
+        Called when c is pressed, should be extended and implemented.
         """
 
         return
 
     def action_expand(self) -> None:
         """
-        Called when e is pressed.
+        Called when e is pressed, should be extended and implemented to allow for an expand feature.
         """
 
         return
 
     def action_delete(self) -> None:
         """
-        Called when d is pressed.
+        Called when d is pressed, should be extended and implemented.
         """
 
         return
 
     def on_click(self, event: Click) -> None:
         """
-        Called when the user clicks a cell.
+        Called when the user clicks a cell, if this shift key is held down then mount a
         """
 
         # If the shift key was not held down then return
@@ -125,9 +140,12 @@ class Exptrack_Data_Table(DataTable):
         if not popup:
             return
 
-        def callback(new_value: Optional[any]) -> None:
+        def callback(new_value: Optional[Union[int, str, datetime]]) -> None:
             """
-            Updates the database and the view with the new value
+            Updates the database and the view with the new value.
+
+            Args:
+                new_value: The value that the user inputted. Should be handled and converted into a displayable string by the presenter.
             """
 
             # If there is no new value then return
@@ -149,9 +167,17 @@ class Exptrack_Data_Table(DataTable):
 
         self.app.push_screen(popup, callback)
 
-    def get_input_popup(self, column: str, id: int) -> Optional[ModalScreen]:
+    def get_input_popup(self, column: Enum, id: int) -> Optional[ModalScreen]:
         """
-        To be extended
+        Gets the popup required to obtain user input for a column data type.
+
+        Columns in each exptrack_data_table can display different data types. This function finds the popup required to deal with the column data type and returns it so it can be mounted. Should be extended to handel the specific presenters columns.
+
+        Args:
+            column: Column enum provided by the presenter class.
+            id: The id of the row that was clicked.
+
+        Return: A popup in the form of a ModalScreen if one is found.
         """
 
         return None

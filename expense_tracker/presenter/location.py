@@ -8,6 +8,10 @@ from expense_tracker.presenter.presenter import Presenter
 
 from typing import Optional
 
+from typing import Union
+
+from datetime import datetime
+
 from geopy.distance import geodesic
 
 from expense_tracker.model.orm import engine
@@ -58,7 +62,7 @@ class Location(Presenter):
             )
 
     @staticmethod
-    def create(values: dict[Enum, any]) -> tuple[int, ...]:
+    def create(values: dict[Enum, Union[int, str, datetime]]) -> tuple[int, ...]:
         """
         Create a transaction
         """
@@ -86,7 +90,7 @@ class Location(Presenter):
             )
 
     @staticmethod
-    def set_value(id: int, column: Column, new_value: any) -> any:
+    def set_value(id: int, column: Column, new_value: Union[int, str, datetime]) -> str:
         """
         Updates cell in the database
         """
@@ -129,7 +133,7 @@ class Location(Presenter):
         Presenter.set_value(id, column, new_value)
 
     @staticmethod
-    def get_value(value: any, column: Column) -> any:
+    def get_value(value: Union[int, str, datetime], column: Column) -> str:
         """
         Format or get a value based on the column it was requested for
         """

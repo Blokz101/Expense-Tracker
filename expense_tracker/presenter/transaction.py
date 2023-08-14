@@ -6,6 +6,8 @@ from datetime import datetime
 
 from enum import Enum
 
+from typing import Union
+
 from datetime import datetime
 
 from expense_tracker.constants import Constants
@@ -79,7 +81,7 @@ class Transaction(Presenter):
             )
 
     @staticmethod
-    def create(values: dict[Enum, any]) -> tuple[int, ...]:
+    def create(values: dict[Enum, Union[int, str, datetime]]) -> tuple[int, ...]:
         """
         Create a transaction
         """
@@ -108,7 +110,7 @@ class Transaction(Presenter):
             return Transaction._format(new_transaction)
 
     @staticmethod
-    def set_value(id: int, column: Column, new_value: any) -> any:
+    def set_value(id: int, column: Column, new_value: Union[int, str, datetime]) -> str:
         """
         Updates a cell in the database.
         """
@@ -169,7 +171,7 @@ class Transaction(Presenter):
         return Presenter.set_value(id, column, new_value)
 
     @staticmethod
-    def get_value(value: any, column: Column) -> any:
+    def get_value(value: Union[int, str, datetime], column: Column) -> str:
         """
         Format or get a value based on the column it was requested for
         """
