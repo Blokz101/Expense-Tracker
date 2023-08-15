@@ -87,6 +87,11 @@ class Presenter:
 
         When extended, this function should contain many if clauses with code to deal with the specific column and then exit the function.
 
+        Args:
+            id: ID of the object that requires editing.
+            column: Column of the object that requires editing.
+            new_value: New value to set the cell to.
+
         Return: The new value in a displayable format.
 
         Throws:
@@ -105,6 +110,10 @@ class Presenter:
         Format or get a value based on the column it was requested for.
 
         When extended, this function should contain many if clauses with code to deal with the specific column and then exit the function.
+
+        Args:
+            value: Database value that needs to be converted into a displayable format.
+            column: Column that indicates what datatype value is.
 
         Return: The value in a displayable format.
 
