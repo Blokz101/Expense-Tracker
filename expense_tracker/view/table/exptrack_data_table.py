@@ -94,10 +94,17 @@ class Exptrack_Data_Table(DataTable):
             if not all(type(cell) == str for cell in row):
                 raise ValueError(f"Row {row} must only contain strings.")
             
+            # line_counts = [cell.count("\n") + 1 for cell in formatted_cells]
+            # height = max(line_counts)
+            
+            cell_height_list: list[int] = (cell.count("\n") + 1 for cell in row)
+            row_height: int = max(cell_height_list)
+            
             # Style and add the row
             self.add_row(
                 *(Text(cell, style=self.get_row_style(row)) for cell in row),
-                key=row[0]
+                key=row[0],
+                height=row_height
             )
     
     def get_row_style(self, row: tuple[str, ...]) -> str:
