@@ -4,7 +4,7 @@ from textual.app import ComposeResult
 from textual.widgets import Input, Static
 from textual.containers import Vertical
 from textual.screen import ModalScreen
-from textual.validation import Regex
+from textual.validation import Function
 from textual.css.query import NoMatches
 
 from expense_tracker.constants import Constants
@@ -71,9 +71,9 @@ class Date_Input_Popup(ModalScreen[Optional[datetime]]):
         self._validation_status_widget: Static = Static(id="validation_status")
         self._input_widget: Input = Input(
             validators=[
-                Regex(
-                    Constants.DATE_REGEX,
-                    failure_description="Input must match mm/dd/yyyy format",
+                Function(
+                    Date_Input_Popup._validate_date,
+                    failure_description="Input must match mm/dd/yyyy format and be a valid date",
                 )
             ]
         )
@@ -116,7 +116,7 @@ class Date_Input_Popup(ModalScreen[Optional[datetime]]):
             return
 
         self.dismiss(
-            datetime.strptime(self._input_widget.value, Constants.DATE_STRPTIME)
+            datetime.strptime(self._input_widget.value, Constants.USER_INPUT_DATE_FORMAT)
         )
 
     def action_exit_popup(self) -> None:
@@ -127,3 +127,20 @@ class Date_Input_Popup(ModalScreen[Optional[datetime]]):
         """
 
         self.dismiss(None)
+        
+    @staticmethod
+    def _validate_date(date: str) -> bool:
+        """
+        Returns true if date is readable and false if not.
+        
+        Args:
+            date: String to be parsed
+            
+        Return: Boolean status of validation
+        """
+        
+        try:
+            datetime.strptime(date, Constants.USER_INPUT_DATE_FORMAT)
+            return True
+        except ValueError:
+            return False

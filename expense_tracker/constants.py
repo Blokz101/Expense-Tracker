@@ -1,22 +1,19 @@
 # expense_tracker/constants.py
 
-from dataclasses import dataclass, field
-
-from typing import Literal
-
 from pathlib import Path
 
 
-@dataclass
 class Constants:
     """
     General constants for the program
     """
 
-    DATE_FORMAT: str = "%A, %B %-d %Y"
 
-    DATE_REGEX: str = "(0[1-9]|1[0-2])\/(^0[1-9]|[12][0-9]|3[01])\/(\d{4}$)"
-    DATE_STRPTIME: str = "%m/%d/%Y"
+    DATE_FORMAT: str = "%a, %b %-d %Y"
+    
+    STATEMENT_DATE_FORMAT: str = "%d/%m/%Y"
+
+    USER_INPUT_DATE_FORMAT: str = "%m/%d/%Y"
 
     SETTINGS_FILE_PATH: str = "settings.ini"
 
@@ -24,7 +21,7 @@ class Constants:
 
     SUPPORTED_IMAGE_EXTENSIONS: tuple[str, ...] = (".png", ".jpg", ".jpeg")
 
-    SETTINGS_FILE_DEFAULTS: tuple[tuple[str, dict[str, str]], ...] = (
+    SETTINGS_FILE_DEFAULTS: list[tuple[str, dict[str, str]]] = [
         (
             "general",
             {
@@ -35,4 +32,4 @@ class Constants:
                 "default_account_id": "0",
             },
         ),
-    )
+    ]
