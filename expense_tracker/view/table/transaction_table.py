@@ -109,12 +109,12 @@ class Transaction_Table(Exptrack_Data_Table):
             return Date_Input_Popup()
 
         if column == Transaction.Column.TAGS:
-            selected_tag_list: list[tuple[int, ...]] = (
+            selected_tag_list: list[tuple[str, ...]] = (
                 Tag.get_tags_for_transaction(id) if id else Tag.get_all()
             )
             selected_tag_id_list: list[int] = list(tag[0] for tag in selected_tag_list)
 
-            tag_list: list[tuple[int, ...]] = []
+            tag_list: list[tuple[str, ...]] = []
 
             for tag in Tag.get_all():
                 tag_list.append(

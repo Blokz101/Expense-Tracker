@@ -16,7 +16,7 @@ class Presenter:
         ID: int = 0
 
     @staticmethod
-    def _format(database_object: any) -> tuple[int, ...]:
+    def _format(database_object: any) -> tuple[str, ...]:
         """
         Formats the raw database objects into a tuple that the view can parse. Should be extended.
 
@@ -29,7 +29,7 @@ class Presenter:
         return []
 
     @staticmethod
-    def get_all() -> list[tuple[int, ...]]:
+    def get_all() -> list[tuple[str, ...]]:
         """
         Gets all the rows in the sql table. Should be extended.
 
@@ -42,7 +42,7 @@ class Presenter:
         raise RuntimeError("Presenter class does not implement get_all.")
 
     @staticmethod
-    def get_by_id(id: int) -> tuple[int, ...]:
+    def get_by_id(id: int) -> tuple[str, ...]:
         """
         Returns a single object with the requested id. Should be extended.
 

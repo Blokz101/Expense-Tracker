@@ -34,19 +34,19 @@ class Tag(Presenter):
         INSTANCE_TAG: int = 2
 
     @staticmethod
-    def _format(tag: DB_Tag) -> tuple[int, ...]:
+    def _format(tag: DB_Tag) -> tuple[str, ...]:
         """
         Formats raw database tags into a tuple
         """
 
         return (
-            tag.id,
+            str(tag.id),
             tag.name,
             str(tag.instance_tag),
         )
 
     @staticmethod
-    def get_all() -> list[tuple[int, ...]]:
+    def get_all() -> list[tuple[str, ...]]:
         """
         Returns a list of all tags as a list of tuples of strings
         """
@@ -55,7 +55,7 @@ class Tag(Presenter):
             return list(Tag._format(tag) for tag in session.query(DB_Tag).all())
 
     @staticmethod
-    def get_by_id(id: int) -> list[tuple[int, ...]]:
+    def get_by_id(id: int) -> list[tuple[str, ...]]:
         """
         Returns a single object with the requested id
         """
@@ -63,7 +63,7 @@ class Tag(Presenter):
             return Tag._format(session.query(DB_Tag).where(DB_Tag.id == id).first())
 
     @staticmethod
-    def create(values: dict[Enum, Union[int, str, datetime]]) -> tuple[int, ...]:
+    def create(values: dict[Enum, Union[int, str, datetime]]) -> tuple[str, ...]:
         """
         Create a transaction
         """
@@ -101,7 +101,7 @@ class Tag(Presenter):
 
     # TODO Edit this entire method to work with multiple amounts
     @staticmethod
-    def get_tags_for_transaction(id: int) -> list[tuple[int, ...]]:
+    def get_tags_for_transaction(id: int) -> list[tuple[str, ...]]:
         """
         Gets the tags from the first amount that a transaction has
         """
@@ -120,7 +120,7 @@ class Tag(Presenter):
             return list(Tag._format(tag) for tag in tag_list)
 
     @staticmethod
-    def get_tags_for_merchant_default(merchant_id: int) -> list[tuple[int, ...]]:
+    def get_tags_for_merchant_default(merchant_id: int) -> list[tuple[str, ...]]:
         """
         Get a list of tag ids that are the defaults for a merchant
         """

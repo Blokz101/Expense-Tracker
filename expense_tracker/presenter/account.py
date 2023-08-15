@@ -36,12 +36,12 @@ class Account(Presenter):
         DATE_COLUMN_INDEX: int = 4
 
     @staticmethod
-    def _format(amount: DB_Account) -> tuple[int, ...]:
+    def _format(amount: DB_Account) -> tuple[str, ...]:
         """
         Formats raw database transaction into a tuple
         """
         return (
-            amount.id,
+            str(amount.id),
             amount.name,
             str(amount.statement_description_column_index),
             str(amount.statement_amount_column_index),
@@ -49,7 +49,7 @@ class Account(Presenter):
         )
 
     @staticmethod
-    def get_by_id(id: int) -> list[tuple[int, ...]]:
+    def get_by_id(id: int) -> list[tuple[str, ...]]:
         """
         Returns a single object with the requested id
         """
@@ -59,7 +59,7 @@ class Account(Presenter):
             )
 
     @staticmethod
-    def get_all() -> list[tuple[int, ...]]:
+    def get_all() -> list[tuple[str, ...]]:
         """
         Returns a list of all merchants as a list of tuples of strings
         """
@@ -69,7 +69,7 @@ class Account(Presenter):
             )
 
     @staticmethod
-    def create(values: dict[Enum, Union[int, str, datetime]]) -> tuple[int, ...]:
+    def create(values: dict[Enum, Union[int, str, datetime]]) -> tuple[str, ...]:
         """
         Create a merchant
         """

@@ -34,19 +34,19 @@ class Merchant(Presenter):
         DEFAULT_TAGS: int = 3
 
     @staticmethod
-    def _format(merchant: DB_Merchant) -> tuple[int, ...]:
+    def _format(merchant: DB_Merchant) -> tuple[str, ...]:
         """
         Formats raw database transaction into a tuple
         """
         return (
-            merchant.id,
+            str(merchant.id),
             merchant.name,
-            merchant.naming_rule,
+            str(merchant.naming_rule),
             ", ".join(tag.name for tag in merchant.default_tags),
         )
 
     @staticmethod
-    def get_all() -> list[tuple[int, ...]]:
+    def get_all() -> list[tuple[str, ...]]:
         """
         Returns a list of all merchants as a list of tuples of strings
         """
@@ -57,7 +57,7 @@ class Merchant(Presenter):
             )
 
     @staticmethod
-    def get_by_id(id: int) -> list[tuple[int, ...]]:
+    def get_by_id(id: int) -> list[tuple[str, ...]]:
         """
         Returns a single object with the requested id
         """
@@ -67,7 +67,7 @@ class Merchant(Presenter):
             )
 
     @staticmethod
-    def create(values: dict[Enum, Union[int, str, datetime]]) -> tuple[int, ...]:
+    def create(values: dict[Enum, Union[int, str, datetime]]) -> tuple[str, ...]:
         """
         Create a merchant
         """

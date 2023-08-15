@@ -76,7 +76,7 @@ class Detailed_Data_Popup(ModalScreen):
         self._data_table_widget.add_column("Value", key="value")
 
         # Get the data list form the specified presenter
-        data_list: list[tuple[int, ...]] = self.parent_table.presenter.get_by_id(
+        data_list: list[tuple[str, ...]] = self.parent_table.presenter.get_by_id(
             self.object_id
         )
 

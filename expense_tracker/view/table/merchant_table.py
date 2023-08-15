@@ -86,12 +86,12 @@ class Merchant_Table(Exptrack_Data_Table):
             )
 
         if column == Merchant.Column.DEFAULT_TAGS:
-            default_tag_list: list[tuple[int, ...]] = (
+            default_tag_list: list[tuple[str, ...]] = (
                 Tag.get_tags_for_merchant_default(id) if id else Tag.get_all()
             )
             selected_tag_id_list: list[int] = list(tag[0] for tag in default_tag_list)
 
-            tag_list: list[tuple[int, ...]] = []
+            tag_list: list[tuple[str, ...]] = []
 
             for tag in Tag.get_all():
                 tag_list.append(

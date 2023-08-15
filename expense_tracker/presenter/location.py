@@ -37,20 +37,20 @@ class Location(Presenter):
         YCOORD: int = 4
 
     @staticmethod
-    def _format(location: DB_Merchant_Location) -> tuple[int, ...]:
+    def _format(location: DB_Merchant_Location) -> tuple[str, ...]:
         """
         Formats raw database transaction into a tuple
         """
         return (
-            location.id,
+            str(location.id),
             location.merchant.name,
             location.name,
-            float(location.x_coord),
-            float(location.y_coord),
+            str(location.x_coord),
+            str(location.y_coord),
         )
 
     @staticmethod
-    def get_by_id(id: int) -> list[tuple[int, ...]]:
+    def get_by_id(id: int) -> list[tuple[str, ...]]:
         """
         Returns a single object with the requested id
         """
@@ -62,7 +62,7 @@ class Location(Presenter):
             )
 
     @staticmethod
-    def create(values: dict[Enum, Union[int, str, datetime]]) -> tuple[int, ...]:
+    def create(values: dict[Enum, Union[int, str, datetime]]) -> tuple[str, ...]:
         """
         Create a transaction
         """
@@ -79,7 +79,7 @@ class Location(Presenter):
             return Location._format(new_location)
 
     @staticmethod
-    def get_all() -> list[tuple[int, ...]]:
+    def get_all() -> list[tuple[str, ...]]:
         """
         Returns a list of all merchants as a list of tuples of strings
         """

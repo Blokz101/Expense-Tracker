@@ -128,13 +128,13 @@ class Transaction_Create_Popup(Create_Popup):
         Gets the input popup to use for each column
         """
         if column == Transaction.Column.TAGS:
-            selected_tag_list: list[tuple[int, ...]] = Tag.get_tags_for_transaction(
+            selected_tag_list: list[tuple[str, ...]] = Tag.get_tags_for_transaction(
                 self.values[Transaction.Column.MERCHANT].value
             )
 
             selected_tag_id_list: list[int] = list(tag[0] for tag in selected_tag_list)
 
-            tag_list: list[tuple[int, ...]] = []
+            tag_list: list[tuple[str, ...]] = []
 
             for tag in Tag.get_all():
                 tag_list.append(

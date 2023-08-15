@@ -4,11 +4,14 @@ from __future__ import annotations
 
 from enum import Enum
 
-from typing import Union
+from typing import Union, Iterable
 
 from datetime import datetime
 
 from typing import Any, Optional
+
+from rich.text import Text
+
 from textual.coordinate import Coordinate
 from textual.widgets import DataTable
 from textual.widgets._data_table import CellKey
@@ -36,7 +39,6 @@ class Exptrack_Data_Table(DataTable):
         self,
         presenter: Presenter,
         column_list: list[tuple[str, Enum]],
-        initial_row_list: Optional[list[tuple[int, ...]]] = None,
         name: Optional[str] = None,
         id: Optional[str] = None,
         classes: Optional[str] = None,
@@ -47,19 +49,12 @@ class Exptrack_Data_Table(DataTable):
         Args:
             presenter: The presenter that is used to get data for the table.
             column_list: List of columns for the table containing the column display name and an presenter Column.
-            initial_row_list: List of rows to draw initials, if non are provided the presenter gets all data.
             name: The name of the widget.
             id: The ID of the widget in the DOM.
             classes: The CSS classes for the widget.
         """
         self.presenter: Presenter = presenter
         self.column_list: list[tuple[str, Enum]] = column_list
-
-        self._initial_row_list: list[tuple[int, ...]]
-        if initial_row_list:
-            self._initial_row_list = initial_row_list
-        else:
-            self._initial_row_list = self.presenter.get_all()
 
         super().__init__(
             zebra_stripes=True,
@@ -78,14 +73,53 @@ class Exptrack_Data_Table(DataTable):
         # Add an id column and other columns
         for column in self.column_list:
             self.add_column(column[0], key=column[1])
-
-        # Add initial rows
-        for row in self._initial_row_list:
+            
+        self.refresh_data()
+            
+    def refresh_data(self) -> None:
+        """
+        Clears and refreshes data from the database.
+        """
+        
+        self.clear()
+        
+        for row in self._get_row_data():
+            
+            # Check that the row is of correct length
             if len(self.columns) != len(row):
                 raise ValueError(
                     f"Table has {len(self.columns)} columns but was given a row with {len(row)} values."
                 )
-            self.add_row(*row[0:], key=row[0])
+            # Check that the row is of correct type
+            if not all(type(cell) == str for cell in row):
+                raise ValueError(f"Row {row} must only contain strings.")
+            
+            # Style and add the row
+            self.add_row(
+                *(Text(cell, style=self.get_row_style(row)) for cell in row),
+                key=row[0]
+            )
+    
+    def get_row_style(self, row: tuple[str, ...]) -> str:
+        """
+        Gets the style for a row. Should be extended if the table requires custom row styles.
+        
+        Args:
+            row: Row in display format
+            
+        Return: Style as a string
+        """
+        
+        return ""
+            
+    def _get_row_data(self) -> list[tuple[str, ...]]:
+        """
+        Gets the rows for the table, should be extended if table requires filtered data.
+        
+        Return: List of rows in display format.
+        """
+        
+        return self.presenter.get_all()
 
     def action_create(self) -> None:
         """

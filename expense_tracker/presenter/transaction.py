@@ -42,24 +42,24 @@ class Transaction(Presenter):
         AMOUNT: int = 7
 
     @staticmethod
-    def _format(transaction: DB_Transaction) -> tuple[int, ...]:
+    def _format(transaction: DB_Transaction) -> tuple[str, ...]:
         """
         Formats raw database transaction into a tuple
         """
         return (
-            transaction.id,
-            transaction.reconciled_status,
+            str(transaction.id),
+            str(transaction.reconciled_status),
             transaction.account.name,
             transaction.description,
             transaction.merchant.name,
             datetime.strftime(transaction.date, Constants.DATE_FORMAT),
             ", ".join(tag.name for tag in transaction.amounts[0].tags),
             # TODO Edit this to support multiple amounts
-            transaction.amounts[0].amount,
+            str(transaction.amounts[0].amount),
         )
 
     @staticmethod
-    def get_all() -> list[tuple[int, ...]]:
+    def get_all() -> list[tuple[str, ...]]:
         """
         Returns a list of all transactions as a list of tuples of strings
         """
@@ -71,7 +71,7 @@ class Transaction(Presenter):
             )
 
     @staticmethod
-    def get_by_id(id: int) -> list[tuple[int, ...]]:
+    def get_by_id(id: int) -> list[tuple[str, ...]]:
         """
         Returns a single object with the requested id
         """
@@ -81,7 +81,7 @@ class Transaction(Presenter):
             )
 
     @staticmethod
-    def create(values: dict[Enum, Union[int, str, datetime]]) -> tuple[int, ...]:
+    def create(values: dict[Enum, Union[int, str, datetime]]) -> tuple[str, ...]:
         """
         Create a transaction
         """
