@@ -35,6 +35,35 @@ class Create_Popup(ModalScreen):
     """
     Prompt the user for the info required to create a new object.
     """
+    
+    DEFAULT_CSS: str = """
+        Create_Popup {
+            align: center middle;
+        }
+
+        Create_Popup > Vertical {
+            width: 60;
+            height: auto;
+            background: $surface;
+            padding: 1;
+        }
+
+        Create_Popup > Vertical > DataTable {
+            border: $error;
+        }
+
+        Create_Popup #validation_status {
+            color: $error;
+        }
+
+        .submittable #validation_status {
+            color: $accent;
+        }
+
+        .submittable > Vertical > DataTable {
+            border: $accent;
+        }
+    """
 
     @dataclass
     class Field:
