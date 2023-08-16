@@ -1,11 +1,13 @@
 # expense_tracker/view/popup/date_input_popup.py
 
 from textual.app import ComposeResult
-from textual.widgets import Input, Static
+from textual.widgets import Static, Input
 from textual.containers import Vertical
 from textual.screen import ModalScreen
 from textual.validation import Function
 from textual.css.query import NoMatches
+
+from expense_tracker.view.validated_input import Validated_Input
 
 from expense_tracker.constants import Constants
 from datetime import datetime
@@ -32,14 +34,6 @@ class Date_Input_Popup(ModalScreen[Optional[datetime]]):
 
         Date_Input_Popup > Vertical > Input {
             margin: 1 0 0 0;
-        }
-
-        .valid #validation_status {
-            color: $primary;
-        }
-
-        #validation_status {
-            color: $error;
         }
     """
 
@@ -68,8 +62,7 @@ class Date_Input_Popup(ModalScreen[Optional[datetime]]):
         """
         self._container: Vertical = Vertical()
         self._instructions_widget: Static = Static(self._instructions_text)
-        self._validation_status_widget: Static = Static(id="validation_status")
-        self._input_widget: Input = Input(
+        self._input_widget: Validated_Input = Validated_Input(
             validators=[
                 Function(
                     Date_Input_Popup._validate_date,
@@ -82,29 +75,6 @@ class Date_Input_Popup(ModalScreen[Optional[datetime]]):
             yield self._instructions_widget
             yield self._input_widget
 
-    def on_input_changed(self, event: Input.Changed) -> None:
-        """
-        Called when the input widget is changed.
-
-        Updates the validation status widget if the input is valid.
-        """
-
-        # If the validation status widget is not mounted mount it
-        try:
-            self.query_one("#validation_status", Static)
-        except NoMatches:
-            self._container.mount(self._validation_status_widget)
-
-        # Update the validation status widget
-        if not event.validation_result.is_valid:
-            self._validation_status_widget.update(
-                event.validation_result.failure_descriptions[0]
-            )
-            self.remove_class("valid")
-        else:
-            self._validation_status_widget.update("Input is valid")
-            self.add_class("valid")
-
     def on_input_submitted(self, event: Input.Submitted) -> None:
         """
         Called when the input widget is submitted with the enter key.
@@ -116,7 +86,9 @@ class Date_Input_Popup(ModalScreen[Optional[datetime]]):
             return
 
         self.dismiss(
-            datetime.strptime(self._input_widget.value, Constants.USER_INPUT_DATE_FORMAT)
+            datetime.strptime(
+                self._input_widget.value, Constants.USER_INPUT_DATE_FORMAT
+            )
         )
 
     def action_exit_popup(self) -> None:
@@ -127,18 +99,18 @@ class Date_Input_Popup(ModalScreen[Optional[datetime]]):
         """
 
         self.dismiss(None)
-        
+
     @staticmethod
     def _validate_date(date: str) -> bool:
         """
         Returns true if date is readable and false if not.
-        
+
         Args:
             date: String to be parsed
-            
+
         Return: Boolean status of validation
         """
-        
+
         try:
             datetime.strptime(date, Constants.USER_INPUT_DATE_FORMAT)
             return True

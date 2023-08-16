@@ -2,4 +2,10 @@ DataTable, Placeholder, Transaction_Table, Merchant_Table, Field_Switcher, Tabbe
     height: 1fr;
 }
 
+.valid #validation_status {
+    color: $primary;
+}
 
+#validation_status {
+    color: $error;
+}

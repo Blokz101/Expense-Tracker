@@ -5,9 +5,10 @@ from textual.widgets import Input, Static
 from textual.containers import Vertical
 from textual.screen import ModalScreen
 from textual.validation import Validator
-from textual.css.query import NoMatches
 
-from typing import Optional
+from expense_tracker.view.validated_input import Validated_Input
+
+from typing import Optional, Union
 
 
 class Text_Input_Popup(ModalScreen[Optional[str]]):
@@ -29,14 +30,6 @@ class Text_Input_Popup(ModalScreen[Optional[str]]):
 
         Text_Input_Popup > Vertical > Input {
             margin: 1 0 0 0;
-        }
-
-        .valid #validation_status {
-            color: $primary;
-        }
-
-        #validation_status {
-            color: $error;
         }
     """
 
@@ -67,36 +60,15 @@ class Text_Input_Popup(ModalScreen[Optional[str]]):
         """
         self._container: Vertical = Vertical()
         self._instructions_widget: Static = Static(self._instructions_text)
-        self._validation_status_widget: Static = Static(id="validation_status")
-        self._input_widget: Input = Input(validators=self._validators)
+        self._input_widget: Union[Validated_Input, Input] = (
+            Validated_Input(validators=self._validators)
+            if self._validators
+            else Input()
+        )
 
         with self._container:
             yield self._instructions_widget
             yield self._input_widget
-
-    def on_input_changed(self, event: Input.Changed) -> None:
-        """
-        Called when the input widget is changed.
-
-        Updates the validation status widget if the input is valid.
-        """
-
-        if self._validators:
-            # If the validation status widget is not mounted mount it
-            try:
-                self.query_one("#validation_status", Static)
-            except NoMatches:
-                self._container.mount(self._validation_status_widget)
-
-            # Update the validation status widget
-            if not event.validation_result.is_valid:
-                self._validation_status_widget.update(
-                    event.validation_result.failure_descriptions[0]
-                )
-                self.remove_class("valid")
-            else:
-                self._validation_status_widget.update("Input is valid")
-                self.add_class("valid")
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
         """

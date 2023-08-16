@@ -73,18 +73,17 @@ class Exptrack_Data_Table(DataTable):
         # Add an id column and other columns
         for column in self.column_list:
             self.add_column(column[0], key=column[1])
-            
+
         self.refresh_data()
-            
+
     def refresh_data(self) -> None:
         """
         Clears and refreshes data from the database.
         """
-        
+
         self.clear()
-        
+
         for row in self._get_row_data():
-            
             # Check that the row is of correct length
             if len(self.columns) != len(row):
                 raise ValueError(
@@ -93,39 +92,39 @@ class Exptrack_Data_Table(DataTable):
             # Check that the row is of correct type
             if not all(type(cell) == str for cell in row):
                 raise ValueError(f"Row {row} must only contain strings.")
-            
+
             # line_counts = [cell.count("\n") + 1 for cell in formatted_cells]
             # height = max(line_counts)
-            
+
             cell_height_list: list[int] = (cell.count("\n") + 1 for cell in row)
             row_height: int = max(cell_height_list)
-            
+
             # Style and add the row
             self.add_row(
                 *(Text(cell, style=self.get_row_style(row)) for cell in row),
                 key=row[0],
-                height=row_height
+                height=row_height,
             )
-    
+
     def get_row_style(self, row: tuple[str, ...]) -> str:
         """
         Gets the style for a row. Should be extended if the table requires custom row styles.
-        
+
         Args:
             row: Row in display format
-            
+
         Return: Style as a string
         """
-        
+
         return ""
-            
+
     def _get_row_data(self) -> list[tuple[str, ...]]:
         """
         Gets the rows for the table, should be extended if table requires filtered data.
-        
+
         Return: List of rows in display format.
         """
-        
+
         return self.presenter.get_all()
 
     def action_create(self) -> None:

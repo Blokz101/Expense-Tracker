@@ -8,9 +8,8 @@ class Constants:
     General constants for the program
     """
 
-
     DATE_FORMAT: str = "%a, %b %-d %Y"
-    
+
     STATEMENT_DATE_FORMAT: str = "%m/%d/%Y"
 
     USER_INPUT_DATE_FORMAT: str = "%m/%d/%Y"

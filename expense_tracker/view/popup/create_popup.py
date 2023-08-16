@@ -35,7 +35,7 @@ class Create_Popup(ModalScreen):
     """
     Prompt the user for the info required to create a new object.
     """
-    
+
     DEFAULT_CSS: str = """
         Create_Popup {
             align: center middle;
