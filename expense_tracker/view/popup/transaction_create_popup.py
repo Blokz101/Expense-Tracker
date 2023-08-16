@@ -41,9 +41,6 @@ class Transaction_Create_Popup(Create_Popup):
         id: Optional[str] = None,
         classes: Optional[str] = None,
     ) -> None:
-        parent_column_list: list[tuple[Enum, any]] = copy(parent_table.column_list)
-        parent_column_list.pop(1)
-
         self.import_photo: Optional[Path] = import_list[0] if import_list else None
 
         super().__init__(
@@ -51,7 +48,6 @@ class Transaction_Create_Popup(Create_Popup):
             f"Import create for {self.import_photo.name}"
             if self.import_photo
             else "Manual create",
-            modified_column_list=parent_column_list,
             name=name,
             id=id,
             classes=classes,

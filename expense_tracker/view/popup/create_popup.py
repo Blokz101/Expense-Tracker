@@ -74,7 +74,6 @@ class Create_Popup(ModalScreen):
         self,
         parent_table: Exptrack_Data_Table,
         instructions: str = "Create",
-        modified_column_list: Optional[list[tuple[Enum, any]]] = None,
         name: Optional[str] = None,
         id: Optional[str] = None,
         classes: Optional[str] = None,
@@ -95,14 +94,14 @@ class Create_Popup(ModalScreen):
         self.parent_table: Exptrack_Data_Table = parent_table
 
         # Generate the colum list if unless a modified one is provided
-        self.column_list: list[tuple[Enum, any]] = self.parent_table.column_list
-        if modified_column_list:
-            self.column_list = modified_column_list
+        self.column_list: list[
+            Exptrack_Data_Table.Column
+        ] = self.parent_table.column_list
 
         # Generate a blank list of values for each column in the parent table, excluding the first or id column
         self.values: dict[Enum, Create_Popup.Field] = {}
         for column in self.column_list[1:]:
-            self.values[column[1]] = Create_Popup.Field()
+            self.values[column.key] = Create_Popup.Field()
 
     BINDINGS: list[tuple[str, str, str]] = [
         Binding("escape", "exit_popup", "Dismiss popup"),
@@ -139,22 +138,21 @@ class Create_Popup(ModalScreen):
         self._data_table_widget.add_column("Entry", key="entry")
 
         # Add rows, the rows and columns are flipped so be careful with naming
-        for row_key, value in zip(self.column_list[1:], self.values.values()):
+        for row, value in zip(self.column_list[1:], self.values.values()):
             display_value: str = "None"
             input_method: Input_Method = Input_Method.NONE
             if value.value:
-                print(row_key[1])
                 display_value = self.parent_table.presenter.get_value(
                     value.value,
-                    row_key[1],
+                    row.key,
                 )
                 input_method = value.input_method
 
             self._data_table_widget.add_row(
-                row_key[0],
+                row.display_name,
                 display_value,
                 input_method.value,
-                key=row_key[1],
+                key=row.key,
             )
 
     def set_value(
