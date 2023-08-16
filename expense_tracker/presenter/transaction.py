@@ -102,7 +102,7 @@ class Transaction(Presenter):
                 transaction_id=new_transaction.id,
                 amount=float(values[Transaction.Column.AMOUNT]),
             )
-            new_amount.tags = Transaction._get_tag_list(values[Transaction.Column.TAGS])
+            new_amount.tags = Tag.get_tag_list(values[Transaction.Column.TAGS])
             session.add(new_amount)
 
             # Commit and return
