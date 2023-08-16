@@ -82,7 +82,9 @@ class Detailed_Data_Popup(ModalScreen):
 
         # Add rows, the rows and columns are flipped so be careful with naming
         for index, column in enumerate(self.parent_table.column_list):
-            self._data_table_widget.add_row(column[0], data_list[index], key=column[1])
+            self._data_table_widget.add_row(
+                column.display_name, data_list[index], key=column.key
+            )
 
     def action_exit_popup(self) -> None:
         """

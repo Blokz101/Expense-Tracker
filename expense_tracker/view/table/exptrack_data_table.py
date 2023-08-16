@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from enum import Enum
 
-from typing import Union, Iterable
+from typing import Union, Optional
 
 from datetime import datetime
 
@@ -19,6 +19,8 @@ from textual.events import Click
 from textual.widgets._data_table import RowKey, ColumnKey
 from textual.screen import ModalScreen
 
+from dataclasses import dataclass
+
 from expense_tracker.presenter.presenter import Presenter
 
 
@@ -29,6 +31,12 @@ class Exptrack_Data_Table(DataTable):
     Should be extended to create specific table classes.
     """
 
+    @dataclass
+    class Column:
+        display_name: str
+        key: Enum
+        expanded_view_only: bool = False
+
     BINDINGS: list[tuple[str, str, str]] = [
         ("c", "create", "Create"),
         ("d", "delete", "Delete"),
@@ -38,7 +46,7 @@ class Exptrack_Data_Table(DataTable):
     def __init__(
         self,
         presenter: Presenter,
-        column_list: list[tuple[str, Enum]],
+        column_list: list[Union[tuple[str, Enum], Column]],
         name: Optional[str] = None,
         id: Optional[str] = None,
         classes: Optional[str] = None,
@@ -54,7 +62,14 @@ class Exptrack_Data_Table(DataTable):
             classes: The CSS classes for the widget.
         """
         self.presenter: Presenter = presenter
-        self.column_list: list[tuple[str, Enum]] = column_list
+        self.column_list: list[Exptrack_Data_Table.Column] = []
+        for column in column_list:
+            if type(column) == Exptrack_Data_Table.Column:
+                self.column_list.append(column)
+            else:
+                self.column_list.append(
+                    Exptrack_Data_Table.Column(column[0], column[1])
+                )
 
         super().__init__(
             zebra_stripes=True,
@@ -72,7 +87,8 @@ class Exptrack_Data_Table(DataTable):
 
         # Add an id column and other columns
         for column in self.column_list:
-            self.add_column(column[0], key=column[1])
+            if not column.expanded_view_only:
+                self.add_column(column.display_name, key=column.key)
 
         self.refresh_data()
 
@@ -84,24 +100,33 @@ class Exptrack_Data_Table(DataTable):
         self.clear()
 
         for row in self._get_row_data():
+            trimmed_row: list = list(
+                cell
+                for cell, column in zip(row, self.column_list)
+                if not column.expanded_view_only
+            )
+
             # Check that the row is of correct length
-            if len(self.columns) != len(row):
+            if len(self.columns) != len(trimmed_row):
                 raise ValueError(
-                    f"Table has {len(self.columns)} columns but was given a row with {len(row)} values."
+                    f"Table has {len(self.columns)} columns but was given a row with {len(trimmed_row)} values."
                 )
             # Check that the row is of correct type
-            if not all(type(cell) == str for cell in row):
-                raise ValueError(f"Row {row} must only contain strings.")
+            if not all(type(cell) == str for cell in trimmed_row):
+                raise ValueError(f"Row {trimmed_row} must only contain strings.")
 
-            # line_counts = [cell.count("\n") + 1 for cell in formatted_cells]
-            # height = max(line_counts)
-
-            cell_height_list: list[int] = (cell.count("\n") + 1 for cell in row)
+            # Calculate the height that each cell requires and the height that the row will have to be to accommodate it
+            cell_height_list: list[int] = list(
+                cell.count("\n") + 1 for cell in trimmed_row
+            )
             row_height: int = max(cell_height_list)
 
             # Style and add the row
             self.add_row(
-                *(Text(cell, style=self.get_row_style(row)) for cell in row),
+                *(
+                    Text(cell, style=self.get_row_style(trimmed_row))
+                    for cell in trimmed_row
+                ),
                 key=row[0],
                 height=row_height,
             )
