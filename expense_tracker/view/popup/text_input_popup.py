@@ -80,7 +80,8 @@ class Text_Input_Popup(ModalScreen[Optional[str]]):
         if self._validators and not event.validation_result.is_valid:
             return
 
-        self.dismiss(self._input_widget.value)
+        value: Optional[str] = self._input_widget.value
+        self.dismiss(value if value else "")
 
     def action_exit_popup(self) -> None:
         """

@@ -96,6 +96,7 @@ class Selector(Widget):
             event: The event that this function is called in response to.
         """
         self.update_options_list(search_input=event.value)
+        event.stop()
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
         """
@@ -104,6 +105,7 @@ class Selector(Widget):
         Args:
             event: The event that this function is called in response to.
         """
+        self._input_widget.value = self._option_list[0].display_name
         self.post_message(self.Submitted(self._option_list[0].option_id))
 
     def on_option_list_option_selected(self, event: OptionList.OptionSelected) -> None:
@@ -113,6 +115,7 @@ class Selector(Widget):
         Args:
             event: The event that this function is called in response to.
         """
+        self._input_widget.value = event.option.prompt
         self.post_message(self.Submitted(event.option_id))
 
     def update_options_list(self, search_input: Optional[str] = None) -> None:

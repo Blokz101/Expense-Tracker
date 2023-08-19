@@ -18,6 +18,9 @@ class Validated_Input(Widget):
     Input with a validation status below it.
     """
 
+    class Valid_Input_Changed(Input.Changed):
+        pass
+
     DEFAULT_CSS = """
         Validated_Input, Validated_Input > Vertical{
             height: auto;
@@ -26,8 +29,8 @@ class Validated_Input(Widget):
 
     def __init__(
         self,
+        validators: Optional[Union[Validator, Iterable[Validator]]],
         placeholder: str = "",
-        validators: Optional[Union[Validator, Iterable[Validator]]] = None,
         name: Optional[str] = None,
         id: Optional[str] = None,
         classes: Optional[str] = None,
@@ -48,7 +51,7 @@ class Validated_Input(Widget):
             placeholder=placeholder, validators=validators
         )
         self._container: Vertical = Vertical()
-
+        self.value: Optional[str] = None
         super().__init__(name=name, id=id, classes=classes)
 
     def compose(self) -> ComposeResult:
@@ -77,11 +80,22 @@ class Validated_Input(Widget):
             self._container.mount(self._validation_status_widget)
 
         # Update the validation status widget
-        if not event.validation_result.is_valid:
+        if event.validation_result.is_valid:
+            self._validation_status_widget.update("Input is valid")
+            self._container.add_class("valid")
+        else:
             self._validation_status_widget.update(
                 event.validation_result.failure_descriptions[0]
             )
             self._container.remove_class("valid")
+
+        # If the result is valid then post the valid changed message
+        if event.validation_result.is_valid:
+            self.value = event.value
+            self.post_message(
+                Validated_Input.Valid_Input_Changed(
+                    event.input, event.value, event.validation_result
+                )
+            )
         else:
-            self._validation_status_widget.update("Input is valid")
-            self._container.add_class("valid")
+            self.value = None

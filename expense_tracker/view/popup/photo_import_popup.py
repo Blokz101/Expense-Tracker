@@ -12,8 +12,11 @@ from pathlib import Path
 
 from expense_tracker.model.photo_manager import Photo_Manager
 
+from expense_tracker.presenter.transaction import Transaction
+
 from expense_tracker.view.popup.transaction_create_popup import Transaction_Create_Popup
 from expense_tracker.view.table.exptrack_data_table import Exptrack_Data_Table
+from expense_tracker.view.popup.popup_utils import Popup_Utils
 
 from typing import Optional
 
@@ -48,6 +51,11 @@ class Photo_Import_Popup(ModalScreen):
         }
     """
 
+    NON_REQUIRED_COLUMNS: list[Transaction.Column] = [
+        Transaction.Column.ID,
+        Transaction.Column.RECONCILED_STATUS,
+    ]
+
     BINDINGS: list[Binding] = [
         Binding("escape", "exit_import", "Dismiss all", priority=True),
     ]
@@ -74,11 +82,11 @@ class Photo_Import_Popup(ModalScreen):
         self._input_widget: Input = Input(
             validators=[
                 Function(
-                    Photo_Import_Popup._directory_exists,
+                    Popup_Utils._directory_exists,
                     failure_description="Directory does not exist",
                 ),
                 Function(
-                    Photo_Import_Popup._photos_in_directory,
+                    Popup_Utils._photos_in_directory,
                     failure_description="No photos in directory",
                 ),
             ]
@@ -127,7 +135,7 @@ class Photo_Import_Popup(ModalScreen):
 
         # Update the data table
         self._data_table_widget.clear()
-        path: Path = Path(Photo_Import_Popup._get_path(self._input_widget.value))
+        path: Path = Path(Popup_Utils._get_path(self._input_widget.value))
         for photo in Photo_Manager.photos_in_directory(path):
             self._data_table_widget.add_row(photo.name)
 
@@ -142,10 +150,23 @@ class Photo_Import_Popup(ModalScreen):
             return
 
         self.dismiss()
-        path: Path = Path(Photo_Import_Popup._get_path(self._input_widget.value))
+        path: Path = Path(Popup_Utils._get_path(self._input_widget.value))
+
+        print(
+            "\n".join(
+                list(
+                    str(column)
+                    for column in self.parent_table.column_list
+                    if not column.key in Photo_Import_Popup.NON_REQUIRED_COLUMNS
+                )
+            )
+        )
+
         self.app.push_screen(
             Transaction_Create_Popup(
-                self.parent_table, import_list=Photo_Manager.photos_in_directory(path)
+                self.parent_table,
+                import_list=Photo_Manager.photos_in_directory(path),
+                excluded_column_key_list=Photo_Import_Popup.NON_REQUIRED_COLUMNS,
             )
         )
 
@@ -157,17 +178,3 @@ class Photo_Import_Popup(ModalScreen):
         """
 
         self.dismiss()
-
-    @staticmethod
-    def _directory_exists(input: str) -> bool:
-        path: Path = Photo_Import_Popup._get_path(input)
-        return Photo_Manager.directory_exists(path)
-
-    @staticmethod
-    def _photos_in_directory(input: str) -> bool:
-        path: Path = Photo_Import_Popup._get_path(input)
-        return len(Photo_Manager.photos_in_directory(path)) > 0
-
-    @staticmethod
-    def _get_path(input: str) -> str:
-        return Path(input.replace("'", ""))

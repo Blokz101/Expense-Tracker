@@ -9,3 +9,10 @@ DataTable, Placeholder, Transaction_Table, Merchant_Table, Field_Switcher, Tabbe
 #validation_status {
     color: $error;
 }
+
+Begin_Reconcile_Popup > Grid {
+    width: 80%;
+    height: 1fr;
+    background: $surface;
+    padding: 1;
+}

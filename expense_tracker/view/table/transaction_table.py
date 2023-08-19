@@ -20,6 +20,7 @@ from expense_tracker.view.selector import Selector
 from expense_tracker.view.popup.transaction_create_popup import Transaction_Create_Popup
 from expense_tracker.view.popup.photo_import_popup import Photo_Import_Popup
 from expense_tracker.view.popup.date_input_popup import Date_Input_Popup
+from expense_tracker.view.popup.begin_reconcile_popup import Begin_Reconcile_Popup
 
 
 class Transaction_Table(Exptrack_Data_Table):
@@ -27,7 +28,10 @@ class Transaction_Table(Exptrack_Data_Table):
     Table of transactions
     """
 
-    BINDINGS: list[tuple[str, str, str]] = [("i", "import", "Import")]
+    BINDINGS: list[tuple[str, str, str]] = [
+        ("i", "import", "Import"),
+        ("r", "reconcile", "Reconcile"),
+    ]
 
     COLUMN_LIST: list[tuple[str, Enum, bool]] = [
         ("ID", Transaction.Column.ID),
@@ -79,6 +83,13 @@ class Transaction_Table(Exptrack_Data_Table):
         """
 
         return
+
+    def action_reconcile(self) -> None:
+        """
+        Called when r is pressed, beings a reconcile.
+        """
+
+        self.app.push_screen(Begin_Reconcile_Popup())
 
     def get_input_popup(self, column: str, id: int) -> Optional[ModalScreen]:
         """

@@ -178,4 +178,4 @@ class Location(Presenter):
 
             # If there are matches, sort the list by distance and return the closest coords
             compared_coords_list.sort(key=lambda x: x[1])
-            return compared_coords_list[0][0].id
+            return compared_coords_list[0][0].merchant_id

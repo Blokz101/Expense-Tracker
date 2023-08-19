@@ -37,11 +37,14 @@ class Photo_Manager:
         if not Photo_Manager.directory_exists(dir_path):
             return []
 
-        return list(
+        return_list: list[Path] = list(
             file
             for file in dir_path.iterdir()
             if file.is_file() and file.suffix in Constants.SUPPORTED_IMAGE_EXTENSIONS
         )
+
+        return_list.sort(key=lambda x: x.name)
+        return return_list
 
     @staticmethod
     def photo_exists_in_archive(photo_name: str, archive_dir: Path) -> bool:

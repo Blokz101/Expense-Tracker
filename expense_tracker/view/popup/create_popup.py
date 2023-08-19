@@ -70,9 +70,15 @@ class Create_Popup(ModalScreen):
         value: Union[int, str, datetime] = None
         input_method: Input_Method = Input_Method.NONE
 
+    BINDINGS: list[tuple[str, str, str]] = [
+        Binding("escape", "exit_popup", "Dismiss popup"),
+        Binding("enter", "submit", "Submit", priority=True),
+    ]
+
     def __init__(
         self,
         parent_table: Exptrack_Data_Table,
+        excluded_column_key_list: Optional[list[Enum]] = None,
         instructions: str = "Create",
         name: Optional[str] = None,
         id: Optional[str] = None,
@@ -84,7 +90,7 @@ class Create_Popup(ModalScreen):
         Args:
             parent_table: The table that the popup is creating a new row for.
             instructions: Instructions to display to the user.
-            modified_column_list: LIst of columns if the create popup should have different columns then the parent table.
+            TODO FIX THIS modified_column_list: List of columns if the create popup should have different columns then the parent table.
             name: The name of the screen.
             id: The ID of the screen in the DOM.
             classes: The CSS classes for the screen.
@@ -93,20 +99,30 @@ class Create_Popup(ModalScreen):
         self.instruction_text: str = instructions
         self.parent_table: Exptrack_Data_Table = parent_table
 
-        # Generate the colum list if unless a modified one is provided
         self.column_list: list[
             Exptrack_Data_Table.Column
         ] = self.parent_table.column_list
+        self.excluded_column_key_list: Optional[list[Enum]] = (
+            excluded_column_key_list
+            if excluded_column_key_list
+            else [parent_table.column_list[0].key] # [parent_table.column_list[0].key] evaluates to the first column's key, or generally the id column's key
+        )
 
         # Generate a blank list of values for each column in the parent table, excluding the first or id column
         self.values: dict[Enum, Create_Popup.Field] = {}
-        for column in self.column_list[1:]:
+        for column in self.get_input_columns():
             self.values[column.key] = Create_Popup.Field()
 
-    BINDINGS: list[tuple[str, str, str]] = [
-        Binding("escape", "exit_popup", "Dismiss popup"),
-        Binding("enter", "submit", "Submit", priority=True),
-    ]
+    def get_input_columns(self) -> list[Exptrack_Data_Table.Column]:
+        """
+        TODO Fill this in
+        """
+
+        return list(
+            column
+            for column in self.column_list
+            if not column.key in self.excluded_column_key_list
+        )
 
     def compose(self) -> ComposeResult:
         """
@@ -138,7 +154,7 @@ class Create_Popup(ModalScreen):
         self._data_table_widget.add_column("Entry", key="entry")
 
         # Add rows, the rows and columns are flipped so be careful with naming
-        for row, value in zip(self.column_list[1:], self.values.values()):
+        for row, value in zip(self.get_input_columns(), self.values.values()):
             display_value: str = "None"
             input_method: Input_Method = Input_Method.NONE
             if value.value:
@@ -241,6 +257,8 @@ class Create_Popup(ModalScreen):
         # If there are still blank values then automatically mount a popup to prompt the user to fill it in
         for key, value in self.values.items():
             if value.value is None:
+                print(f"{key} is none")
+
                 self._mount_popup(key)
                 return False
 
