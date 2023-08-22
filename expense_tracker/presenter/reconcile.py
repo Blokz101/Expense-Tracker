@@ -77,6 +77,12 @@ class Reconcile:
         Reconcile.reconcile_session = Reconcile_Session(statement_path, account_id)
 
     @staticmethod
+    def kill_session() -> None:
+        Reconcile.reconcile_session = None
+        Reconcile.statement_path = None
+        Reconcile.account_id = None
+
+    @staticmethod
     def _format(
         transaction: Union[ST_Transaction, DB_Transaction]
     ) -> tuple[str, str, str, str, str]:

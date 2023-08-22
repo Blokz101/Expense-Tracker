@@ -10,6 +10,7 @@ from expense_tracker.view.selector import Selector
 from expense_tracker.view.validated_input import Validated_Input
 
 from expense_tracker.presenter.account import Account
+from expense_tracker.presenter.reconcile import Reconcile
 
 from expense_tracker.view.popup.reconcile_popup import Reconcile_Popup
 
@@ -96,6 +97,14 @@ class Begin_Reconcile_Popup(ModalScreen):
             yield self._account_text
             yield self._selector
             yield self._button
+
+    def on_mount(self) -> None:
+        """
+        TODO Fill this in
+        """
+        if Reconcile.ongoing_session():
+            self.dismiss()
+            self.app.push_screen(Reconcile_Popup())
 
     def action_exit_popup(self) -> None:
         """

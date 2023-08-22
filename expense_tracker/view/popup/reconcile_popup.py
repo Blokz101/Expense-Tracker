@@ -40,12 +40,13 @@ class Reconcile_Popup(ModalScreen):
 
     BINDINGS: list[Binding] = [
         Binding("escape", "exit_popup", "Dismiss popup"),
+        Binding("q", "kill_session", "Kill reconcile session"),
     ]
 
     def __init__(
         self,
-        statement_path: Path,
-        account_id: int,
+        statement_path: Optional[Path] = None,
+        account_id: Optional[int] = None,
         name: Optional[str] = None,
         id: Optional[str] = None,
         classes: Optional[str] = None,
@@ -55,7 +56,16 @@ class Reconcile_Popup(ModalScreen):
         """
         super().__init__(name, id, classes)
 
-        Reconcile.new_session(statement_path, account_id)
+        if statement_path and account_id:
+            Reconcile.new_session(statement_path, account_id)
+            return
+
+        if Reconcile.ongoing_session():
+            return
+
+        raise RuntimeError(
+            "No reconcile session is running and either statement_path or account_id were not provided to the constructor."
+        )
 
     def compose(self) -> ComposeResult:
         """
@@ -93,3 +103,11 @@ class Reconcile_Popup(ModalScreen):
         """
 
         self.dismiss(None)
+
+    def action_kill_session(self) -> None:
+        """
+        TODO Fill this in
+        """
+        Reconcile.kill_session()
+        self.dismiss(None)
+        self.app.notify("Killed session")
