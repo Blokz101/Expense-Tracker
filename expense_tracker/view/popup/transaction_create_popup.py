@@ -85,7 +85,7 @@ class Transaction_Create_Popup(Create_Popup):
         )
         if not coords:
             return
-        
+
         # Get the possible locations and set them as defaults
         possible_location_id: Optional[int] = Location.possible_location(
             coords, Config_Manager().get_same_merchant_mile_radius()
@@ -103,11 +103,11 @@ class Transaction_Create_Popup(Create_Popup):
                 self.values[Transaction.Column.MERCHANT].value
             )
         )
-        
+
         # If there are no default tags then done set the value
         if not default_tag_id_list:
             return
-        
+
         self.values[Transaction.Column.TAGS].value = default_tag_id_list
         self.values[Transaction.Column.TAGS].input_method = Input_Method.PHOTO
 
@@ -140,7 +140,6 @@ class Transaction_Create_Popup(Create_Popup):
         Gets the input popup to use for each column
         """
         if column == Transaction.Column.TAGS:
-            
             # If the tags are at None or their default value, then convert them to an empty list for ease of processing
             selected_tag_id_list: list[int] = self.values[Transaction.Column.TAGS].value
             if not selected_tag_id_list:

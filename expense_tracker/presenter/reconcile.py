@@ -13,6 +13,8 @@ from datetime import datetime
 
 from expense_tracker.constants import Constants
 
+from expense_tracker.presenter.presenter import Presenter
+
 from expense_tracker.model.orm import engine
 from expense_tracker.model.orm.db_transaction import DB_Transaction
 from expense_tracker.model.orm.db_merchant import DB_Merchant
@@ -134,17 +136,83 @@ class Reconcile:
         return formatted_list
 
     @staticmethod
-    def get_error_list() -> tuple[str, ...]:
+    def get_error_list() -> (
+        list[tuple[str, str, str, str, str, str, str, str, str, str]]
+    ):
         """
         TODO Fill this in
         """
 
-        None
+        formatted_list: list[
+            tuple[str, str, str, str, str, str, str, str, str, str]
+        ] = []
+
+        for row in Reconcile.reconcile_session.reconcile_row_list:
+            if row.matched_trans or not row.possible_match_list:
+                continue
+
+            formatted_list.extend(Reconcile._format_possible_row(row))
+
+        return formatted_list
 
     @staticmethod
-    def get_orphan_list() -> tuple[str, ...]:
+    def _format_possible_row(
+        row: Reconcile_Session.Row,
+    ) -> list[tuple[str, str, str, str, str, str, str, str, str, str]]:
         """
         TODO Fill this in
         """
 
-        None
+        # A list of all the rows needed to display one statement transaction and all its possibly matching database transactions
+        display_rows: list[tuple[str, str, str, str, str, str, str, str, str, str]] = []
+
+        for index, possible_match in enumerate(row.possible_match_list):
+            statement_cells: tuple[str, str, str, str] = (
+                Reconcile._format(row.statement_trans)
+                if index == 0
+                else (str(row.statement_trans.row_id), "", "", "")
+            )
+            database_cells: tuple[str, str, str, str] = Reconcile._format(
+                possible_match
+            )
+
+            display_rows.append((statement_cells + database_cells))
+
+        return display_rows
+
+    @staticmethod
+    def get_orphan_list() -> list[tuple[str, ...]]:
+        """
+        TODO Fill this in
+        """
+
+        return list(
+            Reconcile._format(orphan)
+            for orphan in Reconcile.reconcile_session.orphan_list
+        )
+
+    @staticmethod
+    def set_value(
+        row_id: int,
+        column: Union[Full_Column, Orphan_Column],
+        new_value: Union[int, str, datetime],
+    ) -> str:
+        """
+        TODO Fill this in
+        """
+
+        with Session(engine) as session:
+            if column == Reconcile.Full_Column.ST_MERCHANT:
+                new_merchant: DB_Merchant = (
+                    session.query(DB_Merchant)
+                    .where(DB_Merchant.id == new_value)
+                    .first()
+                )
+                Reconcile.reconcile_session.set_statement_transaction_merchant(
+                    row_id, new_merchant
+                )
+                return Reconcile.reconcile_session.reconcile_row_list[
+                    row_id
+                ].statement_trans.merchant.name
+
+        Presenter.set_value(id, column, new_value)

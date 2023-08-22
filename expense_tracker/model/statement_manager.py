@@ -82,13 +82,16 @@ class Statement:
 
         with open(self.statement_path) as statement_file:
             csv_parser: csv = csv.reader(statement_file, delimiter=",")
-            for index, row in enumerate(csv_parser):
+
+            id_counter: int = 0
+
+            for row in csv_parser:
                 if not self._valid_statement_row(row):
                     continue
 
                 st_trans_list.append(
                     ST_Transaction(
-                        index,
+                        id_counter,
                         row[self._description_column_index],
                         DB_Util.get_merchant_from_description(
                             row[self._description_column_index]
@@ -100,6 +103,8 @@ class Statement:
                         float(row[self._amount_column_index]),
                     )
                 )
+
+                id_counter += 1
 
         return st_trans_list
 

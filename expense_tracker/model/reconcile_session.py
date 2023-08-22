@@ -33,7 +33,7 @@ class Reconcile_Session:
     class Row:
         statement_trans: ST_Transaction
         matched_trans: Optional[DB_Transaction] = None
-        flagged_trans: Optional[list[DB_Transaction]] = None
+        possible_match_list: Optional[list[DB_Transaction]] = None
 
     def __init__(self, statement_path: Path, account_id: int) -> None:
         """
@@ -85,13 +85,25 @@ class Reconcile_Session:
 
         # For each row check for matches, if there are any then record them and remove the database transaction form the remaining transactions list
         for row in self.reconcile_row_list:
-            # Check for match, if there is one then set the row's matched transaction and remove the database transaction from the remaining transactions list
             match: DB_Transaction = self._find_match(
                 row.statement_trans, remaining_db_trans
             )
             if match:
                 row.matched_trans = match
                 remaining_db_trans.remove(match)
+
+        # Find possible matches for each non matched statement transaction
+        for row in self.reconcile_row_list:
+            # Dont find possible matches if a confirmed one is already found
+            if row.matched_trans:
+                continue
+
+            row.possible_match_list = self._find_possible_matches(
+                row.statement_trans, remaining_db_trans
+            )
+
+        # Set the orphans list
+        self.orphan_list = remaining_db_trans
 
     def _find_match(
         self, st_trans: ST_Transaction, remaining_db_trans: list[DB_Transaction]
@@ -108,6 +120,23 @@ class Reconcile_Session:
         # No matches were found
         return None
 
+    def _find_possible_matches(
+        self, st_trans: ST_Transaction, remaining_db_trans: list[DB_Transaction]
+    ) -> list[DB_Transaction]:
+        """
+        TODO Fill this in
+        """
+
+        possible_matches_list: list[DB_Transaction] = []
+
+        # Check the statement trans against the remaining database trans, if two out of three fields match then add it.
+        for db_trans in remaining_db_trans:
+            if self.matching_trans_fields(st_trans, db_trans) == 2:
+                possible_matches_list.append(db_trans)
+
+        # Return the list
+        return possible_matches_list
+
     def matching_trans_fields(
         self, st_trans: ST_Transaction, db_trans: DB_Transaction
     ) -> int:
@@ -121,18 +150,25 @@ class Reconcile_Session:
             session.add(db_trans)
 
             # Check the amount
-            if st_trans.amount == DB_Util.get_transaction_amount(db_trans):
-                matching_fields = +1
+            if abs(st_trans.amount) == abs(DB_Util.get_transaction_amount(db_trans)):
+                matching_fields += 1
 
             # Check date
             if st_trans.date.date() == db_trans.date.date():
-                matching_fields = +1
+                matching_fields += 1
 
             # Check merchant
-            if (
-                DB_Util.get_merchant_from_description(st_trans.description)
-                == db_trans.merchant
-            ):
-                matching_fields = +1
+            if st_trans.merchant and st_trans.merchant.id == db_trans.merchant.id:
+                matching_fields += 1
 
         return matching_fields
+
+    def set_statement_transaction_merchant(
+        self, row_id: int, new_merchant: DB_Merchant
+    ) -> None:
+        """
+        TODO Fill this in
+        """
+
+        self.reconcile_row_list[row_id].statement_trans.merchant = new_merchant
+        self.match()

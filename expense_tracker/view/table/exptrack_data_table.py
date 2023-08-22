@@ -13,11 +13,13 @@ from typing import Any, Optional
 from rich.text import Text
 
 from textual.coordinate import Coordinate
+from textual.geometry import Size
 from textual.widgets import DataTable
 from textual.widgets._data_table import CellKey
 from textual.events import Click
 from textual.widgets._data_table import RowKey, ColumnKey
 from textual.screen import ModalScreen
+from textual.message import Message
 
 from dataclasses import dataclass
 
@@ -42,6 +44,11 @@ class Exptrack_Data_Table(DataTable):
         ("d", "delete", "Delete"),
         ("e", "expand", "Expand"),
     ]
+
+    class Data_Edited(Message):
+        """
+        TODO Fill this in
+        """
 
     def __init__(
         self,
@@ -91,6 +98,13 @@ class Exptrack_Data_Table(DataTable):
                 self.add_column(column.display_name, key=column.key)
 
         self.refresh_data()
+
+    def get_content_height(self, container: Size, viewport: Size, width: int) -> int:
+        """
+        TODO Fill this in
+        """
+
+        return self.row_count + 2
 
     def refresh_data(self) -> None:
         """
@@ -177,6 +191,7 @@ class Exptrack_Data_Table(DataTable):
         """
         Called when the user clicks a cell, if this shift key is held down then mount a
         """
+        print("Click Parent")
 
         # If the shift key was not held down then return
         if not event.shift:
@@ -229,6 +244,9 @@ class Exptrack_Data_Table(DataTable):
                 updated_value,
                 update_width=True,
             )
+
+            # Post a data edited message
+            self.post_message(Exptrack_Data_Table.Data_Edited())
 
         self.app.push_screen(popup, callback)
 

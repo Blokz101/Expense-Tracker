@@ -2,8 +2,8 @@
 
 from textual.app import ComposeResult
 from textual.screen import ModalScreen
-from textual.widgets import Static
-from textual.containers import Grid
+from textual.widgets import Static, Footer
+from textual.containers import VerticalScroll
 from textual.binding import Binding
 
 from typing import Optional
@@ -62,15 +62,28 @@ class Reconcile_Popup(ModalScreen):
         TODO Fill this in
         """
 
-        self._container: Grid = Grid()
+        self._container: VerticalScroll = VerticalScroll()
         self._reconcile_table: Reconcile_Table = Reconcile_Table()
-        # self._possible_match_table: Possible_Match_Table = Possible_Match_Table()
-        # self._orphan_table: Orphan_Table = Orphan_Table()
+        self._possible_match_table: Possible_Match_Table = Possible_Match_Table()
+        self._orphan_table: Orphan_Table = Orphan_Table()
 
         with self._container:
+            yield Static("Statement")
             yield self._reconcile_table
-            # yield self._possible_match_table
-            # yield self._orphan_table
+            yield Static("Possible Matches")
+            yield self._possible_match_table
+            yield Static("Orphan Table")
+            yield self._orphan_table
+            yield Footer()
+
+    def refresh_data(self) -> None:
+        """
+        TODO Fill this in
+        """
+
+        self._reconcile_table.refresh_data()
+        self._possible_match_table.refresh_data()
+        self._orphan_table.refresh_data()
 
     def action_exit_popup(self) -> None:
         """

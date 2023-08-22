@@ -105,7 +105,9 @@ class Create_Popup(ModalScreen):
         self.excluded_column_key_list: Optional[list[Enum]] = (
             excluded_column_key_list
             if excluded_column_key_list
-            else [parent_table.column_list[0].key] # [parent_table.column_list[0].key] evaluates to the first column's key, or generally the id column's key
+            else [
+                parent_table.column_list[0].key
+            ]  # [parent_table.column_list[0].key] evaluates to the first column's key, or generally the id column's key
         )
 
         # Generate a blank list of values for each column in the parent table, excluding the first or id column
