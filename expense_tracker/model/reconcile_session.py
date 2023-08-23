@@ -69,6 +69,7 @@ class Reconcile_Session:
                 session.query(DB_Transaction)
                 .where(DB_Transaction.reconciled_status == False)
                 .where(DB_Transaction.account_id == self._account_id)
+                .order_by(DB_Transaction.date)
                 .all()
             )
 
@@ -107,6 +108,7 @@ class Reconcile_Session:
 
         # Set the orphans list
         self.orphan_list = remaining_db_trans
+        self.orphan_list.sort(key=lambda x: x.date, reverse=True)
 
     def _find_match(
         self, st_trans: ST_Transaction, remaining_db_trans: list[DB_Transaction]

@@ -53,7 +53,9 @@ class Merchant(Presenter):
         with Session(engine) as session:
             return list(
                 Merchant._format(merchant)
-                for merchant in session.query(DB_Merchant).all()
+                for merchant in session.query(DB_Merchant)
+                .order_by(DB_Merchant.name)
+                .all()
             )
 
     @staticmethod

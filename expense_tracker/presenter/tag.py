@@ -52,7 +52,12 @@ class Tag(Presenter):
         """
 
         with Session(engine) as session:
-            return list(Tag._format(tag) for tag in session.query(DB_Tag).all())
+            return list(
+                Tag._format(tag)
+                for tag in session.query(DB_Tag)
+                .order_by(DB_Tag.instance_tag, DB_Tag.name)
+                .all()
+            )
 
     @staticmethod
     def get_by_id(id: int) -> list[tuple[str, ...]]:

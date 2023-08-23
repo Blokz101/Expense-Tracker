@@ -86,7 +86,9 @@ class Location(Presenter):
         with Session(engine) as session:
             return list(
                 Location._format(location)
-                for location in session.query(DB_Merchant_Location).all()
+                for location in session.query(DB_Merchant_Location)
+                .order_by(DB_Merchant_Location.merchant_id, DB_Merchant_Location.name)
+                .all()
             )
 
     @staticmethod

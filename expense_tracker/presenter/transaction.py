@@ -67,7 +67,9 @@ class Transaction(Presenter):
         with Session(engine) as session:
             return list(
                 Transaction._format(transaction)
-                for transaction in session.query(DB_Transaction).all()
+                for transaction in session.query(DB_Transaction)
+                .order_by(DB_Transaction.date.desc())
+                .all()
             )
 
     @staticmethod

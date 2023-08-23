@@ -65,7 +65,8 @@ class Account(Presenter):
         """
         with Session(engine) as session:
             return list(
-                Account._format(account) for account in session.query(DB_Account).all()
+                Account._format(account)
+                for account in session.query(DB_Account).order_by(DB_Account.name).all()
             )
 
     @staticmethod
