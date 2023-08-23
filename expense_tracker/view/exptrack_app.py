@@ -18,12 +18,15 @@ class Exptrack_App(App):
     CSS_PATH = Constants.CSS_FILE_PATH
 
     def compose(self) -> ComposeResult:
+        self._transaction_table: Transaction_Table = Transaction_Table()
+        self._field_switcher: Field_Switcher = Field_Switcher()
+
         yield Header()
         with TabbedContent():
             with TabPane("Accounts"):
-                yield Transaction_Table()
+                yield self._transaction_table
             with TabPane("Budgets"):
                 yield Placeholder("Budgets coming soon")
             with TabPane("Fields"):
-                yield Field_Switcher()
+                yield self._field_switcher
         yield Footer()

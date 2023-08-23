@@ -47,7 +47,7 @@ class Exptrack_Data_Table(DataTable):
 
     class Data_Edited(Message):
         """
-        TODO Fill this in
+        Message to signal that data in the table has been edited.
         """
 
     def __init__(
@@ -101,7 +101,7 @@ class Exptrack_Data_Table(DataTable):
 
     def get_content_height(self, container: Size, viewport: Size, width: int) -> int:
         """
-        TODO Fill this in
+        Sets the height of the table.
         """
 
         return self.row_count + 2
@@ -191,7 +191,6 @@ class Exptrack_Data_Table(DataTable):
         """
         Called when the user clicks a cell, if this shift key is held down then mount a
         """
-        print("Click Parent")
 
         # If the shift key was not held down then return
         if not event.shift:

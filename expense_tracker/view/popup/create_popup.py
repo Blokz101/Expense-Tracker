@@ -90,7 +90,7 @@ class Create_Popup(ModalScreen):
         Args:
             parent_table: The table that the popup is creating a new row for.
             instructions: Instructions to display to the user.
-            TODO FIX THIS modified_column_list: List of columns if the create popup should have different columns then the parent table.
+            excluded_column_key_list: List of columns that should be excluded in the compact view.
             name: The name of the screen.
             id: The ID of the screen in the DOM.
             classes: The CSS classes for the screen.
@@ -112,12 +112,15 @@ class Create_Popup(ModalScreen):
 
         # Generate a blank list of values for each column in the parent table, excluding the first or id column
         self.values: dict[Enum, Create_Popup.Field] = {}
-        for column in self.get_input_columns():
+        for column in self.get_compact_columns():
             self.values[column.key] = Create_Popup.Field()
 
-    def get_input_columns(self) -> list[Exptrack_Data_Table.Column]:
+    def get_compact_columns(self) -> list[Exptrack_Data_Table.Column]:
         """
-        TODO Fill this in
+        Get a list of columns that should be displayed in the compact table view.
+
+        Return:
+            List of columns for the compact view.
         """
 
         return list(
@@ -156,7 +159,7 @@ class Create_Popup(ModalScreen):
         self._data_table_widget.add_column("Entry", key="entry")
 
         # Add rows, the rows and columns are flipped so be careful with naming
-        for row, value in zip(self.get_input_columns(), self.values.values()):
+        for row, value in zip(self.get_compact_columns(), self.values.values()):
             display_value: str = "None"
             input_method: Input_Method = Input_Method.NONE
             if value.value:
@@ -259,8 +262,6 @@ class Create_Popup(ModalScreen):
         # If there are still blank values then automatically mount a popup to prompt the user to fill it in
         for key, value in self.values.items():
             if value.value is None:
-                print(f"{key} is none")
-
                 self._mount_popup(key)
                 return False
 

@@ -152,16 +152,6 @@ class Photo_Import_Popup(ModalScreen):
         self.dismiss()
         path: Path = Path(Popup_Utils._get_path(self._input_widget.value))
 
-        print(
-            "\n".join(
-                list(
-                    str(column)
-                    for column in self.parent_table.column_list
-                    if not column.key in Photo_Import_Popup.NON_REQUIRED_COLUMNS
-                )
-            )
-        )
-
         self.app.push_screen(
             Transaction_Create_Popup(
                 self.parent_table,

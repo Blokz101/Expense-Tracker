@@ -58,7 +58,10 @@ class Reconcile_Session:
 
     def _get_unreconciled_transactions(self) -> list[DB_Transaction]:
         """
-        TODO Fill this in
+        Get all unreconciled transactions.
+
+        Returns:
+            A list of transactions that have not been reconciled.
         """
 
         with Session(engine) as session:
@@ -71,7 +74,7 @@ class Reconcile_Session:
 
     def match(self) -> None:
         """
-        TODO Fill this in
+        Match rows from the statement to transactions that have not been reconciled.
         """
 
         # Clear the reconcile row list and orphan list to rewrite them
@@ -109,7 +112,15 @@ class Reconcile_Session:
         self, st_trans: ST_Transaction, remaining_db_trans: list[DB_Transaction]
     ) -> Optional[DB_Transaction]:
         """
-        TODO Fill this in
+        Try to find database transaction a match for a statement row.
+
+        Match is defined as a database transaction where all columns (amount, merchant, date) are equal.
+
+        Args:
+            st_trans: Statement Row in the form of a ST_Transaction.
+            remaining_db_trans: List of the database transactions that have not been reconciled or matched.
+
+        Returns: Database transaction if one is found.
         """
 
         # Check the statement trans against the remaining database trans, if one is a match return it.
@@ -124,7 +135,15 @@ class Reconcile_Session:
         self, st_trans: ST_Transaction, remaining_db_trans: list[DB_Transaction]
     ) -> list[DB_Transaction]:
         """
-        TODO Fill this in
+        Try to find database transactions that might match a statement row.
+
+        Possible match is defined as a database transaction where two of three columns (amount, merchant, date) are equal.
+
+        Args:
+            st_trans: Statement Row in the form of a ST_Transaction.
+            remaining_db_trans: List of the database transactions that have not been reconciled or matched.
+
+        Returns: List of database transaction if it might be a possible match.
         """
 
         possible_matches_list: list[DB_Transaction] = []
@@ -141,7 +160,13 @@ class Reconcile_Session:
         self, st_trans: ST_Transaction, db_trans: DB_Transaction
     ) -> int:
         """
-        TODO Fill this in
+        Find the number of columns (amount, merchant, date) that match.
+
+        Args:
+            st_trans: Statement row in the form of a ST_Transaction.
+            db_trans: Database transaction.
+
+        Return: Int from 0 to 3 that represents how many columns (amount, merchant, date) are equal.
         """
 
         matching_fields: int = 0
@@ -167,8 +192,41 @@ class Reconcile_Session:
         self, row_id: int, new_merchant: DB_Merchant
     ) -> None:
         """
-        TODO Fill this in
+        Set the merchant for a statement transaction in the current reconcile session.
+
+        Args:
+            row_id: ID of the row to be edited.
+            new_merchant: New merchant.
         """
 
         self.reconcile_row_list[row_id].statement_trans.merchant = new_merchant
         self.match()
+
+    def committable(self) -> bool:
+        """
+        If all the statements have been matched.
+
+        Returns:
+            Boolean that represents if the session is committable.
+        """
+
+        for row in self.reconcile_row_list:
+            if not row.matched_trans:
+                return False
+
+        return True
+
+    def commit(self) -> None:
+        """
+        Try to commit the session.
+        """
+
+        if not self.committable():
+            raise RuntimeError("Session is not committable")
+
+        with Session(engine) as session:
+            for row in self.reconcile_row_list:
+                db_trans: DB_Transaction = row.matched_trans
+                db_trans.reconciled_status = True
+                session.add(db_trans)
+            session.commit()

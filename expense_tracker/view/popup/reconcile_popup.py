@@ -22,7 +22,7 @@ from expense_tracker.view.table.reconcile_tables import (
 
 class Reconcile_Popup(ModalScreen):
     """
-    TODO Fill this in
+    Popup that allows the user to reconcile database transactions with a statement.
     """
 
     DEFAULT_CSS: str = """
@@ -40,7 +40,8 @@ class Reconcile_Popup(ModalScreen):
 
     BINDINGS: list[Binding] = [
         Binding("escape", "exit_popup", "Dismiss popup"),
-        Binding("q", "kill_session", "Kill reconcile session"),
+        Binding("Q", "kill_session", "Kill reconcile session"),
+        Binding("S", "commit_reconcile", "Submit reconcile"),
     ]
 
     def __init__(
@@ -52,7 +53,14 @@ class Reconcile_Popup(ModalScreen):
         classes: Optional[str] = None,
     ) -> None:
         """
-        TODO Fill this in
+        Constructor
+
+        Args:
+            statement_path: Path to the statement csv.
+            account_id: ID of the account that the statement belongs to.
+            name: The name of the screen.
+            id: The ID of the screen in the DOM.
+            classes: The CSS classes for the screen.
         """
         super().__init__(name, id, classes)
 
@@ -69,7 +77,7 @@ class Reconcile_Popup(ModalScreen):
 
     def compose(self) -> ComposeResult:
         """
-        TODO Fill this in
+        Composes the display.
         """
 
         self._container: VerticalScroll = VerticalScroll()
@@ -88,7 +96,7 @@ class Reconcile_Popup(ModalScreen):
 
     def refresh_data(self) -> None:
         """
-        TODO Fill this in
+        Refreshes the data in each of the tables.
         """
 
         self._reconcile_table.refresh_data()
@@ -106,8 +114,27 @@ class Reconcile_Popup(ModalScreen):
 
     def action_kill_session(self) -> None:
         """
-        TODO Fill this in
+        Called when capital Q is pressed.
+
+        Kills the current session and dismisses popup.
         """
         Reconcile.kill_session()
         self.dismiss(None)
         self.app.notify("Killed session")
+
+    def action_commit_reconcile(self) -> None:
+        """
+        Attempts to commit the reconcile session.
+        """
+
+        if not Reconcile.committable():
+            self.notify(
+                "Reconcile failed, one or more statements is not matched.",
+                severity="error",
+            )
+            return
+
+        Reconcile.commit()
+        Reconcile.kill_session()
+        self.dismiss(None)
+        self.app.notify("Committed session")

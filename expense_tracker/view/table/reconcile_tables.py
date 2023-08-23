@@ -15,7 +15,7 @@ from expense_tracker.view.popup.options_input_popup import Options_Input_Popup
 
 class Reconcile_Table(Exptrack_Data_Table):
     """
-    TODO Fill this in
+    Table that shows the statement and matched database transactions.
     """
 
     COLUMN_LIST: list[tuple[str, Enum]] = [
@@ -37,14 +37,35 @@ class Reconcile_Table(Exptrack_Data_Table):
         id: Optional[str] = None,
         classes: Optional[str] = None,
     ) -> None:
+        """
+        Constructor
+
+        Args:
+            name: The name of the screen.
+            id: The ID of the screen in the DOM.
+            classes: The CSS classes for the screen.
+        """
+
         super().__init__(Reconcile, Reconcile_Table.COLUMN_LIST, name, id, classes)
 
-    def _get_row_data(self) -> list[tuple[str, ...]]:
+    def _get_row_data(self) -> list[tuple[str, str, str, str, str, str, str, str]]:
+        """
+        Gets the row data from presenter.
+
+        Return: List of row data in displayable format.
+        """
+
         return self.presenter.get_statement_list()
 
     def get_input_popup(self, column: str, id: int) -> Optional[ModalScreen]:
         """
-        Get the input popup based on the column
+        Get the input popup based on the column.
+
+        Args:
+            column: Column that the popup should be able to respond to.
+            id: ID of the row that was clicked.
+
+        Return: Popup in the form of a ModalScreen if one exists for the column. If there is no popup, then the column cannot be edited by the user.
         """
 
         if column == Reconcile.Full_Column.ST_MERCHANT:
@@ -62,14 +83,16 @@ class Reconcile_Table(Exptrack_Data_Table):
         self, message: Exptrack_Data_Table.Data_Edited
     ) -> None:
         """
-        TODO Fill this in
+        Called when table data is edited.
+
+        Refreshes the view with the new data.
         """
         self.parent.parent.refresh_data()
 
 
 class Possible_Match_Table(Exptrack_Data_Table):
     """
-    TODO Fill this in
+    Table that shows the possible matches of statement transactions that are not yet matched.
     """
 
     COLUMN_LIST: list[tuple[str, Enum]] = [
@@ -94,7 +117,7 @@ class Possible_Match_Table(Exptrack_Data_Table):
         super().__init__(Reconcile, Possible_Match_Table.COLUMN_LIST, name, id, classes)
 
     def _get_row_data(self) -> list[tuple[str, ...]]:
-        return self.presenter.get_error_list()
+        return self.presenter.get_possible_match_list()
 
     def get_input_popup(self, column: str, id: int) -> Optional[ModalScreen]:
         """
@@ -116,14 +139,16 @@ class Possible_Match_Table(Exptrack_Data_Table):
         self, message: Exptrack_Data_Table.Data_Edited
     ) -> None:
         """
-        TODO Fill this in
+        Called when table data is edited.
+
+        Refreshes the view with the new data.
         """
         self.parent.parent.refresh_data()
 
 
 class Orphan_Table(Exptrack_Data_Table):
     """
-    TODO Fill this in
+    Table that displays the orphans of the reconcile session.
     """
 
     COLUMN_LIST: list[tuple[str, Enum]] = [

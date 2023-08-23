@@ -19,13 +19,18 @@ from expense_tracker.model.orm.db_month_budget import DB_Month_Budget
 
 class DB_Util:
     """
-    TODO Fill this in
+    Database manipulation utility functions.
     """
 
     @staticmethod
     def get_merchant_from_description(description: str) -> Optional[DB_Merchant]:
         """
-        TODO Fill this out
+        Uses existing merchant naming rules to try to find a merchant for a given statement description.
+
+        Args:
+            description: Statement row description.
+
+        Return: DB_Merchant if one was found.
         """
         with Session(engine) as session:
             for merchant in session.query(DB_Merchant).all():
@@ -40,7 +45,12 @@ class DB_Util:
     @staticmethod
     def get_transaction_amount(transaction: DB_Transaction) -> float:
         """
-        TODO Fill this in
+        Get the total amount for a transaction.
+
+        Args:
+            transaction: Transaction whose amounts should be totaled.
+
+        Return: Amount total.
         """
 
         with Session(engine) as session:

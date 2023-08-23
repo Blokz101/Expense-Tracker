@@ -64,6 +64,11 @@ class Begin_Reconcile_Popup(ModalScreen):
     ) -> None:
         """
         Constructor
+
+        Args:
+            name: The name of the screen.
+            id: The ID of the screen in the DOM.
+            classes: The CSS classes for the screen.
         """
 
         self.statement_path: Optional[str] = None
@@ -73,7 +78,7 @@ class Begin_Reconcile_Popup(ModalScreen):
 
     def compose(self) -> ComposeResult:
         """
-        Composes the display
+        Composes the display.
         """
         self._container: Vertical = Vertical()
         self._statement_text: Static = Static("Input a statement path")
@@ -100,10 +105,13 @@ class Begin_Reconcile_Popup(ModalScreen):
 
     def on_mount(self) -> None:
         """
-        TODO Fill this in
+        Called when the widget mounts.
+
+        Checks for an ongoing session, if there is one then dismiss self and continue with ongoing session.
         """
         if Reconcile.ongoing_session():
             self.dismiss()
+            Reconcile.reconcile_session.match()
             self.app.push_screen(Reconcile_Popup())
 
     def action_exit_popup(self) -> None:
