@@ -7,11 +7,11 @@ class Constants:
     """
     General constants for the program
     """
-    
+
     # Textual
     VALIDATION_TEXT_ID: str = "validation_text"
     VALIDATION_BUTTON_ID: str = "validation_button"
-    
+
     VALIDATED_CLASS: str = "validated"
 
     # Date formats

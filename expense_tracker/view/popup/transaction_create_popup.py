@@ -28,10 +28,14 @@ class Transaction_Create_Popup(Create_Popup):
     Transaction specific create popup
     """
 
+    UNSETABLE_COLUMN_KEY_LIST: list[Transaction.Column] = [
+        Transaction.Column.ID,
+        Transaction.Column.RECONCILED_STATUS,
+    ]
+
     def __init__(
         self,
         parent_table: Exptrack_Data_Table,
-        excluded_column_key_list: Optional[list[Transaction.Column]] = None,
         import_list: Optional[list[Path]] = None,
         name: Optional[str] = None,
         id: Optional[str] = None,
@@ -41,7 +45,7 @@ class Transaction_Create_Popup(Create_Popup):
 
         super().__init__(
             parent_table,
-            excluded_column_key_list=excluded_column_key_list,
+            excluded_column_key_list=Transaction_Create_Popup.UNSETABLE_COLUMN_KEY_LIST,
             instructions=f"Import create for {self.import_photo.name}"
             if self.import_photo
             else "Manual create",
@@ -130,7 +134,6 @@ class Transaction_Create_Popup(Create_Popup):
             self.app.push_screen(
                 Transaction_Create_Popup(
                     self.parent_table,
-                    excluded_column_key_list=self.excluded_column_key_list,
                     import_list=self.import_list[1:],
                 )
             )

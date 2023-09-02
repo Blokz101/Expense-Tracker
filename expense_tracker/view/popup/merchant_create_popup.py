@@ -11,18 +11,21 @@ from expense_tracker.presenter.tag import Tag
 from expense_tracker.view.popup.create_popup import Create_Popup
 from expense_tracker.view.popup.toggle_input_popup import Toggle_Input_Popup
 
+
 class Merchant_Create_Popup(Create_Popup):
     """
     TODO Fill this in later
     """
-    
+
     def get_input_popup(self, column: str, id: int) -> Optional[ModalScreen]:
         """
         Gets the input popup to use for each column
         """
         if column == Merchant.Column.DEFAULT_TAGS:
             # If the tags are at None or their default value, then convert them to an empty list for ease of processing
-            selected_tag_id_list: list[int] = self.values[Merchant.Column.DEFAULT_TAGS].value
+            selected_tag_id_list: list[int] = self.values[
+                Merchant.Column.DEFAULT_TAGS
+            ].value
             if not selected_tag_id_list:
                 selected_tag_id_list = []
 

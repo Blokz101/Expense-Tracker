@@ -51,11 +51,6 @@ class Photo_Import_Popup(ModalScreen):
         }
     """
 
-    NON_REQUIRED_COLUMNS: list[Transaction.Column] = [
-        Transaction.Column.ID,
-        Transaction.Column.RECONCILED_STATUS,
-    ]
-
     BINDINGS: list[Binding] = [
         Binding("escape", "exit_import", "Dismiss all", priority=True),
     ]
@@ -156,7 +151,6 @@ class Photo_Import_Popup(ModalScreen):
             Transaction_Create_Popup(
                 self.parent_table,
                 import_list=Photo_Manager.photos_in_directory(path),
-                excluded_column_key_list=Photo_Import_Popup.NON_REQUIRED_COLUMNS,
             )
         )
 
