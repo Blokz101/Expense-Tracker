@@ -52,15 +52,7 @@ class Create_Popup(ModalScreen):
             border: $error;
         }
 
-        Create_Popup #validation_status {
-            color: $error;
-        }
-
-        .submittable #validation_status {
-            color: $accent;
-        }
-
-        .submittable > Vertical > DataTable {
+        .valid > Vertical > DataTable {
             border: $accent;
         }
     """
@@ -225,7 +217,7 @@ class Create_Popup(ModalScreen):
 
         # Update the validation widget's text and self's class
         if self.submittable() == True and not "submittable" in self.classes:
-            self.add_class("submittable")
+            self.add_class("valid")
             self._validation_status_widget.update("Submittable")
 
         if self.submittable() == False:

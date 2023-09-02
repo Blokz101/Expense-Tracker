@@ -7,15 +7,20 @@ class Constants:
     """
     General constants for the program
     """
+    
+    # Textual
+    VALIDATION_TEXT_ID: str = "validation_text"
+    VALIDATION_BUTTON_ID: str = "validation_button"
+    
+    VALIDATED_CLASS: str = "validated"
 
+    # Date formats
     DATE_FORMAT: str = "%a, %b %-d %Y"
-
     STATEMENT_DATE_FORMAT: str = "%m/%d/%Y"
-
     USER_INPUT_DATE_FORMAT: str = "%m/%d/%Y"
 
+    # File Paths
     SETTINGS_FILE_PATH: str = "settings.ini"
-
     CSS_FILE_PATH: str = "stylesheet.css"
 
     SUPPORTED_IMAGE_EXTENSIONS: tuple[str, ...] = (".png", ".jpg", ".jpeg")

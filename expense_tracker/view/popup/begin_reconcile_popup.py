@@ -46,10 +46,6 @@ class Begin_Reconcile_Popup(ModalScreen):
         Begin_Reconcile_Popup > Vertical {
             border: $error;
         }
-
-        .valid > Vertical {
-            border: $primary;
-        }
     """
 
     BINDINGS: list[Binding] = [
@@ -140,24 +136,12 @@ class Begin_Reconcile_Popup(ModalScreen):
             self.statement_path = event.value
         else:
             self.statement_path = None
-        self._update_valid_class()
 
     def on_selector_submitted(self, event: Selector.Submitted) -> None:
         """
         TODO Fill this in
         """
         self.account_id = event.option_id
-        self._update_valid_class()
-
-    def _update_valid_class(self) -> None:
-        """
-        TODO Fill this in
-        """
-
-        if self.submittable():
-            self.add_class("valid")
-        else:
-            self.remove_class("valid")
 
     def on_button_pressed(self) -> None:
         """
