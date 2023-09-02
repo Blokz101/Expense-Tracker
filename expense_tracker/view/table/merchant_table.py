@@ -15,7 +15,7 @@ from expense_tracker.presenter.tag import Tag
 from expense_tracker.view.table.exptrack_data_table import Exptrack_Data_Table
 from expense_tracker.view.popup.text_input_popup import Text_Input_Popup
 from expense_tracker.view.popup.detailed_data_popup import Detailed_Data_Popup
-from expense_tracker.view.popup.create_popup import Create_Popup
+from expense_tracker.view.popup.merchant_create_popup import Merchant_Create_Popup
 from expense_tracker.view.popup.toggle_input_popup import Toggle_Input_Popup
 
 
@@ -46,7 +46,7 @@ class Merchant_Table(Exptrack_Data_Table):
         Called when c is pressed.
         """
 
-        self.app.push_screen(Create_Popup(self))
+        self.app.push_screen(Merchant_Create_Popup(self))
 
     def action_expand(self) -> None:
         """
