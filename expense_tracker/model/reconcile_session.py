@@ -4,7 +4,7 @@ from pathlib import Path
 
 from typing import Optional
 
-from copy import copy
+from copy import deepcopy
 
 from dataclasses import dataclass
 
@@ -85,26 +85,30 @@ class Reconcile_Session:
         self.orphan_list = []
 
         # Create a list to keep track of the remaining database transactions
-        remaining_db_trans: list[DB_Transaction] = copy(self.db_trans_list)
+        remaining_db_trans: list[DB_Transaction] = deepcopy(self.db_trans_list)
 
-        # For each row check for matches, if there are any then record them and remove the database transaction form the remaining transactions list
-        for row in self.reconcile_row_list:
-            match: DB_Transaction = self._find_match(
-                row.statement_trans, remaining_db_trans
-            )
-            if match:
-                row.matched_trans = match
-                remaining_db_trans.remove(match)
+        with Session(engine) as session:
 
-        # Find possible matches for each non matched statement transaction
-        for row in self.reconcile_row_list:
-            # Dont find possible matches if a confirmed one is already found
-            if row.matched_trans:
-                continue
+            session.add_all(remaining_db_trans)
 
-            row.possible_match_list = self._find_possible_matches(
-                row.statement_trans, remaining_db_trans
-            )
+            # For each row check for matches, if there are any then record them and remove the database transaction form the remaining transactions list
+            for row in self.reconcile_row_list:
+                match: DB_Transaction = self._find_match(
+                    row.statement_trans, remaining_db_trans
+                )
+                if match:
+                    row.matched_trans = match
+                    remaining_db_trans.remove(match)
+
+            # Find possible matches for each non matched statement transaction
+            for row in self.reconcile_row_list:
+                # Dont find possible matches if a confirmed one is already found
+                if row.matched_trans:
+                    continue
+
+                row.possible_match_list = self._find_possible_matches(
+                    row.statement_trans, remaining_db_trans
+                )
 
         # Set the orphans list
         self.orphan_list = remaining_db_trans
@@ -127,7 +131,7 @@ class Reconcile_Session:
 
         # Check the statement trans against the remaining database trans, if one is a match return it.
         for db_trans in remaining_db_trans:
-            if self.matching_trans_fields(st_trans, db_trans) == 3:
+            if self._matching_trans_fields(st_trans, db_trans) == 3:
                 return db_trans
 
         # No matches were found
@@ -152,13 +156,13 @@ class Reconcile_Session:
 
         # Check the statement trans against the remaining database trans, if two out of three fields match then add it.
         for db_trans in remaining_db_trans:
-            if self.matching_trans_fields(st_trans, db_trans) == 2:
+            if self._matching_trans_fields(st_trans, db_trans) == 2:
                 possible_matches_list.append(db_trans)
 
         # Return the list
         return possible_matches_list
 
-    def matching_trans_fields(
+    def _matching_trans_fields(
         self, st_trans: ST_Transaction, db_trans: DB_Transaction
     ) -> int:
         """
@@ -173,20 +177,17 @@ class Reconcile_Session:
 
         matching_fields: int = 0
 
-        with Session(engine) as session:
-            session.add(db_trans)
+        # Check the amount
+        if abs(st_trans.amount) == abs(DB_Util.get_transaction_amount(db_trans)):
+            matching_fields += 1
 
-            # Check the amount
-            if abs(st_trans.amount) == abs(DB_Util.get_transaction_amount(db_trans)):
-                matching_fields += 1
+        # Check date
+        if st_trans.date.date() == db_trans.date.date():
+            matching_fields += 1
 
-            # Check date
-            if st_trans.date.date() == db_trans.date.date():
-                matching_fields += 1
-
-            # Check merchant
-            if st_trans.merchant and st_trans.merchant.id == db_trans.merchant.id:
-                matching_fields += 1
+        # Check merchant
+        if st_trans.merchant and st_trans.merchant.id == db_trans.merchant.id:
+            matching_fields += 1
 
         return matching_fields
 
@@ -227,8 +228,9 @@ class Reconcile_Session:
             raise RuntimeError("Session is not committable")
 
         with Session(engine) as session:
+
             for row in self.reconcile_row_list:
                 db_trans: DB_Transaction = row.matched_trans
-                db_trans.reconciled_status = True
                 session.add(db_trans)
+                db_trans.reconciled_status = True
             session.commit()
